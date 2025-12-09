@@ -1,0 +1,814 @@
+import React, { useState, useEffect } from 'react';
+import { Clock, BookOpen, Users, Upload, LogOut, CheckCircle, XCircle, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
+
+const VocabTestApp = () => {
+  const [mode, setMode] = useState('home');
+  const [teacherAuth, setTeacherAuth] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [answers, setAnswers] = useState([]);
+  const [currentAnswer, setCurrentAnswer] = useState('');
+  const [studentInfo, setStudentInfo] = useState({ name: '', class: '', pageFrom: '', pageTo: '' });
+  const [testResults, setTestResults] = useState(null);
+  const [vocabularyData, setVocabularyData] = useState([]);
+  const [allVocabulary, setAllVocabulary] = useState({});
+
+  // Klassenstufen-Konfiguration
+  const classGrades = ['5a', '5b', '5c', '5d', '6a', '6b', '6c', '6d', '7a', '7b', '7c', '7d', 
+                       '8a', '8b', '8c', '8d', '9a', '9b', '9c', '9d', '10a', '10b', '10c', '10d'];
+  
+  const pageRanges = {
+    '5': { min: 1, max: 50 },
+    '6': { min: 51, max: 100 },
+    '7': { min: 101, max: 150 },
+    '8': { min: 151, max: 202 },
+    '9': { min: 203, max: 226 },
+    '10': { min: 203, max: 227 }
+  };
+
+  // Vokabeln aus Klasse 10 (Seiten 203-227)
+  const grade10Vocab = {
+    203: [
+      { german: 'missbrauchen', english: 'to abuse', alternatives: ['abuse'] },
+      { german: 'der Missbrauch', english: 'abuse', alternatives: ['the abuse'] },
+      { german: 'die Zuneigung', english: 'affection', alternatives: [] },
+      { german: 'sich entschuldigen', english: 'to apologise', alternatives: ['apologise', 'to apologize', 'apologize'] },
+      { german: 'schikanieren', english: 'to bully', alternatives: ['bully'] },
+      { german: 'die Ursache', english: 'cause', alternatives: ['the cause'] },
+      { german: 'selbstbewusst', english: 'confident', alternatives: [] },
+      { german: 'verlangen', english: 'to demand', alternatives: ['demand'] },
+      { german: 'verdienen', english: 'to deserve', alternatives: ['deserve'] },
+      { german: 'enttäuschen', english: 'to disappoint', alternatives: ['disappoint'] },
+      { german: 'die Enttäuschung', english: 'disappointment', alternatives: ['the disappointment'] },
+      { german: 'in Verlegenheit bringen', english: 'to embarrass', alternatives: ['embarrass'] },
+      { german: 'ermutigen', english: 'to encourage', alternatives: ['encourage'] },
+      { german: 'gleich', english: 'equal', alternatives: [] },
+      { german: 'ausdrücken', english: 'to express', alternatives: ['express'] },
+      { german: 'fest', english: 'firm', alternatives: [] },
+      { german: 'die Lücke', english: 'gap', alternatives: ['the gap'] },
+      { german: 'schuldig', english: 'guilty', alternatives: [] },
+      { german: 'die Identität', english: 'identity', alternatives: ['the identity'] },
+      { german: 'beeindrucken', english: 'to impress', alternatives: ['impress'] }
+    ],
+    204: [
+      { german: 'der Eindruck', english: 'impression', alternatives: ['the impression'] },
+      { german: 'zunehmen', english: 'to increase', alternatives: ['increase'] },
+      { german: 'wahrscheinlich', english: 'likely', alternatives: [] },
+      { german: 'die Stimmung', english: 'mood', alternatives: ['the mood'] },
+      { german: 'naiv', english: 'naive', alternatives: [] },
+      { german: 'vernachlässigen', english: 'to neglect', alternatives: ['neglect'] },
+      { german: 'offensichtlich', english: 'obviously', alternatives: [] },
+      { german: 'Gleichaltrige/r', english: 'peer', alternatives: [] },
+      { german: 'jdn herumhacken auf', english: 'to pick on sb', alternatives: ['pick on sb', 'to pick on'] },
+      { german: 'der Druck', english: 'pressure', alternatives: ['the pressure'] },
+      { german: 'großziehen', english: 'to raise', alternatives: ['raise'] },
+      { german: 'die Beziehung', english: 'relationship', alternatives: ['the relationship'] },
+      { german: 'sich verlassen auf', english: 'to rely on', alternatives: ['rely on'] },
+      { german: 'der Respekt', english: 'respect', alternatives: ['the respect'] },
+      { german: 'die Verantwortung', english: 'responsibility', alternatives: ['the responsibility'] },
+      { german: 'das Selbstwertgefühl', english: 'self-esteem', alternatives: ['the self-esteem'] },
+      { german: 'sexuell', english: 'sexual', alternatives: [] },
+      { german: 'verwöhnen', english: 'to spoil', alternatives: ['spoil'] },
+      { german: 'streng', english: 'strict', alternatives: [] },
+      { german: 'leiden', english: 'to suffer', alternatives: ['suffer'] }
+    ],
+    205: [
+      { german: 'unterstützen', english: 'to support', alternatives: ['support'] },
+      { german: 'dankbar', english: 'thankful', alternatives: [] },
+      { german: 'das Vertrauen', english: 'trust', alternatives: ['the trust'] },
+      { german: 'ungerecht', english: 'unfair', alternatives: [] },
+      { german: 'unwahrscheinlich', english: 'unlikely', alternatives: [] },
+      { german: 'die Erziehung', english: 'upbringing', alternatives: ['the upbringing'] },
+      { german: 'das Opfer', english: 'victim', alternatives: ['the victim'] },
+      { german: 'sich zurückziehen', english: 'to withdraw', alternatives: ['withdraw'] },
+      { german: 'der Akzent', english: 'accent', alternatives: ['the accent'] },
+      { german: 'erwachsen', english: 'adult', alternatives: [] },
+      { german: 'der/die Erwachsene', english: 'adult', alternatives: ['the adult'] },
+      { german: 'furchtbar', english: 'awful', alternatives: [] },
+      { german: 'kaum', english: 'barely', alternatives: [] },
+      { german: 'fähig', english: 'capable', alternatives: ['capable of'] },
+      { german: 'behaupten', english: 'to claim', alternatives: ['claim'] },
+      { german: 'bestätigen', english: 'to confirm', alternatives: ['confirm'] },
+      { german: 'zufrieden', english: 'content', alternatives: [] },
+      { german: 'überzeugen', english: 'to convince', alternatives: ['convince'] },
+      { german: 'aktuell', english: 'current', alternatives: [] },
+      { german: 'wagen', english: 'to dare', alternatives: ['dare'] }
+    ],
+    206: [
+      { german: 'anständig', english: 'decent', alternatives: [] },
+      { german: 'bestimmt', english: 'definitely', alternatives: [] },
+      { german: 'verzweifelt', english: 'desperately', alternatives: [] },
+      { german: 'die Katastrophe', english: 'disaster', alternatives: ['the disaster'] },
+      { german: 'der Rand', english: 'edge', alternatives: ['the edge'] },
+      { german: 'ermöglichen', english: 'to enable', alternatives: ['enable'] },
+      { german: 'ganz', english: 'entire', alternatives: [] },
+      { german: 'die Ausnahme', english: 'exception', alternatives: ['the exception'] },
+      { german: 'existieren', english: 'to exist', alternatives: ['exist'] },
+      { german: 'zum Narren halten', english: 'to fool', alternatives: ['fool'] },
+      { german: 'zögern', english: 'to hesitate', alternatives: ['hesitate'] },
+      { german: 'die Ehre', english: 'honour', alternatives: ['honor', 'the honour', 'the honor'] },
+      { german: 'sofort', english: 'immediately', alternatives: [] },
+      { german: 'sich einmischen', english: 'to interfere', alternatives: ['interfere'] },
+      { german: 'die Grenze', english: 'limit', alternatives: ['the limit'] },
+      { german: 'bedeutend', english: 'major', alternatives: [] },
+      { german: 'geistig', english: 'mental', alternatives: [] },
+      { german: 'gewöhnlich', english: 'ordinary', alternatives: [] },
+      { german: 'körperlich', english: 'physical', alternatives: [] },
+      { german: 'potentiell', english: 'potential', alternatives: [] }
+    ],
+    207: [
+      { german: 'das Potential', english: 'potential', alternatives: ['the potential'] },
+      { german: 'praktisch', english: 'practically', alternatives: [] },
+      { german: 'vorhersagen', english: 'to predict', alternatives: ['predict'] },
+      { german: 'die Anwesenheit', english: 'presence', alternatives: ['the presence'] },
+      { german: 'richtig', english: 'proper', alternatives: ['properly'] },
+      { german: 'beweisen', english: 'to prove', alternatives: ['prove'] },
+      { german: 'drängen', english: 'to push', alternatives: ['push'] },
+      { german: 'schnell', english: 'rapidly', alternatives: [] },
+      { german: 'die Wirklichkeit', english: 'reality', alternatives: ['the reality'] },
+      { german: 'kürzlich', english: 'recently', alternatives: [] },
+      { german: 'lächerlich', english: 'ridiculous', alternatives: [] },
+      { german: 'selbstbewusst', english: 'self-confident', alternatives: [] },
+      { german: 'ernst', english: 'serious', alternatives: [] },
+      { german: 'die Situation', english: 'situation', alternatives: ['the situation'] },
+      { german: 'irgendwie', english: 'somehow', alternatives: [] },
+      { german: 'die Statistik', english: 'statistics', alternatives: ['the statistics'] },
+      { german: 'kämpfen', english: 'to struggle', alternatives: ['struggle'] },
+      { german: 'dumm', english: 'stupid', alternatives: [] },
+      { german: 'annehmen', english: 'to suppose', alternatives: ['suppose'] },
+      { german: 'traditionell', english: 'traditional', alternatives: [] }
+    ],
+    208: [
+      { german: 'im Gegensatz zu', english: 'unlike', alternatives: [] },
+      { german: 'die Gewalt', english: 'violence', alternatives: ['the violence'] },
+      { german: 'gewalttätig', english: 'violent', alternatives: [] },
+      { german: 'absolut', english: 'absolutely', alternatives: [] },
+      { german: 'beschuldigen', english: 'to accuse', alternatives: ['accuse'] },
+      { german: 'erreichen', english: 'to achieve', alternatives: ['achieve'] },
+      { german: 'eigentlich', english: 'actually', alternatives: [] },
+      { german: 'zugeben', english: 'to admit', alternatives: ['admit'] },
+      { german: 'das Ziel', english: 'aim', alternatives: ['the aim'] },
+      { german: 'erstaunt', english: 'amazed', alternatives: [] },
+      { german: 'beschämt', english: 'ashamed', alternatives: [] },
+      { german: 'bewusst', english: 'aware', alternatives: [] },
+      { german: 'mutig', english: 'brave', alternatives: [] },
+      { german: 'großartig', english: 'brilliant', alternatives: [] },
+      { german: 'die Kampagne', english: 'campaign', alternatives: ['the campaign'] },
+      { german: 'die Wohltätigkeitsorganisation', english: 'charity', alternatives: ['the charity'] },
+      { german: 'sich beschweren', english: 'to complain', alternatives: ['complain'] },
+      { german: 'völlig', english: 'completely', alternatives: [] },
+      { german: 'überzeugt', english: 'confident', alternatives: [] },
+      { german: 'Konsequenz', english: 'consequence', alternatives: ['the consequence'] }
+    ],
+    209: [
+      { german: 'ständig', english: 'constantly', alternatives: [] },
+      { german: 'beitragen', english: 'to contribute', alternatives: ['contribute'] },
+      { german: 'kritisieren', english: 'to criticise', alternatives: ['criticise', 'to criticize', 'criticize'] },
+      { german: 'entscheidend', english: 'crucial', alternatives: [] },
+      { german: 'definieren', english: 'to define', alternatives: ['define'] },
+      { german: 'die Definition', english: 'definition', alternatives: ['the definition'] },
+      { german: 'liefern', english: 'to deliver', alternatives: ['deliver'] },
+      { german: 'demonstrieren', english: 'to demonstrate', alternatives: ['demonstrate'] },
+      { german: 'bestreiten', english: 'to deny', alternatives: ['deny'] },
+      { german: 'verdienen', english: 'to deserve', alternatives: ['deserve'] },
+      { german: 'zerstören', english: 'to destroy', alternatives: ['destroy'] },
+      { german: 'die Würde', english: 'dignity', alternatives: ['the dignity'] },
+      { german: 'direkt', english: 'direct', alternatives: [] },
+      { german: 'die Richtung', english: 'direction', alternatives: ['the direction'] },
+      { german: 'benachteiligen', english: 'to disadvantage', alternatives: ['disadvantage'] },
+      { german: 'der Nachteil', english: 'disadvantage', alternatives: ['the disadvantage'] },
+      { german: 'Disziplin', english: 'discipline', alternatives: ['the discipline'] },
+      { german: 'Diskriminierung', english: 'discrimination', alternatives: ['the discrimination'] },
+      { german: 'diskutieren', english: 'to discuss', alternatives: ['discuss'] },
+      { german: 'einfach', english: 'easy', alternatives: [] }
+    ],
+    210: [
+      { german: 'die Wirkung', english: 'effect', alternatives: ['the effect'] },
+      { german: 'wirksam', english: 'effective', alternatives: [] },
+      { german: 'effizient', english: 'efficient', alternatives: [] },
+      { german: 'die Anstrengung', english: 'effort', alternatives: ['the effort'] },
+      { german: 'sich engagieren', english: 'to engage', alternatives: ['engage'] },
+      { german: 'enorm', english: 'enormous', alternatives: [] },
+      { german: 'sicherstellen', english: 'to ensure', alternatives: ['ensure'] },
+      { german: 'besonders', english: 'especially', alternatives: [] },
+      { german: 'etablieren', english: 'to establish', alternatives: ['establish'] },
+      { german: 'schätzen', english: 'to estimate', alternatives: ['estimate'] },
+      { german: 'die Schätzung', english: 'estimate', alternatives: ['the estimate', 'estimation'] },
+      { german: 'schließlich', english: 'eventually', alternatives: [] },
+      { german: 'Beweis', english: 'evidence', alternatives: ['the evidence'] },
+      { german: 'übertrieben', english: 'exaggerated', alternatives: [] },
+      { german: 'genau', english: 'exact', alternatives: [] },
+      { german: 'genau', english: 'exactly', alternatives: [] },
+      { german: 'übertreiben', english: 'to exaggerate', alternatives: ['exaggerate'] },
+      { german: 'prüfen', english: 'to examine', alternatives: ['examine'] },
+      { german: 'überschreiten', english: 'to exceed', alternatives: ['exceed'] },
+      { german: 'ausgezeichnet', english: 'excellent', alternatives: [] }
+    ],
+    211: [
+      { german: 'die Aufregung', english: 'excitement', alternatives: ['the excitement'] },
+      { german: 'ausschließen', english: 'to exclude', alternatives: ['exclude'] },
+      { german: 'die Übung', english: 'exercise', alternatives: ['the exercise'] },
+      { german: 'erschöpft', english: 'exhausted', alternatives: [] },
+      { german: 'erwarten', english: 'to expect', alternatives: ['expect'] },
+      { german: 'die Erwartung', english: 'expectation', alternatives: ['the expectation'] },
+      { german: 'erleben', english: 'to experience', alternatives: ['experience'] },
+      { german: 'die Erfahrung', english: 'experience', alternatives: ['the experience'] },
+      { german: 'erklären', english: 'to explain', alternatives: ['explain'] },
+      { german: 'die Erklärung', english: 'explanation', alternatives: ['the explanation'] },
+      { german: 'erforschen', english: 'to explore', alternatives: ['explore'] },
+      { german: 'der Ausdruck', english: 'expression', alternatives: ['the expression'] },
+      { german: 'extrem', english: 'extreme', alternatives: [] },
+      { german: 'das Gesicht', english: 'face', alternatives: ['the face'] },
+      { german: 'gegenüberstehen', english: 'to face', alternatives: ['face'] },
+      { german: 'die Einrichtung', english: 'facility', alternatives: ['the facility'] },
+      { german: 'die Tatsache', english: 'fact', alternatives: ['the fact'] },
+      { german: 'scheitern', english: 'to fail', alternatives: ['fail'] },
+      { german: 'das Scheitern', english: 'failure', alternatives: ['the failure'] },
+      { german: 'fair', english: 'fair', alternatives: [] }
+    ],
+    212: [
+      { german: 'fantastisch', english: 'fantastic', alternatives: [] },
+      { german: 'faszinierend', english: 'fascinating', alternatives: [] },
+      { german: 'die Mode', english: 'fashion', alternatives: ['the fashion'] },
+      { german: 'die Angst', english: 'fear', alternatives: ['the fear'] },
+      { german: 'fürchten', english: 'to fear', alternatives: ['fear'] },
+      { german: 'das Merkmal', english: 'feature', alternatives: ['the feature'] },
+      { german: 'füttern', english: 'to feed', alternatives: ['feed'] },
+      { german: 'das Gefühl', english: 'feeling', alternatives: ['the feeling'] },
+      { german: 'kämpfen', english: 'to fight', alternatives: ['fight'] },
+      { german: 'der Kampf', english: 'fight', alternatives: ['the fight'] },
+      { german: 'die Figur', english: 'figure', alternatives: ['the figure'] },
+      { german: 'schließlich', english: 'finally', alternatives: [] },
+      { german: 'finanziell', english: 'financial', alternatives: [] },
+
+  // Lade gespeicherte Vokabeln beim Start
+  useEffect(() => {
+    const loadVocab = async () => {
+      try {
+        const result = await window.storage.get('all-vocabulary');
+        if (result) {
+          setAllVocabulary(JSON.parse(result.value));
+        } else {
+          // Speichere Klasse 10 Vokabeln initial
+          await window.storage.set('all-vocabulary', JSON.stringify(grade10Vocab));
+          setAllVocabulary(grade10Vocab);
+        }
+      } catch (error) {
+        setAllVocabulary(grade10Vocab);
+      }
+    };
+    loadVocab();
+  }, []);
+
+  // Timer
+  useEffect(() => {
+    if (mode === 'test' && timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (mode === 'test' && timeLeft === 0) {
+      handleNextQuestion();
+    }
+  }, [timeLeft, mode]);
+
+  // Intelligente Antwortprüfung
+  const checkAnswer = (userAnswer, correctAnswer, alternatives) => {
+    const normalize = (str) => str.toLowerCase().trim().replace(/[.,!?;]/g, '');
+    const normalized = normalize(userAnswer);
+    const correct = normalize(correctAnswer);
+    
+    if (normalized === correct) return true;
+    if (alternatives && alternatives.some(alt => normalize(alt) === normalized)) return true;
+    if (levenshteinDistance(normalized, correct) <= 1 && normalized.length > 3) return true;
+    
+    if (alternatives) {
+      for (const alt of alternatives) {
+        if (levenshteinDistance(normalized, normalize(alt)) <= 1 && normalized.length > 3) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  };
+
+  const levenshteinDistance = (str1, str2) => {
+    const matrix = [];
+    for (let i = 0; i <= str2.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= str1.length; j++) matrix[0][j] = j;
+    
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[str2.length][str1.length];
+  };
+
+  const getGradeFromClass = (classStr) => {
+    return classStr ? classStr.charAt(0) + (classStr.length > 2 ? classStr.charAt(1) : '') : '';
+  };
+
+  const getAvailablePages = () => {
+    const grade = getGradeFromClass(studentInfo.class);
+    const range = pageRanges[grade];
+    if (!range) return [];
+    
+    const pages = [];
+    for (let i = range.min; i <= range.max; i++) {
+      if (allVocabulary[i]) pages.push(i);
+    }
+    return pages;
+  };
+
+  const startTest = () => {
+    const from = parseInt(studentInfo.pageFrom);
+    const to = parseInt(studentInfo.pageTo);
+    
+    let vocabList = [];
+    for (let page = from; page <= to; page++) {
+      if (allVocabulary[page]) {
+        vocabList = [...vocabList, ...allVocabulary[page]];
+      }
+    }
+    
+    // Mische Vokabeln
+    vocabList = vocabList.sort(() => Math.random() - 0.5).slice(0, 20);
+    
+    setVocabularyData(vocabList);
+    setCurrentQuestion(0);
+    setAnswers([]);
+    setTimeLeft(15);
+    setMode('test');
+  };
+
+  const handleNextQuestion = () => {
+    const vocab = vocabularyData;
+    const isCorrect = checkAnswer(
+      currentAnswer,
+      vocab[currentQuestion].english,
+      vocab[currentQuestion].alternatives
+    );
+
+    const newAnswers = [...answers, {
+      question: vocab[currentQuestion].german,
+      correct: vocab[currentQuestion].english,
+      userAnswer: currentAnswer || '[keine Antwort]',
+      isCorrect: isCorrect,
+      timeUsed: 15 - timeLeft
+    }];
+
+    setAnswers(newAnswers);
+    setCurrentAnswer('');
+
+    if (currentQuestion + 1 < vocab.length) {
+      setCurrentQuestion(currentQuestion + 1);
+      setTimeLeft(15);
+    } else {
+      finishTest(newAnswers);
+    }
+  };
+
+  const finishTest = async (finalAnswers) => {
+    const score = finalAnswers.filter(a => a.isCorrect).length;
+    const result = {
+      studentName: studentInfo.name,
+      class: studentInfo.class,
+      pageFrom: studentInfo.pageFrom,
+      pageTo: studentInfo.pageTo,
+      score: score,
+      total: finalAnswers.length,
+      answers: finalAnswers,
+      date: new Date().toLocaleString('de-DE')
+    };
+    
+    setTestResults(result);
+    
+    try {
+      const historyResult = await window.storage.get('test-history');
+      let history = [];
+      if (historyResult) history = JSON.parse(historyResult.value);
+      history.push(result);
+      await window.storage.set('test-history', JSON.stringify(history));
+    } catch (error) {
+      console.error('Fehler beim Speichern:', error);
+    }
+    
+    setMode('results');
+  };
+
+  const teacherLogin = (password) => {
+    if (password === 'lehrer123') {
+      setTeacherAuth(true);
+      setMode('teacherDash');
+    } else {
+      alert('Falsches Passwort');
+    }
+  };
+
+  const handleExcelUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      
+      const vocabByPage = {};
+      let currentPage = null;
+      
+      for (const row of jsonData) {
+        if (!row[0]) continue;
+        
+        // Prüfe ob es eine Seitenzahl ist
+        if (typeof row[0] === 'number' || !isNaN(parseInt(row[0]))) {
+          currentPage = parseInt(row[0]);
+          vocabByPage[currentPage] = [];
+        } else if (currentPage && row[0] && row[1]) {
+          vocabByPage[currentPage].push({
+            german: row[0].toString(),
+            english: row[1].toString(),
+            alternatives: row[2] ? row[2].toString().split(',').map(s => s.trim()) : []
+          });
+        }
+      }
+      
+      const updatedVocab = { ...allVocabulary, ...vocabByPage };
+      setAllVocabulary(updatedVocab);
+      await window.storage.set('all-vocabulary', JSON.stringify(updatedVocab));
+      alert('Vokabeln erfolgreich hochgeladen!');
+    } catch (error) {
+      alert('Fehler beim Laden der Excel-Datei: ' + error.message);
+    }
+  };
+
+  // Home Screen
+  if (mode === 'home') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-4xl mx-auto pt-20">
+          <div className="text-center mb-12">
+            <BookOpen className="w-20 h-20 mx-auto mb-4 text-indigo-600" />
+            <h1 className="text-5xl font-bold text-gray-800 mb-2">Vokabeltest</h1>
+            <p className="text-gray-600">Wähle deinen Bereich aus</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <button
+              onClick={() => setMode('student')}
+              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <Users className="w-16 h-16 mx-auto mb-4 text-blue-500" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Schüler</h2>
+              <p className="text-gray-600">Starte einen Vokabeltest</p>
+            </button>
+            
+            <button
+              onClick={() => {
+                const pw = prompt('Lehrer-Passwort:');
+                if (pw) teacherLogin(pw);
+              }}
+              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <Upload className="w-16 h-16 mx-auto mb-4 text-green-500" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Lehrer</h2>
+              <p className="text-gray-600">Ergebnisse einsehen</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Schüler-Eingabe
+  if (mode === 'student') {
+    const availablePages = getAvailablePages();
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-2xl mx-auto pt-20">
+          <button onClick={() => setMode('home')} className="mb-4 text-indigo-600 hover:text-indigo-800">
+            ← Zurück
+          </button>
+          
+          <div className="bg-white p-8 rounded-2xl shadow-lg">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6">Schüler-Anmeldung</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-gray-700 mb-2 font-medium">Name *</label>
+                <input
+                  type="text"
+                  value={studentInfo.name}
+                  onChange={(e) => setStudentInfo({...studentInfo, name: e.target.value})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Max Mustermann"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 mb-2 font-medium">Klasse *</label>
+                <select
+                  value={studentInfo.class}
+                  onChange={(e) => setStudentInfo({...studentInfo, class: e.target.value, pageFrom: '', pageTo: ''})}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">Wähle deine Klasse</option>
+                  {classGrades.map(grade => (
+                    <option key={grade} value={grade}>{grade}</option>
+                  ))}
+                </select>
+              </div>
+              
+              {studentInfo.class && (
+                <>
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Von Seite *</label>
+                    <select
+                      value={studentInfo.pageFrom}
+                      onChange={(e) => setStudentInfo({...studentInfo, pageFrom: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="">Wähle Startseite</option>
+                      {availablePages.map(page => (
+                        <option key={page} value={page}>Seite {page}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Bis Seite *</label>
+                    <select
+                      value={studentInfo.pageTo}
+                      onChange={(e) => setStudentInfo({...studentInfo, pageTo: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      disabled={!studentInfo.pageFrom}
+                    >
+                      <option value="">Wähle Endseite</option>
+                      {availablePages
+                        .filter(page => page >= parseInt(studentInfo.pageFrom))
+                        .map(page => (
+                          <option key={page} value={page}>Seite {page}</option>
+                        ))}
+                    </select>
+                  </div>
+                </>
+              )}
+              
+              <button
+                onClick={startTest}
+                disabled={!studentInfo.name || !studentInfo.class || !studentInfo.pageFrom || !studentInfo.pageTo}
+                className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              >
+                Test starten
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Test-Modus
+  if (mode === 'test') {
+    const vocab = vocabularyData;
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-2xl mx-auto pt-10">
+          <div className="bg-white p-8 rounded-2xl shadow-lg">
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-gray-600">Frage {currentQuestion + 1} von {vocab.length}</span>
+              <div className={`flex items-center gap-2 ${timeLeft <= 5 ? 'text-red-600' : 'text-gray-600'}`}>
+                <Clock className="w-5 h-5" />
+                <span className="text-xl font-bold">{timeLeft}s</span>
+              </div>
+            </div>
+            
+            <div className="mb-8">
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div
+                  className="bg-indigo-600 h-2 rounded-full transition-all"
+                  style={{ width: `${((currentQuestion + 1) / vocab.length) * 100}%` }}
+                />
+              </div>
+            </div>
+            
+            <div className="text-center mb-8">
+              <p className="text-gray-600 mb-2">Übersetze ins Deutsche:</p>
+              <h3 className="text-4xl font-bold text-gray-800">{vocab[currentQuestion].german}</h3>
+            </div>
+            
+            <input
+              type="text"
+              value={currentAnswer}
+              onChange={(e) => setCurrentAnswer(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleNextQuestion()}
+              className="w-full p-4 border-2 border-gray-300 rounded-lg text-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="Deine Antwort..."
+              autoFocus
+            />
+            
+            <button
+              onClick={handleNextQuestion}
+              className="w-full mt-4 bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors"
+            >
+              Weiter
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Ergebnisse
+  if (mode === 'results') {
+    const percentage = (testResults.score / testResults.total * 100).toFixed(0);
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-3xl mx-auto pt-10">
+          <div className="bg-white p-8 rounded-2xl shadow-lg">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Test abgeschlossen!</h2>
+              <div className="text-6xl font-bold mb-2" style={{color: percentage >= 50 ? '#10b981' : '#ef4444'}}>
+                {testResults.score}/{testResults.total}
+              </div>
+              <p className="text-gray-600 text-xl">{percentage}% richtig</p>
+              <p className="text-gray-500 mt-2">Seite {testResults.pageFrom} bis {testResults.pageTo}</p>
+            </div>
+            
+            <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+              {testResults.answers.map((answer, idx) => (
+                <div key={idx} className={`p-4 rounded-lg border-2 ${answer.isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+                  <div className="flex items-start gap-3">
+                    {answer.isCorrect ? (
+                      <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                    ) : (
+                      <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-800">{answer.question}</p>
+                      <p className="text-gray-600">
+                        Deine Antwort: <span className={answer.isCorrect ? 'text-green-600' : 'text-red-600'}>{answer.userAnswer}</span>
+                      </p>
+                      {!answer.isCorrect && (
+                        <p className="text-gray-600">Richtig: <span className="text-green-600">{answer.correct}</span></p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => {
+                setMode('home');
+                setStudentInfo({ name: '', class: '', pageFrom: '', pageTo: '' });
+              }}
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors"
+            >
+              Neuer Test
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Lehrer-Dashboard
+  if (mode === 'teacherDash') {
+    const [testHistory, setTestHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+      const loadHistory = async () => {
+        try {
+          const result = await window.storage.get('test-history');
+          if (result) {
+            setTestHistory(JSON.parse(result.value));
+          }
+        } catch (error) {
+          console.log('Keine Historie gefunden');
+        }
+        setLoading(false);
+      };
+      loadHistory();
+    }, []);
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="max-w-6xl mx-auto pt-10">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold text-gray-800">Lehrer-Dashboard</h2>
+            <button
+              onClick={() => {
+                setTeacherAuth(false);
+                setMode('home');
+              }}
+              className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            >
+              <LogOut className="w-4 h-4" />
+              Abmelden
+            </button>
+          </div>
+          
+          <div className="bg-white p-6 rounded-2xl shadow-lg mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Vokabeln verwalten</h3>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 cursor-pointer">
+                <Upload className="w-4 h-4" />
+                Excel hochladen
+                <input
+                  type="file"
+                  accept=".xls,.xlsx"
+                  onChange={handleExcelUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            <p className="text-sm text-gray-600 mt-2">
+              Lade eine Excel-Datei mit Vokabeln hoch. Format: Seite | Englisch | Deutsch | Alternativen (optional)
+            </p>
+          </div>
+          
+          <div className="bg-white p-6 rounded-2xl shadow-lg mb-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Übersicht</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-gray-600">Tests absolviert</p>
+                <p className="text-3xl font-bold text-blue-600">{testHistory.length}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <p className="text-gray-600">Durchschnitt</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {testHistory.length > 0 
+                    ? (testHistory.reduce((sum, t) => sum + (t.score/t.total*100), 0) / testHistory.length).toFixed(0)
+                    : 0}%
+                </p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <p className="text-gray-600">Schüler</p>
+                <p className="text-3xl font-bold text-purple-600">
+                  {new Set(testHistory.map(t => t.studentName)).size}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Test-Historie</h3>
+            {loading ? (
+              <p className="text-gray-600 text-center py-8">Lade Daten...</p>
+            ) : testHistory.length === 0 ? (
+              <p className="text-gray-600 text-center py-8">Noch keine Tests absolviert</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4">Datum</th>
+                      <th className="text-left py-3 px-4">Name</th>
+                      <th className="text-left py-3 px-4">Klasse</th>
+                      <th className="text-left py-3 px-4">Seiten</th>
+                      <th className="text-left py-3 px-4">Ergebnis</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {testHistory.slice().reverse().map((test, idx) => (
+                      <tr key={idx} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-4">{test.date}</td>
+                        <td className="py-3 px-4">{test.studentName}</td>
+                        <td className="py-3 px-4">{test.class}</td>
+                        <td className="py-3 px-4">{test.pageFrom}-{test.pageTo}</td>
+                        <td className="py-3 px-4">
+                          <span className={`font-bold ${test.score/test.total >= 0.5 ? 'text-green-600' : 'text-red-600'}`}>
+                            {test.score}/{test.total} ({(test.score/test.total*100).toFixed(0)}%)
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default VocabTestApp;
