@@ -32,7 +32,7 @@
       font-size: 1.8em;
     }
     .screen { display: none; }
-    .screen.active { display: block; }
+    .screen.active { display: block !important; }
     
     .form-group {
       margin: 20px 0;
@@ -580,13 +580,10 @@
         updateLoadingStatus('✓ Firebase bereit!');
         
         // Zeige Login-Screen explizit an
-        setTimeout(() => {
-          document.getElementById('loadingScreen').style.display = 'none';
-          const loginScreen = document.getElementById('loginScreen');
-          loginScreen.classList.add('active');
-          loginScreen.style.display = 'block';
-          console.log('Login Screen sollte jetzt sichtbar sein');
-        }, 100);
+        document.getElementById('loadingScreen').style.display = 'none';
+        const loginScreen = document.getElementById('loginScreen');
+        loginScreen.style.display = 'block';
+        console.log('Login Screen angezeigt');
       } catch (e) {
         document.getElementById('loadingScreen').innerHTML = 
           '<p style="color: #e74c3c;">❌ Firebase Fehler: ' + e.message + '</p>';
