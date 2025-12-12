@@ -280,6 +280,11 @@
       border-radius: 8px;
       display: none;
     }
+    .checking {
+      background: #d1ecf1;
+      color: #0c5460;
+      display: block;
+    }
     .success { background: #d4edda; color: #155724; display: block; }
     .error { background: #f8d7da; color: #721c24; display: block; }
     .info { background: #d1ecf1; color: #0c5460; display: block; }
@@ -407,6 +412,7 @@
   
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
   
   <script>
   const firebaseConfig = {
@@ -430,6 +436,10 @@
   let timer = null;
   let timeLeft = 15;
   let firebaseReady = false;
+  
+  // WICHTIG: Hier deinen Anthropic API Key eintragen!
+  // Du bekommst ihn auf: https://console.anthropic.com/settings/keys
+  const ANTHROPIC_API_KEY = "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"; // HIER EINTRAGEN!
   
   function updateLoadingStatus(msg) {
     const el = document.getElementById('loadingStatus');
@@ -609,6 +619,8 @@
     const grid = document.getElementById('pageGrid');
     grid.innerHTML = '';
     
+    console.log("Erstelle Grid mit Performance:", userPerformance);
+    
     pages.forEach(page => {
       const vocabCount = allVocabs.filter(v => parseInt(v.Page) === page).length;
       const box = document.createElement('div');
@@ -618,6 +630,8 @@
       const pageKey = 'page_' + page;
       const perf = userPerformance[pageKey];
       
+      console.log("Seite", page, "Performance:", perf);
+      
       if (vocabCount < 5) {
         box.classList.add('disabled');
       } else {
@@ -625,11 +639,16 @@
         if (perf && perf.percent !== undefined) {
           if (perf.percent >= 80) {
             box.classList.add('green');
+            console.log("Seite", page, "wird GRÜN (", perf.percent, "%)");
           } else if (perf.percent >= 50) {
             box.classList.add('yellow');
+            console.log("Seite", page, "wird GELB (", perf.percent, "%)");
           } else {
             box.classList.add('red');
+            console.log("Seite", page, "wird ROT (", perf.percent, "%)");
           }
+        } else {
+          console.log("Seite", page, "keine Performance-Daten");
         }
       }
       
@@ -741,8 +760,6 @@
     
     const vocab = quizVocabs[currentQuestionIndex];
     const userAnswer = document.getElementById('answerInput').value.trim();
-    const correctAnswer = vocab.English.toLowerCase();
-    const isCorrect = userAnswer.toLowerCase() === correctAnswer;
     
     if (timeout) {
       answers.push({
@@ -753,25 +770,102 @@
       });
       document.getElementById('feedback').textContent = "⏰ Zeit abgelaufen! Richtig wäre: " + vocab.English;
       document.getElementById('feedback').className = 'feedback wrong';
-    } else {
-      if (isCorrect) {
-        score++;
-        document.getElementById('feedback').textContent = "✓ Richtig!";
-        document.getElementById('feedback').className = 'feedback correct';
-      } else {
-        document.getElementById('feedback').textContent = "✗ Falsch! Richtig: " + vocab.English;
-        document.getElementById('feedback').className = 'feedback wrong';
-      }
+      document.getElementById('submitBtn').disabled = true;
       
-      answers.push({
-        question: vocab.German,
-        correct: vocab.English,
-        user: userAnswer || "(keine Antwort)",
-        isCorrect: isCorrect
-      });
+      setTimeout(() => {
+        currentQuestionIndex++;
+        showQuestion();
+      }, 2000);
+      return;
     }
     
+    // Zeige "Wird geprüft..." Nachricht
+    document.getElementById('feedback').textContent = "🤔 Prüfe Antwort...";
+    document.getElementById('feedback').className = 'feedback checking';
     document.getElementById('submitBtn').disabled = true;
+    
+    // Prüfe Antwort mit AI
+    checkAnswerWithAI(userAnswer, vocab);
+  }
+  
+  async function checkAnswerWithAI(userAnswer, vocab) {
+    const correctAnswer = vocab.English;
+    
+    // Exakte Übereinstimmung? Sofort richtig!
+    if (userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim()) {
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // Kein API Key? Nur exakte Übereinstimmung
+    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === "") {
+      handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    try {
+      // Rufe Anthropic API auf
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 50,
+          messages: [{
+            role: "user",
+            content: `Du bist ein Englischlehrer. Ist die folgende Übersetzung korrekt oder akzeptabel?
+
+Deutsche Vokabel: "${vocab.German}"
+Richtige englische Übersetzung: "${correctAnswer}"
+Schülerantwort: "${userAnswer}"
+
+Antworte NUR mit "RICHTIG" oder "FALSCH". Akzeptiere Synonyme und kleinere Variationen.`
+          }]
+        })
+      });
+      
+      if (!response.ok) {
+        console.error("API Fehler:", response.status);
+        // Bei Fehler: nur exakte Übereinstimmung
+        handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+        return;
+      }
+      
+      const data = await response.json();
+      const aiResponse = data.content[0].text.toUpperCase();
+      const isCorrect = aiResponse.includes("RICHTIG");
+      
+      console.log("AI sagt:", aiResponse, "-> isCorrect:", isCorrect);
+      
+      handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer);
+      
+    } catch (error) {
+      console.error("Fehler bei AI-Prüfung:", error);
+      // Bei Fehler: nur exakte Übereinstimmung
+      handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+    }
+  }
+  
+  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer) {
+    if (isCorrect) {
+      score++;
+      document.getElementById('feedback').textContent = "✓ Richtig!";
+      document.getElementById('feedback').className = 'feedback correct';
+    } else {
+      document.getElementById('feedback').textContent = "✗ Falsch! Richtig: " + correctAnswer;
+      document.getElementById('feedback').className = 'feedback wrong';
+    }
+    
+    answers.push({
+      question: vocab.German,
+      correct: correctAnswer,
+      user: userAnswer || "(keine Antwort)",
+      isCorrect: isCorrect
+    });
     
     setTimeout(() => {
       currentQuestionIndex++;
@@ -845,6 +939,7 @@
   }
   
   function backToSelection() {
+    // Lade Performance neu, damit die Farben aktualisiert werden
     showPageSelection();
   }
   
