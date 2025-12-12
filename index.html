@@ -628,13 +628,18 @@
     }
     
     try {
+      console.log("Login Versuch für:", name);
       const snap = await db.ref('users/' + name).get();
+      console.log("User snapshot erhalten, exists:", snap.exists());
+      
       if (!snap.exists()) {
         showStatus("User nicht gefunden!", 'error');
         return;
       }
       
       const data = snap.val();
+      console.log("User Daten:", data);
+      
       if (data.password !== pass) {
         showStatus("Falsches Passwort!", 'error');
         return;
@@ -656,12 +661,17 @@
         jahrgang: jahrgang 
       };
       userPerformance = data.performance || {};
+      
+      console.log("Rufe loadVocabs auf...");
       await loadVocabs();
+      console.log("loadVocabs beendet, rufe showPageSelection auf...");
       showPageSelection();
+      console.log("showPageSelection beendet");
       
     } catch (error) {
       showStatus("Fehler: " + error.message, 'error');
       console.error("Login Error:", error);
+      console.error("Error stack:", error.stack);
     }
   }
   
