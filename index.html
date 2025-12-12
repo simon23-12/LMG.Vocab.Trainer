@@ -425,7 +425,7 @@
     appId: "1:743231387214:web:166169b25f72616280351f"
   };
   
-  let app, db;
+  let app, db, functions;
   let currentUser = null;
   let userPerformance = {};
   let allVocabs = [];
@@ -436,10 +436,6 @@
   let timer = null;
   let timeLeft = 15;
   let firebaseReady = false;
-  
-  // WICHTIG: Hier deinen Anthropic API Key eintragen!
-  // Du bekommst ihn auf: https://console.anthropic.com/settings/keys
-  const ANTHROPIC_API_KEY = "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"; // HIER EINTRAGEN!
   
   function updateLoadingStatus(msg) {
     const el = document.getElementById('loadingStatus');
@@ -469,6 +465,7 @@
       try {
         app = firebase.initializeApp(firebaseConfig);
         db = firebase.database();
+        functions = firebase.functions();
         firebaseReady = true;
         updateLoadingStatus('✓ Firebase bereit!');
         document.getElementById('loadingScreen').style.display = 'none';
@@ -797,65 +794,22 @@
       return;
     }
     
-    // Kein API Key? Nur exakte Übereinstimmung
-    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === "") {
-      handleAnswerResult(false, userAnswer, vocab, correctAnswer);
-      return;
-    }
-    
     try {
-      // Rufe Anthropic API auf
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01"
-        },
-        body: JSON.stringify({
-          model: "claude-haiku-4-5-20251001",
-          max_tokens: 10,
-          messages: [{
-            role: "user",
-            content: `Is this English translation correct or acceptable?
-
-German word: "${vocab.German}"
-Correct English: "${correctAnswer}"
-Student answer: "${userAnswer}"
-
-Reply ONLY with "CORRECT" or "WRONG". Accept synonyms and minor variations.`
-          }]
-        })
+      // Rufe Firebase Cloud Function auf
+      const checkVocab = functions.httpsCallable('checkVocab');
+      const result = await checkVocab({
+        german: vocab.German,
+        correct: correctAnswer,
+        userAnswer: userAnswer
       });
       
-      if (!response.ok) {
-        console.error("API Fehler:", response.status);
-        // Bei Fehler: nur exakte Übereinstimmung
-        handleAnswerResult(false, userAnswer, vocab, correctAnswer);
-        return;
-      }
+      console.log("AI sagt:", result.data.aiResponse, "-> isCorrect:", result.data.isCorrect);
       
-      const data = await response.json();
-      console.log("API Antwort (vollständig):", data);
-      
-      const aiResponse = data.content[0].text.trim();
-      console.log("AI Text:", aiResponse);
-      
-      // Prüfe auf verschiedene Arten von "richtig"
-      const responseUpper = aiResponse.toUpperCase();
-      const isCorrect = responseUpper.includes("RICHTIG") || 
-                        responseUpper.includes("CORRECT") || 
-                        responseUpper.includes("YES") || 
-                        responseUpper.includes("JA") ||
-                        responseUpper.startsWith("R"); // Falls nur "RICHTIG" ohne mehr
-      
-      console.log("AI sagt:", aiResponse, "-> Interpretation: isCorrect =", isCorrect);
-      
-      handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer);
+      handleAnswerResult(result.data.isCorrect, userAnswer, vocab, correctAnswer);
       
     } catch (error) {
       console.error("Fehler bei AI-Prüfung:", error);
-      // Bei Fehler: nur exakte Übereinstimmung
+      // Bei Fehler: nur exakte Übereinstimmung zählt als falsch
       handleAnswerResult(false, userAnswer, vocab, correctAnswer);
     }
   }
