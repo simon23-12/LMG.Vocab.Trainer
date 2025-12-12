@@ -2,10 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vokabeltrainer - Jahrgang 10</title>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -36,7 +34,6 @@
     .screen { display: none; }
     .screen.active { display: block; }
     
-    /* Login/Register Screen */
     .form-group {
       margin: 20px 0;
     }
@@ -81,7 +78,6 @@
       transform: none;
     }
     
-    /* Page Selection */
     .interval-selector {
       display: flex;
       gap: 20px;
@@ -90,6 +86,7 @@
       padding: 20px;
       background: #f8f9fa;
       border-radius: 10px;
+      flex-wrap: wrap;
     }
     .interval-selector label {
       font-weight: 600;
@@ -128,7 +125,6 @@
       opacity: 0.5;
     }
     
-    /* Quiz Screen */
     .quiz-header {
       display: flex;
       justify-content: space-between;
@@ -203,7 +199,6 @@
       color: #721c24;
     }
     
-    /* Results Screen */
     .score-display {
       text-align: center;
       margin: 40px 0;
@@ -265,16 +260,26 @@
     .success { background: #d4edda; color: #155724; display: block; }
     .error { background: #f8d7da; color: #721c24; display: block; }
     .info { background: #d1ecf1; color: #0c5460; display: block; }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 20px;
+      color: #667eea;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>📚 Vokabeltrainer Jahrgang 10</h1>
     
+    <div id="loadingScreen" class="loading">
+      <p>⏳ Lade Firebase...</p>
+      <p id="loadingStatus" style="font-size: 14px; margin-top: 10px;"></p>
+    </div>
+    
     <div id="status"></div>
     
-    <!-- Login/Register Screen -->
-    <div id="loginScreen" class="screen active">
+    <div id="loginScreen" class="screen">
       <h2>Registrieren</h2>
       <div class="form-group">
         <label>Name:</label>
@@ -308,7 +313,6 @@
       <button onclick="login()">Login</button>
     </div>
     
-    <!-- Page Selection Screen -->
     <div id="pageSelectionScreen" class="screen">
       <h2>Willkommen, <span id="userName"></span>! 👋</h2>
       <p style="color: #666; margin-bottom: 20px;">Klasse: <span id="userClass"></span></p>
@@ -327,7 +331,6 @@
       <button onclick="logout()" style="background: #e74c3c; margin-top: 30px;">Logout</button>
     </div>
     
-    <!-- Quiz Screen -->
     <div id="quizScreen" class="screen">
       <div class="quiz-header">
         <div class="progress">
@@ -357,7 +360,6 @@
       </div>
     </div>
     
-    <!-- Results Screen -->
     <div id="resultsScreen" class="screen">
       <h2>🎉 Quiz beendet!</h2>
       
@@ -380,6 +382,9 @@
     </div>
   </div>
   
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  
   <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
@@ -391,9 +396,7 @@
     appId: "1:743231387214:web:166169b25f72616280351f"
   };
   
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  
+  let app, db;
   let currentUser = null;
   let allVocabs = [];
   let quizVocabs = [];
@@ -402,6 +405,54 @@
   let answers = [];
   let timer = null;
   let timeLeft = 15;
+  let firebaseReady = false;
+  
+  function updateLoadingStatus(msg) {
+    const el = document.getElementById('loadingStatus');
+    if (el) el.textContent = msg;
+    console.log('Loading:', msg);
+  }
+  
+  function initFirebase() {
+    let attempts = 0;
+    const maxAttempts = 20;
+    
+    function tryInit() {
+      attempts++;
+      updateLoadingStatus(`Versuch ${attempts}/${maxAttempts}...`);
+      
+      if (typeof firebase === 'undefined') {
+        if (attempts < maxAttempts) {
+          setTimeout(tryInit, 200);
+        } else {
+          document.getElementById('loadingScreen').innerHTML = 
+            '<p style="color: #e74c3c;">❌ Firebase konnte nicht geladen werden.</p>' +
+            '<p style="font-size: 14px;">Bitte Seite neu laden oder als HTML-Datei lokal öffnen.</p>';
+        }
+        return;
+      }
+      
+      try {
+        app = firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        firebaseReady = true;
+        updateLoadingStatus('✓ Firebase bereit!');
+        document.getElementById('loadingScreen').style.display = 'none';
+        showScreen('loginScreen');
+      } catch (e) {
+        document.getElementById('loadingScreen').innerHTML = 
+          '<p style="color: #e74c3c;">❌ Firebase Fehler: ' + e.message + '</p>';
+      }
+    }
+    
+    tryInit();
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initFirebase, 100));
+  } else {
+    setTimeout(initFirebase, 100);
+  }
   
   function showStatus(msg, type = 'info') {
     const el = document.getElementById('status');
@@ -411,10 +462,16 @@
   
   function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    const screen = document.getElementById(screenId);
+    if (screen) screen.classList.add('active');
   }
   
   async function register() {
+    if (!firebaseReady) {
+      showStatus("Firebase lädt noch...", 'error');
+      return;
+    }
+    
     const name = document.getElementById('regName').value.trim();
     const pass = document.getElementById('regPass').value;
     const cls = document.getElementById('regClass').value;
@@ -442,6 +499,11 @@
   }
   
   async function login() {
+    if (!firebaseReady) {
+      showStatus("Firebase lädt noch...", 'error');
+      return;
+    }
+    
     const name = document.getElementById('loginName').value.trim();
     const pass = document.getElementById('loginPass').value;
     
@@ -479,6 +541,7 @@
   
   async function loadVocabs() {
     try {
+      showStatus("Lade Vokabeln...", 'info');
       const snap = await db.ref('vocabulary10').get();
       if (!snap.exists()) {
         showStatus("Keine Vokabeln gefunden!", 'error');
@@ -497,10 +560,8 @@
     document.getElementById('userName').textContent = currentUser.name;
     document.getElementById('userClass').textContent = currentUser.class;
     
-    // Ermittle alle verfügbaren Seiten
     const pages = [...new Set(allVocabs.map(v => parseInt(v.Page)))].sort((a,b) => a-b);
     
-    // Fülle Dropdowns
     const fromSelect = document.getElementById('pageFrom');
     const toSelect = document.getElementById('pageTo');
     fromSelect.innerHTML = '';
@@ -512,7 +573,6 @@
     });
     toSelect.selectedIndex = pages.length - 1;
     
-    // Erstelle Seiten-Grid
     const grid = document.getElementById('pageGrid');
     grid.innerHTML = '';
     
@@ -565,7 +625,6 @@
   }
   
   function startQuiz(vocabPool) {
-    // Wähle zufällig 10 Vokabeln
     const shuffled = vocabPool.sort(() => 0.5 - Math.random());
     quizVocabs = shuffled.slice(0, Math.min(10, vocabPool.length));
     
