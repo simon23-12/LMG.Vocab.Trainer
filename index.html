@@ -335,14 +335,14 @@
   <div class="container">
     <h1>📚 Vokabeltrainer Jahrgang 10</h1>
     
-    <div id="loadingScreen" class="loading">
+    <div id="loadingScreen" class="loading" style="display: none;">
       <p>⏳ Lade Firebase...</p>
       <p id="loadingStatus" style="font-size: 14px; margin-top: 10px;"></p>
     </div>
     
     <div id="status"></div>
     
-    <div id="loginScreen" class="screen">
+    <div id="loginScreen" class="screen active">
       <h2>Registrieren</h2>
       <div class="form-group">
         <label>Name:</label>
@@ -578,8 +578,7 @@
         db = firebase.database();
         firebaseReady = true;
         updateLoadingStatus('✓ Firebase bereit!');
-        document.getElementById('loadingScreen').style.display = 'none';
-        showScreen('loginScreen');
+        // Loading Screen wird ausgeblendet, Login bleibt sichtbar
       } catch (e) {
         document.getElementById('loadingScreen').innerHTML = 
           '<p style="color: #e74c3c;">❌ Firebase Fehler: ' + e.message + '</p>';
