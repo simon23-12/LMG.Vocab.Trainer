@@ -321,6 +321,26 @@
         <label>Klasse:</label>
         <select id="regClass">
           <option value="">-- Klasse wählen --</option>
+          <option value="5a">5a</option>
+          <option value="5b">5b</option>
+          <option value="5c">5c</option>
+          <option value="5d">5d</option>
+          <option value="6a">6a</option>
+          <option value="6b">6b</option>
+          <option value="6c">6c</option>
+          <option value="6d">6d</option>
+          <option value="7a">7a</option>
+          <option value="7b">7b</option>
+          <option value="7c">7c</option>
+          <option value="7d">7d</option>
+          <option value="8a">8a</option>
+          <option value="8b">8b</option>
+          <option value="8c">8c</option>
+          <option value="8d">8d</option>
+          <option value="9a">9a</option>
+          <option value="9b">9b</option>
+          <option value="9c">9c</option>
+          <option value="9d">9d</option>
           <option value="10a">10a</option>
           <option value="10b">10b</option>
           <option value="10c">10c</option>
@@ -567,8 +587,10 @@
       return;
     }
     
-    if (!cls.startsWith('10')) {
-      showStatus("Nur Klasse 10a-10d verfügbar!", 'error');
+    // Extrahiere Jahrgang aus Klasse (z.B. "7b" -> "7")
+    const jahrgang = cls.charAt(0);
+    if (!['5','6','7','8','9'].includes(jahrgang) && !cls.startsWith('10')) {
+      showStatus("Ungültige Klasse!", 'error');
       return;
     }
     
@@ -618,12 +640,14 @@
         return;
       }
       
-      if (!data.class.startsWith('10')) {
-        showStatus("Nur für Jahrgang 10!", 'error');
-        return;
-      }
+      // Extrahiere Jahrgang aus Klasse
+      const jahrgang = data.class.charAt(0) === '1' ? '10' : data.class.charAt(0);
       
-      currentUser = { name: name, class: data.class };
+      currentUser = { 
+        name: name, 
+        class: data.class,
+        jahrgang: jahrgang 
+      };
       userPerformance = data.performance || {};
       await loadVocabs();
       showPageSelection();
@@ -636,15 +660,21 @@
   async function loadVocabs() {
     try {
       showStatus("Lade Vokabeln...", 'info');
-      const snap = await db.ref('vocabulary10').get();
+      
+      // Lade Vokabeln basierend auf Jahrgang
+      const vocabPath = 'vocabulary' + currentUser.jahrgang;
+      console.log("Lade Vokabeln von:", vocabPath);
+      
+      const snap = await db.ref(vocabPath).get();
       if (!snap.exists()) {
-        showStatus("Keine Vokabeln gefunden!", 'error');
+        showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " gefunden!", 'error');
+        allVocabs = [];
         return;
       }
       
       const data = snap.val();
       allVocabs = Object.values(data);
-      console.log("Vokabeln geladen:", allVocabs.length);
+      console.log("Vokabeln geladen:", allVocabs.length, "für Jahrgang", currentUser.jahrgang);
       console.log("Performance:", userPerformance);
     } catch (error) {
       showStatus("Fehler beim Laden: " + error.message, 'error');
@@ -654,6 +684,11 @@
   function showPageSelection() {
     document.getElementById('userName').textContent = currentUser.name;
     document.getElementById('userClass').textContent = currentUser.class;
+    
+    if (allVocabs.length === 0) {
+      showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " verfügbar!", 'error');
+      return;
+    }
     
     const pages = [...new Set(allVocabs.map(v => parseInt(v.Page)))].sort((a,b) => a-b);
     
