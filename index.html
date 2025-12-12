@@ -653,31 +653,43 @@
   }
   
   async function login() {
+    console.log("=== LOGIN START ===");
+    
     if (!firebaseReady) {
       showStatus("Firebase lädt noch...", 'error');
+      console.log("Firebase nicht bereit");
       return;
     }
     
     const name = document.getElementById('loginName').value.trim();
     const pass = document.getElementById('loginPass').value;
     
+    console.log("Login-Versuch:", { name, pass: pass ? "***" : "leer" });
+    
     if (!name || !pass) {
       showStatus("Bitte Name und Passwort eingeben!", 'error');
+      console.log("Name oder Passwort fehlt");
       return;
     }
     
     // Teacher Admin Login
+    console.log("Prüfe Teacher-Login...");
     if (name === 'teacher' && pass === 'LMGadmin') {
+      console.log("✓ Teacher-Login erkannt!");
       currentUser = { 
         name: 'teacher', 
         class: 'admin',
         jahrgang: 'admin',
         isAdmin: true
       };
+      console.log("Zeige Admin-Screen...");
       showScreen('adminScreen');
       showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
+      console.log("=== LOGIN ENDE (Teacher) ===");
       return;
     }
+    
+    console.log("Kein Teacher-Login, versuche normalen Login...");
     
     try {
       console.log("Login Versuch für:", name);
