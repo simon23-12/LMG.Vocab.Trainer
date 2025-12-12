@@ -2,81 +2,383 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Testside for a Database</title>
+  <title>Vokabeltrainer - Jahrgang 10</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
-      font-family: Arial, sans-serif; 
-      max-width: 600px; 
-      margin: 50px auto; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       padding: 20px;
     }
-    input, select { 
-      padding: 8px; 
-      margin: 5px 0; 
-      width: 220px; 
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
-    button { 
-      padding: 8px 15px; 
-      margin: 5px;
+    h1 { 
+      color: #667eea; 
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 2.5em;
+    }
+    h2 { 
+      color: #333; 
+      margin: 30px 0 20px 0;
+      font-size: 1.8em;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    
+    /* Login/Register Screen */
+    .form-group {
+      margin: 20px 0;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+    input, select {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border 0.3s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    button {
+      padding: 12px 30px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
+      margin: 10px 5px;
+      transition: all 0.3s;
     }
-    #status {
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Page Selection */
+    .interval-selector {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    .interval-selector label {
+      font-weight: 600;
+      color: #555;
+    }
+    .interval-selector select {
+      max-width: 100px;
+    }
+    .page-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .page-box {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .page-box:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    }
+    .page-box.disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    
+    /* Quiz Screen */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    .progress {
+      font-size: 18px;
+      font-weight: 600;
+      color: #667eea;
+    }
+    .timer {
+      font-size: 32px;
+      font-weight: bold;
+      color: #764ba2;
+      min-width: 60px;
+      text-align: center;
+    }
+    .timer.warning {
+      color: #e74c3c;
+      animation: pulse 0.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .question-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 40px;
+      border-radius: 20px;
+      text-align: center;
+      margin: 40px 0;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .question-word {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .question-label {
+      font-size: 20px;
+      opacity: 0.9;
+    }
+    .answer-input {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      font-size: 24px;
+      text-align: center;
+      border: 3px solid #667eea;
+      border-radius: 12px;
+    }
+    .feedback {
       margin-top: 20px;
-      padding: 10px;
-      border-radius: 5px;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .feedback.correct {
+      background: #d4edda;
+      color: #155724;
+    }
+    .feedback.wrong {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    /* Results Screen */
+    .score-display {
+      text-align: center;
+      margin: 40px 0;
+    }
+    .score-circle {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .score-text {
+      font-size: 24px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .results-list {
+      margin: 30px 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .result-item {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .result-item.correct {
+      background: #d4edda;
+    }
+    .result-item.wrong {
+      background: #f8d7da;
+    }
+    .result-word {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    .result-answer {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+    
+    #status {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 8px;
       display: none;
     }
-    .success { background-color: #d4edda; color: #155724; display: block; }
-    .error { background-color: #f8d7da; color: #721c24; display: block; }
+    .success { background: #d4edda; color: #155724; display: block; }
+    .error { background: #f8d7da; color: #721c24; display: block; }
+    .info { background: #d1ecf1; color: #0c5460; display: block; }
   </style>
 </head>
 <body>
-  <h1>TESTSIDE FOR A DATABASE</h1>
-  
-  <div id="status"></div>
-  
-  <h2>Register</h2>
-  <input id="regName" placeholder="Name" />
-  <input id="regPass" placeholder="Password" type="password" />
-  <select id="regClass">
-    <option value="">-- Klasse wählen --</option>
-    <option value="5a">5a</option>
-    <option value="5b">5b</option>
-    <option value="5c">5c</option>
-    <option value="5d">5d</option>
-    <option value="6a">6a</option>
-    <option value="6b">6b</option>
-    <option value="6c">6c</option>
-    <option value="6d">6d</option>
-    <option value="7a">7a</option>
-    <option value="7b">7b</option>
-    <option value="7c">7c</option>
-    <option value="7d">7d</option>
-    <option value="8a">8a</option>
-    <option value="8b">8b</option>
-    <option value="8c">8c</option>
-    <option value="8d">8d</option>
-    <option value="9a">9a</option>
-    <option value="9b">9b</option>
-    <option value="9c">9c</option>
-    <option value="9d">9d</option>
-    <option value="10a">10a</option>
-    <option value="10b">10b</option>
-    <option value="10c">10c</option>
-    <option value="10d">10d</option>
-  </select>
-  <button onclick="register()">Register</button>
-  
-  <h2>Login</h2>
-  <input id="loginName" placeholder="Name" />
-  <input id="loginPass" placeholder="Password" type="password" />
-  <button onclick="login()">Login</button>
-  
-  <h2>Debug</h2>
-  <button onclick="testConnection()">Test Connection</button>
-  <button onclick="listUsers()">List All Users</button>
+  <div class="container">
+    <h1>📚 Vokabeltrainer Jahrgang 10</h1>
+    
+    <div id="status"></div>
+    
+    <!-- Login/Register Screen -->
+    <div id="loginScreen" class="screen active">
+      <h2>Registrieren</h2>
+      <div class="form-group">
+        <label>Name:</label>
+        <input id="regName" placeholder="Dein Name" />
+      </div>
+      <div class="form-group">
+        <label>Passwort:</label>
+        <input id="regPass" placeholder="Passwort" type="password" />
+      </div>
+      <div class="form-group">
+        <label>Klasse:</label>
+        <select id="regClass">
+          <option value="">-- Klasse wählen --</option>
+          <option value="10a">10a</option>
+          <option value="10b">10b</option>
+          <option value="10c">10c</option>
+          <option value="10d">10d</option>
+        </select>
+      </div>
+      <button onclick="register()">Registrieren</button>
+      
+      <h2>Login</h2>
+      <div class="form-group">
+        <label>Name:</label>
+        <input id="loginName" placeholder="Dein Name" />
+      </div>
+      <div class="form-group">
+        <label>Passwort:</label>
+        <input id="loginPass" placeholder="Passwort" type="password" />
+      </div>
+      <button onclick="login()">Login</button>
+    </div>
+    
+    <!-- Page Selection Screen -->
+    <div id="pageSelectionScreen" class="screen">
+      <h2>Willkommen, <span id="userName"></span>! 👋</h2>
+      <p style="color: #666; margin-bottom: 20px;">Klasse: <span id="userClass"></span></p>
+      
+      <div class="interval-selector">
+        <label>Von Seite:</label>
+        <select id="pageFrom"></select>
+        <label>Bis Seite:</label>
+        <select id="pageTo"></select>
+        <button onclick="startIntervalQuiz()">Intervall testen</button>
+      </div>
+      
+      <h3>Oder wähle eine einzelne Seite:</h3>
+      <div id="pageGrid" class="page-grid"></div>
+      
+      <button onclick="logout()" style="background: #e74c3c; margin-top: 30px;">Logout</button>
+    </div>
+    
+    <!-- Quiz Screen -->
+    <div id="quizScreen" class="screen">
+      <div class="quiz-header">
+        <div class="progress">
+          Frage <span id="currentQuestion">1</span> von <span id="totalQuestions">10</span>
+        </div>
+        <div class="timer" id="timer">15</div>
+      </div>
+      
+      <div class="question-card">
+        <div class="question-label">Übersetze ins Englische:</div>
+        <div class="question-word" id="questionWord">Wort</div>
+      </div>
+      
+      <div style="text-align: center;">
+        <input 
+          type="text" 
+          id="answerInput" 
+          class="answer-input" 
+          placeholder="Deine Antwort..."
+          onkeypress="if(event.key==='Enter') submitAnswer()"
+          autocomplete="off"
+        />
+        <div id="feedback" class="feedback"></div>
+        <button onclick="submitAnswer()" id="submitBtn" style="margin-top: 20px; font-size: 18px;">
+          Antwort abgeben
+        </button>
+      </div>
+    </div>
+    
+    <!-- Results Screen -->
+    <div id="resultsScreen" class="screen">
+      <h2>🎉 Quiz beendet!</h2>
+      
+      <div class="score-display">
+        <div class="score-circle">
+          <span id="scorePercent">0%</span>
+        </div>
+        <div class="score-text">
+          <span id="scoreCount">0</span> von <span id="scoreTotalCount">10</span> richtig
+        </div>
+      </div>
+      
+      <h3>Deine Antworten:</h3>
+      <div id="resultsList" class="results-list"></div>
+      
+      <div style="text-align: center; margin-top: 40px;">
+        <button onclick="backToSelection()">Neue Runde starten</button>
+        <button onclick="logout()" style="background: #e74c3c;">Logout</button>
+      </div>
+    </div>
+  </div>
   
   <script>
   const firebaseConfig = {
@@ -89,155 +391,319 @@
     appId: "1:743231387214:web:166169b25f72616280351f"
   };
   
-  // Initialize Firebase
   const app = firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   
-  function showStatus(message, isError = false) {
-    const status = document.getElementById('status');
-    status.textContent = message;
-    status.className = isError ? 'error' : 'success';
-    console.log(isError ? 'ERROR:' : 'SUCCESS:', message);
+  let currentUser = null;
+  let allVocabs = [];
+  let quizVocabs = [];
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let answers = [];
+  let timer = null;
+  let timeLeft = 15;
+  
+  function showStatus(msg, type = 'info') {
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = type;
+  }
+  
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
   }
   
   async function register() {
+    const name = document.getElementById('regName').value.trim();
+    const pass = document.getElementById('regPass').value;
+    const cls = document.getElementById('regClass').value;
+    
+    if (!name || !pass || !cls) {
+      showStatus("Bitte alle Felder ausfüllen!", 'error');
+      return;
+    }
+    
+    if (!cls.startsWith('10')) {
+      showStatus("Nur Klasse 10a-10d verfügbar!", 'error');
+      return;
+    }
+    
     try {
-      const name = document.getElementById('regName').value.trim();
-      const pass = document.getElementById('regPass').value;
-      const schoolClass = document.getElementById('regClass').value;
-      
-      if (!name || !pass) {
-        showStatus("Bitte Name und Passwort eingeben!", true);
-        return;
-      }
-      
-      if (!schoolClass) {
-        showStatus("Bitte eine Klasse auswählen!", true);
-        return;
-      }
-      
-      showStatus("Registrierung läuft...");
-      
-      // Firebase speichert automatisch alle Felder!
       await db.ref('users/' + name).set({ 
         password: pass,
-        class: schoolClass,
+        class: cls,
         created: new Date().toISOString()
       });
-      
-      showStatus("✓ User erfolgreich registriert! (Klasse: " + schoolClass + ")");
-      document.getElementById('regName').value = '';
-      document.getElementById('regPass').value = '';
-      document.getElementById('regClass').value = '';
-      
+      showStatus("Registrierung erfolgreich! Jetzt einloggen.", 'success');
     } catch (error) {
-      showStatus("FEHLER beim Registrieren: " + error.message, true);
-      console.error("Full error:", error);
+      showStatus("Fehler: " + error.message, 'error');
     }
   }
   
   async function login() {
+    const name = document.getElementById('loginName').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    
+    if (!name || !pass) {
+      showStatus("Bitte Name und Passwort eingeben!", 'error');
+      return;
+    }
+    
     try {
-      const name = document.getElementById('loginName').value.trim();
-      const pass = document.getElementById('loginPass').value;
-      
-      if (!name || !pass) {
-        showStatus("Bitte Name und Passwort eingeben!", true);
-        return;
-      }
-      
-      showStatus("Login läuft...");
-      
       const snap = await db.ref('users/' + name).get();
-      
       if (!snap.exists()) {
-        showStatus("User nicht gefunden!", true);
+        showStatus("User nicht gefunden!", 'error');
         return;
       }
       
       const data = snap.val();
-      if (data.password === pass) {
-        showStatus("✓ Login erfolgreich! Willkommen, " + name + " (Klasse: " + data.class + ")");
-      } else {
-        showStatus("Falsches Passwort!", true);
-      }
-      
-    } catch (error) {
-      showStatus("FEHLER beim Login: " + error.message, true);
-      console.error("Full error:", error);
-    }
-  }
-  
-  async function testConnection() {
-    try {
-      showStatus("Teste Verbindung...");
-      const testRef = db.ref('test');
-      await testRef.set({ timestamp: Date.now() });
-      showStatus("✓ Verbindung funktioniert! Datenbank ist erreichbar.");
-    } catch (error) {
-      showStatus("FEHLER: Keine Verbindung zur Datenbank! " + error.message, true);
-      console.error("Connection error:", error);
-    }
-  }
-  
-  async function listUsers() {
-    try {
-      showStatus("Lade User-Liste...");
-      const snap = await db.ref('users').get();
-      
-      if (!snap.exists()) {
-        showStatus("Keine User in der Datenbank gefunden.");
+      if (data.password !== pass) {
+        showStatus("Falsches Passwort!", 'error');
         return;
       }
       
-      const users = snap.val();
-      let userInfo = [];
-      for (let name in users) {
-        userInfo.push(name + " (" + users[name].class + ")");
+      if (!data.class.startsWith('10')) {
+        showStatus("Nur für Jahrgang 10!", 'error');
+        return;
       }
-      showStatus("✓ Gefundene Users: " + userInfo.join(', '));
+      
+      currentUser = { name: name, class: data.class };
+      await loadVocabs();
+      showPageSelection();
       
     } catch (error) {
-      showStatus("FEHLER beim Laden: " + error.message, true);
-      console.error("Full error:", error);
+      showStatus("Fehler: " + error.message, 'error');
     }
   }
   
-  // Teste Verbindung beim Laden der Seite
-  window.onload = () => {
-    console.log("Firebase initialized");
-    console.log("Database URL:", firebaseConfig.databaseURL);
-  };
+  async function loadVocabs() {
+    try {
+      const snap = await db.ref('vocabulary10').get();
+      if (!snap.exists()) {
+        showStatus("Keine Vokabeln gefunden!", 'error');
+        return;
+      }
+      
+      const data = snap.val();
+      allVocabs = Object.values(data);
+      console.log("Vokabeln geladen:", allVocabs.length);
+    } catch (error) {
+      showStatus("Fehler beim Laden: " + error.message, 'error');
+    }
+  }
+  
+  function showPageSelection() {
+    document.getElementById('userName').textContent = currentUser.name;
+    document.getElementById('userClass').textContent = currentUser.class;
+    
+    // Ermittle alle verfügbaren Seiten
+    const pages = [...new Set(allVocabs.map(v => parseInt(v.Page)))].sort((a,b) => a-b);
+    
+    // Fülle Dropdowns
+    const fromSelect = document.getElementById('pageFrom');
+    const toSelect = document.getElementById('pageTo');
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+    
+    pages.forEach(page => {
+      fromSelect.innerHTML += `<option value="${page}">${page}</option>`;
+      toSelect.innerHTML += `<option value="${page}">${page}</option>`;
+    });
+    toSelect.selectedIndex = pages.length - 1;
+    
+    // Erstelle Seiten-Grid
+    const grid = document.getElementById('pageGrid');
+    grid.innerHTML = '';
+    
+    pages.forEach(page => {
+      const vocabCount = allVocabs.filter(v => parseInt(v.Page) === page).length;
+      const box = document.createElement('div');
+      box.className = 'page-box';
+      if (vocabCount < 5) box.classList.add('disabled');
+      box.textContent = page;
+      box.title = `${vocabCount} Vokabeln`;
+      if (vocabCount >= 5) {
+        box.onclick = () => startPageQuiz(page);
+      }
+      grid.appendChild(box);
+    });
+    
+    showScreen('pageSelectionScreen');
+    showStatus("Bereit zum Lernen! 🚀", 'success');
+  }
+  
+  function startPageQuiz(page) {
+    const vocabs = allVocabs.filter(v => parseInt(v.Page) === page);
+    if (vocabs.length < 5) {
+      showStatus("Zu wenig Vokabeln auf dieser Seite!", 'error');
+      return;
+    }
+    startQuiz(vocabs);
+  }
+  
+  function startIntervalQuiz() {
+    const from = parseInt(document.getElementById('pageFrom').value);
+    const to = parseInt(document.getElementById('pageTo').value);
+    
+    if (from > to) {
+      showStatus("'Von' muss kleiner als 'Bis' sein!", 'error');
+      return;
+    }
+    
+    const vocabs = allVocabs.filter(v => {
+      const page = parseInt(v.Page);
+      return page >= from && page <= to;
+    });
+    
+    if (vocabs.length < 10) {
+      showStatus("Zu wenig Vokabeln in diesem Intervall (mindestens 10 benötigt)!", 'error');
+      return;
+    }
+    
+    startQuiz(vocabs);
+  }
+  
+  function startQuiz(vocabPool) {
+    // Wähle zufällig 10 Vokabeln
+    const shuffled = vocabPool.sort(() => 0.5 - Math.random());
+    quizVocabs = shuffled.slice(0, Math.min(10, vocabPool.length));
+    
+    currentQuestionIndex = 0;
+    score = 0;
+    answers = [];
+    
+    document.getElementById('totalQuestions').textContent = quizVocabs.length;
+    
+    showScreen('quizScreen');
+    showQuestion();
+  }
+  
+  function showQuestion() {
+    if (currentQuestionIndex >= quizVocabs.length) {
+      showResults();
+      return;
+    }
+    
+    const vocab = quizVocabs[currentQuestionIndex];
+    
+    document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+    document.getElementById('questionWord').textContent = vocab.German;
+    document.getElementById('answerInput').value = '';
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('answerInput').focus();
+    document.getElementById('submitBtn').disabled = false;
+    
+    startTimer();
+  }
+  
+  function startTimer() {
+    timeLeft = 15;
+    document.getElementById('timer').textContent = timeLeft;
+    document.getElementById('timer').classList.remove('warning');
+    
+    if (timer) clearInterval(timer);
+    
+    timer = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timer').textContent = timeLeft;
+      
+      if (timeLeft <= 5) {
+        document.getElementById('timer').classList.add('warning');
+      }
+      
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        submitAnswer(true);
+      }
+    }, 1000);
+  }
+  
+  function submitAnswer(timeout = false) {
+    clearInterval(timer);
+    
+    const vocab = quizVocabs[currentQuestionIndex];
+    const userAnswer = document.getElementById('answerInput').value.trim();
+    const correctAnswer = vocab.English.toLowerCase();
+    const isCorrect = userAnswer.toLowerCase() === correctAnswer;
+    
+    if (timeout) {
+      answers.push({
+        question: vocab.German,
+        correct: vocab.English,
+        user: "(keine Antwort)",
+        isCorrect: false
+      });
+      document.getElementById('feedback').textContent = "⏰ Zeit abgelaufen! Richtig wäre: " + vocab.English;
+      document.getElementById('feedback').className = 'feedback wrong';
+    } else {
+      if (isCorrect) {
+        score++;
+        document.getElementById('feedback').textContent = "✓ Richtig!";
+        document.getElementById('feedback').className = 'feedback correct';
+      } else {
+        document.getElementById('feedback').textContent = "✗ Falsch! Richtig: " + vocab.English;
+        document.getElementById('feedback').className = 'feedback wrong';
+      }
+      
+      answers.push({
+        question: vocab.German,
+        correct: vocab.English,
+        user: userAnswer || "(keine Antwort)",
+        isCorrect: isCorrect
+      });
+    }
+    
+    document.getElementById('submitBtn').disabled = true;
+    
+    setTimeout(() => {
+      currentQuestionIndex++;
+      showQuestion();
+    }, 2000);
+  }
+  
+  function showResults() {
+    const percent = Math.round((score / quizVocabs.length) * 100);
+    
+    document.getElementById('scorePercent').textContent = percent + '%';
+    document.getElementById('scoreCount').textContent = score;
+    document.getElementById('scoreTotalCount').textContent = quizVocabs.length;
+    
+    const resultsList = document.getElementById('resultsList');
+    resultsList.innerHTML = '';
+    
+    answers.forEach(answer => {
+      const item = document.createElement('div');
+      item.className = 'result-item ' + (answer.isCorrect ? 'correct' : 'wrong');
+      item.innerHTML = `
+        <div>
+          <div class="result-word">${answer.question}</div>
+          <div class="result-answer">
+            Deine Antwort: ${answer.user}<br>
+            Richtig: ${answer.correct}
+          </div>
+        </div>
+        <div style="font-size: 24px;">
+          ${answer.isCorrect ? '✓' : '✗'}
+        </div>
+      `;
+      resultsList.appendChild(item);
+    });
+    
+    showScreen('resultsScreen');
+  }
+  
+  function backToSelection() {
+    showPageSelection();
+  }
+  
+  function logout() {
+    currentUser = null;
+    allVocabs = [];
+    showScreen('loginScreen');
+    showStatus("Erfolgreich ausgeloggt!", 'info');
+  }
   </script>
-  <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
-import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-database.js";
-
-// Firebase config
-const firebaseConfig = {
-    apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
-    authDomain: "testdatabase-4daf4.firebaseapp.com",
-    databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "testdatabase-4daf4",
-    storageBucket: "testdatabase-4daf4.appspot.com",
-    messagingSenderId: "743231387214",
-    appId: "1:743231387214:web:166169b25f72616280351f"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// Suppose your JSON data is stored in a variable called vocabData
-// e.g., import it or copy-paste as const vocabData = {...}
-
-for (const key in vocabData) {
-    const entry = vocabData[key];
-    const newRef = push(ref(db, 'vocabulary'));
-    set(newRef, entry);
-}
-
-console.log('Upload completed!');
-</script>
-
 </body>
 </html>
