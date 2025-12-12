@@ -274,6 +274,41 @@
       opacity: 0.8;
     }
     
+    .student-card {
+      padding: 15px;
+      margin: 10px 0;
+      background: #f8f9fa;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid #667eea;
+    }
+    .student-card:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+    }
+    .student-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    .perf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .perf-item {
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid #ddd;
+    }
+    .perf-item.green { border-color: #56ab2f; background: #d4edda; }
+    .perf-item.yellow { border-color: #f09819; background: #fff3cd; }
+    .perf-item.red { border-color: #eb3349; background: #f8d7da; }
+    
     #status {
       margin: 20px 0;
       padding: 15px;
@@ -627,6 +662,19 @@
       return;
     }
     
+    // Teacher Admin Login
+    if (name === 'teacher' && pass === 'LMGadmin') {
+      currentUser = { 
+        name: 'teacher', 
+        class: 'admin',
+        jahrgang: 'admin',
+        isAdmin: true
+      };
+      showScreen('adminScreen');
+      showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
+      return;
+    }
+    
     try {
       console.log("Login Versuch für:", name);
       const snap = await db.ref('users/' + name).get();
@@ -677,36 +725,49 @@
   
   async function loadVocabs() {
     try {
+      console.log("=== loadVocabs START ===");
       showStatus("Lade Vokabeln...", 'info');
       
       // Lade Vokabeln basierend auf Jahrgang
       const vocabPath = 'vocabulary' + currentUser.jahrgang;
       console.log("Lade Vokabeln von:", vocabPath);
       
+      console.log("Rufe db.ref().get() auf...");
       const snap = await db.ref(vocabPath).get();
+      console.log("Snapshot erhalten!");
       console.log("Snapshot exists?", snap.exists());
       
       if (!snap.exists()) {
+        console.log("Snapshot existiert NICHT");
         showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " gefunden!", 'error');
         allVocabs = [];
         return;
       }
       
+      console.log("Snapshot existiert, hole Daten...");
       const data = snap.val();
-      console.log("Raw data:", data);
-      console.log("Data keys:", Object.keys(data));
+      console.log("Raw data erhalten, Typ:", typeof data);
+      console.log("Data keys:", data ? Object.keys(data).length : 'null');
       
       allVocabs = Object.values(data);
       console.log("Vokabeln geladen:", allVocabs.length, "für Jahrgang", currentUser.jahrgang);
-      console.log("Erste 3 Vokabeln:", allVocabs.slice(0, 3));
+      
+      if (allVocabs.length > 0) {
+        console.log("Erste Vokabel:", allVocabs[0]);
+      }
+      
       console.log("Performance:", userPerformance);
       
       if (allVocabs.length === 0) {
         showStatus("Vokabeln sind leer!", 'error');
       }
+      
+      console.log("=== loadVocabs ENDE ===");
     } catch (error) {
+      console.error("=== loadVocabs ERROR ===");
       showStatus("Fehler beim Laden: " + error.message, 'error');
       console.error("LoadVocabs Error:", error);
+      console.error("Error stack:", error.stack);
     }
   }
   
@@ -942,12 +1003,8 @@
       }
     }
     
-    // 5. Leichte Tippfehler tolerieren (Levenshtein Distance)
-    if (getLevenshteinDistance(userNorm, correctNorm) <= 2) {
-      console.log("✓ Kleiner Tippfehler akzeptiert:", userAnswer);
-      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
-      return;
-    }
+    // 5. TIPPFEHLER-TOLERANZ ENTFERNT - zu gnädig!
+    // Alte Zeile entfernt: if (getLevenshteinDistance(userNorm, correctNorm) <= 2)
     
     // 6. Falls Vercel API verfügbar: Prüfe mit AI
     const VERCEL_API = "https://vercel-ap-ivocab.vercel.app";
@@ -1113,8 +1170,117 @@
     currentUser = null;
     userPerformance = {};
     allVocabs = [];
+    document.getElementById('adminClassSelect').value = '';
+    document.getElementById('studentList').innerHTML = '';
+    document.getElementById('studentPerformance').innerHTML = '';
     showScreen('loginScreen');
     showStatus("Erfolgreich ausgeloggt!", 'info');
+  }
+  
+  // ADMIN FUNCTIONS
+  async function loadClassPerformance() {
+    const selectedClass = document.getElementById('adminClassSelect').value;
+    if (!selectedClass) {
+      document.getElementById('studentList').innerHTML = '';
+      return;
+    }
+    
+    try {
+      showStatus("Lade Schüler von Klasse " + selectedClass + "...", 'info');
+      
+      const snap = await db.ref('users').get();
+      if (!snap.exists()) {
+        document.getElementById('studentList').innerHTML = '<p>Keine Schüler gefunden.</p>';
+        return;
+      }
+      
+      const allUsers = snap.val();
+      const studentsInClass = [];
+      
+      for (let username in allUsers) {
+        const user = allUsers[username];
+        if (user.class === selectedClass) {
+          studentsInClass.push({
+            name: username,
+            performance: user.performance || {}
+          });
+        }
+      }
+      
+      if (studentsInClass.length === 0) {
+        document.getElementById('studentList').innerHTML = '<p>Keine Schüler in dieser Klasse gefunden.</p>';
+        return;
+      }
+      
+      let html = '<h3>Schüler in Klasse ' + selectedClass + ':</h3>';
+      studentsInClass.forEach(student => {
+        const perfCount = Object.keys(student.performance).length;
+        html += `
+          <div class="student-card" onclick="showStudentPerformance('${student.name}')">
+            <div class="student-name">${student.name}</div>
+            <div style="font-size: 14px; color: #666; margin-top: 5px;">
+              ${perfCount} Seite${perfCount !== 1 ? 'n' : ''} getestet
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('studentList').innerHTML = html;
+      showStatus("✓ " + studentsInClass.length + " Schüler gefunden", 'success');
+      
+    } catch (error) {
+      showStatus("Fehler: " + error.message, 'error');
+      console.error(error);
+    }
+  }
+  
+  async function showStudentPerformance(username) {
+    try {
+      const snap = await db.ref('users/' + username).get();
+      if (!snap.exists()) return;
+      
+      const user = snap.val();
+      const perf = user.performance || {};
+      
+      if (Object.keys(perf).length === 0) {
+        document.getElementById('studentPerformance').innerHTML = 
+          `<h3>${username}</h3><p>Noch keine Tests absolviert.</p>`;
+        return;
+      }
+      
+      let html = `<h3>Performance von ${username} (${user.class})</h3>`;
+      html += '<div class="perf-grid">';
+      
+      // Sortiere nach Seitennummer
+      const sorted = Object.entries(perf).sort((a, b) => {
+        const pageA = parseInt(a[0].replace(/\D/g, ''));
+        const pageB = parseInt(b[0].replace(/\D/g, ''));
+        return pageA - pageB;
+      });
+      
+      sorted.forEach(([key, data]) => {
+        const pageNum = key.replace('page_', '').replace('interval_', 'I: ');
+        let colorClass = '';
+        if (data.percent >= 80) colorClass = 'green';
+        else if (data.percent >= 50) colorClass = 'yellow';
+        else colorClass = 'red';
+        
+        html += `
+          <div class="perf-item ${colorClass}">
+            <div style="font-weight: bold; font-size: 16px;">${pageNum}</div>
+            <div style="font-size: 20px; margin: 5px 0;">${data.percent}%</div>
+            <div style="font-size: 12px;">${data.score}/${data.total}</div>
+            <div style="font-size: 11px; color: #666;">${data.date || ''}</div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      document.getElementById('studentPerformance').innerHTML = html;
+      
+    } catch (error) {
+      console.error(error);
+    }
   }
   </script>
 </body>
