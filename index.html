@@ -606,9 +606,24 @@
   }
   
   function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    console.log("showScreen aufgerufen für:", screenId);
+    
+    // Verstecke alle Screens
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.style.display = 'none';
+      console.log("Verstecke:", s.id);
+    });
+    
+    // Zeige gewünschten Screen
     const screen = document.getElementById(screenId);
-    if (screen) screen.classList.add('active');
+    if (screen) {
+      screen.classList.add('active');
+      screen.style.display = 'block';
+      console.log("✓ Zeige Screen:", screenId);
+    } else {
+      console.error("❌ Screen nicht gefunden:", screenId);
+    }
   }
   
   async function register() {
