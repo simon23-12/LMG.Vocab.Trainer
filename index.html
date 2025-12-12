@@ -640,8 +640,15 @@
         return;
       }
       
-      // Extrahiere Jahrgang aus Klasse
-      const jahrgang = data.class.charAt(0) === '1' ? '10' : data.class.charAt(0);
+      // Extrahiere Jahrgang aus Klasse (5a -> "5", 10b -> "10")
+      let jahrgang;
+      if (data.class.startsWith('10')) {
+        jahrgang = '10';
+      } else {
+        jahrgang = data.class.charAt(0);
+      }
+      
+      console.log("Login erfolgreich:", name, "Klasse:", data.class, "Jahrgang:", jahrgang);
       
       currentUser = { 
         name: name, 
@@ -654,6 +661,7 @@
       
     } catch (error) {
       showStatus("Fehler: " + error.message, 'error');
+      console.error("Login Error:", error);
     }
   }
   
