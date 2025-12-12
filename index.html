@@ -674,6 +674,8 @@
       console.log("Lade Vokabeln von:", vocabPath);
       
       const snap = await db.ref(vocabPath).get();
+      console.log("Snapshot exists?", snap.exists());
+      
       if (!snap.exists()) {
         showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " gefunden!", 'error');
         allVocabs = [];
@@ -681,11 +683,20 @@
       }
       
       const data = snap.val();
+      console.log("Raw data:", data);
+      console.log("Data keys:", Object.keys(data));
+      
       allVocabs = Object.values(data);
       console.log("Vokabeln geladen:", allVocabs.length, "für Jahrgang", currentUser.jahrgang);
+      console.log("Erste 3 Vokabeln:", allVocabs.slice(0, 3));
       console.log("Performance:", userPerformance);
+      
+      if (allVocabs.length === 0) {
+        showStatus("Vokabeln sind leer!", 'error');
+      }
     } catch (error) {
       showStatus("Fehler beim Laden: " + error.message, 'error');
+      console.error("LoadVocabs Error:", error);
     }
   }
   
