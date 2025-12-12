@@ -421,6 +421,7 @@
   
   let app, db;
   let currentUser = null;
+  let userPerformance = {};
   let allVocabs = [];
   let quizVocabs = [];
   let currentQuestionIndex = 0;
@@ -561,6 +562,7 @@
       }
       
       currentUser = { name: name, class: data.class };
+      userPerformance = data.performance || {};
       await loadVocabs();
       showPageSelection();
       
@@ -581,6 +583,7 @@
       const data = snap.val();
       allVocabs = Object.values(data);
       console.log("Vokabeln geladen:", allVocabs.length);
+      console.log("Performance:", userPerformance);
     } catch (error) {
       showStatus("Fehler beim Laden: " + error.message, 'error');
     }
@@ -610,9 +613,32 @@
       const vocabCount = allVocabs.filter(v => parseInt(v.Page) === page).length;
       const box = document.createElement('div');
       box.className = 'page-box';
-      if (vocabCount < 5) box.classList.add('disabled');
-      box.textContent = page;
-      box.title = `${vocabCount} Vokabeln`;
+      
+      // Performance-Daten laden
+      const pageKey = 'page_' + page;
+      const perf = userPerformance[pageKey];
+      
+      if (vocabCount < 5) {
+        box.classList.add('disabled');
+      } else {
+        // Farbe basierend auf Performance
+        if (perf && perf.percent !== undefined) {
+          if (perf.percent >= 80) {
+            box.classList.add('green');
+          } else if (perf.percent >= 50) {
+            box.classList.add('yellow');
+          } else {
+            box.classList.add('red');
+          }
+        }
+      }
+      
+      box.innerHTML = `
+        <div class="page-number">${page}</div>
+        ${perf && perf.percent !== undefined ? `<div class="page-percent">${perf.percent}%</div>` : ''}
+      `;
+      box.title = `${vocabCount} Vokabeln${perf ? ' - Letzter Score: ' + perf.percent + '%' : ''}`;
+      
       if (vocabCount >= 5) {
         box.onclick = () => startPageQuiz(page);
       }
@@ -629,7 +655,7 @@
       showStatus("Zu wenig Vokabeln auf dieser Seite!", 'error');
       return;
     }
-    startQuiz(vocabs);
+    startQuiz(vocabs, 'page_' + page);
   }
   
   function startIntervalQuiz() {
@@ -651,16 +677,17 @@
       return;
     }
     
-    startQuiz(vocabs);
+    startQuiz(vocabs, 'interval_' + from + '_' + to);
   }
   
-  function startQuiz(vocabPool) {
+  function startQuiz(vocabPool, performanceKey = null) {
     const shuffled = vocabPool.sort(() => 0.5 - Math.random());
     quizVocabs = shuffled.slice(0, Math.min(10, vocabPool.length));
     
     currentQuestionIndex = 0;
     score = 0;
     answers = [];
+    window.currentPerformanceKey = performanceKey;
     
     document.getElementById('totalQuestions').textContent = quizVocabs.length;
     
@@ -780,7 +807,41 @@
       resultsList.appendChild(item);
     });
     
+    // Speichere Performance in Firebase
+    savePerformance(percent);
+    
     showScreen('resultsScreen');
+  }
+  
+  async function savePerformance(percent) {
+    if (!currentUser || !window.currentPerformanceKey) {
+      console.log("Speichern abgebrochen: kein User oder Key");
+      return;
+    }
+    
+    try {
+      const perfData = {
+        percent: percent,
+        score: score,
+        total: quizVocabs.length,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('de-DE')
+      };
+      
+      console.log("Speichere Performance:", window.currentPerformanceKey, perfData);
+      
+      // Speichere in user performance
+      userPerformance[window.currentPerformanceKey] = perfData;
+      
+      // Speichere in Firebase
+      await db.ref('users/' + currentUser.name + '/performance/' + window.currentPerformanceKey).set(perfData);
+      
+      console.log('✓ Performance gespeichert in Firebase');
+      showStatus('Performance gespeichert! 💾', 'success');
+    } catch (error) {
+      console.error('Fehler beim Speichern:', error);
+      showStatus('Fehler beim Speichern: ' + error.message, 'error');
+    }
   }
   
   function backToSelection() {
@@ -789,6 +850,7 @@
   
   function logout() {
     currentUser = null;
+    userPerformance = {};
     allVocabs = [];
     showScreen('loginScreen');
     showStatus("Erfolgreich ausgeloggt!", 'info');
