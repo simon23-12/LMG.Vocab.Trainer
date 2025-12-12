@@ -412,7 +412,6 @@
   
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
   
   <script>
   const firebaseConfig = {
@@ -425,7 +424,7 @@
     appId: "1:743231387214:web:166169b25f72616280351f"
   };
   
-  let app, db, functions;
+  let app, db;
   let currentUser = null;
   let userPerformance = {};
   let allVocabs = [];
@@ -436,6 +435,57 @@
   let timer = null;
   let timeLeft = 15;
   let firebaseReady = false;
+  
+  // Synonym-Dictionary für häufige Vokabeln
+  const synonyms = {
+    'house': ['home', 'dwelling', 'residence'],
+    'home': ['house', 'dwelling', 'residence'],
+    'beautiful': ['pretty', 'lovely', 'gorgeous', 'attractive'],
+    'learn': ['to learn', 'study'],
+    'to learn': ['learn', 'study'],
+    'fast': ['quick', 'rapid', 'swift', 'speedy'],
+    'quick': ['fast', 'rapid', 'swift', 'speedy'],
+    'big': ['large', 'huge', 'enormous', 'giant'],
+    'small': ['little', 'tiny', 'mini'],
+    'happy': ['glad', 'joyful', 'cheerful', 'pleased'],
+    'sad': ['unhappy', 'sorrowful', 'depressed'],
+    'good': ['nice', 'fine', 'great', 'excellent'],
+    'bad': ['poor', 'terrible', 'awful'],
+    'start': ['begin', 'commence', 'to start', 'to begin'],
+    'end': ['finish', 'conclude', 'to end', 'to finish'],
+    'see': ['to see', 'look at', 'watch', 'view'],
+    'look': ['see', 'watch', 'gaze'],
+    'talk': ['speak', 'chat', 'converse', 'to talk', 'to speak'],
+    'walk': ['go', 'stroll', 'to walk'],
+    'run': ['jog', 'sprint', 'to run'],
+    'eat': ['to eat', 'consume', 'dine'],
+    'drink': ['to drink', 'sip'],
+    'give': ['to give', 'provide', 'offer'],
+    'take': ['to take', 'grab', 'get'],
+    'make': ['to make', 'create', 'produce', 'build'],
+    'do': ['to do', 'perform', 'execute'],
+    'say': ['to say', 'tell', 'state'],
+    'think': ['to think', 'believe', 'consider'],
+    'know': ['to know', 'understand'],
+    'want': ['to want', 'wish', 'desire'],
+    'need': ['to need', 'require'],
+    'help': ['to help', 'assist', 'aid', 'support'],
+    'work': ['to work', 'labor', 'job'],
+    'play': ['to play', 'game'],
+    'stop': ['to stop', 'halt', 'cease'],
+    'wait': ['to wait', 'hold on'],
+    'like': ['to like', 'enjoy', 'love'],
+    'love': ['to love', 'adore'],
+    'hate': ['to hate', 'dislike'],
+    'try': ['to try', 'attempt'],
+    'use': ['to use', 'utilize', 'employ'],
+    'find': ['to find', 'discover', 'locate'],
+    'get': ['to get', 'obtain', 'receive'],
+    'come': ['to come', 'arrive'],
+    'go': ['to go', 'travel', 'move'],
+    'buy': ['to buy', 'purchase'],
+    'sell': ['to sell', 'vend']
+  };
   
   function updateLoadingStatus(msg) {
     const el = document.getElementById('loadingStatus');
@@ -465,7 +515,6 @@
       try {
         app = firebase.initializeApp(firebaseConfig);
         db = firebase.database();
-        functions = firebase.functions();
         firebaseReady = true;
         updateLoadingStatus('✓ Firebase bereit!');
         document.getElementById('loadingScreen').style.display = 'none';
@@ -788,30 +837,106 @@
   async function checkAnswerWithAI(userAnswer, vocab) {
     const correctAnswer = vocab.English;
     
-    // Exakte Übereinstimmung? Sofort richtig!
-    if (userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim()) {
+    // Normalisiere beide Antworten
+    const userNorm = userAnswer.toLowerCase().trim();
+    const correctNorm = correctAnswer.toLowerCase().trim();
+    
+    // 1. Exakte Übereinstimmung
+    if (userNorm === correctNorm) {
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    try {
-      // Rufe Firebase Cloud Function auf
-      const checkVocab = functions.httpsCallable('checkVocab');
-      const result = await checkVocab({
-        german: vocab.German,
-        correct: correctAnswer,
-        userAnswer: userAnswer
-      });
-      
-      console.log("AI sagt:", result.data.aiResponse, "-> isCorrect:", result.data.isCorrect);
-      
-      handleAnswerResult(result.data.isCorrect, userAnswer, vocab, correctAnswer);
-      
-    } catch (error) {
-      console.error("Fehler bei AI-Prüfung:", error);
-      // Bei Fehler: nur exakte Übereinstimmung zählt als falsch
-      handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+    // 2. Prüfe mit/ohne "to" bei Verben
+    const userWithoutTo = userNorm.replace(/^to\s+/, '');
+    const correctWithoutTo = correctNorm.replace(/^to\s+/, '');
+    if (userWithoutTo === correctWithoutTo) {
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
     }
+    
+    // 3. Prüfe Synonyme
+    const correctSynonyms = synonyms[correctNorm] || [];
+    if (correctSynonyms.includes(userNorm)) {
+      console.log("✓ Synonym akzeptiert:", userAnswer, "für", correctAnswer);
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 4. Prüfe ob Userantwort in der Synonym-Liste der richtigen Antwort ist
+    for (let key in synonyms) {
+      if (synonyms[key].includes(correctNorm) && synonyms[key].includes(userNorm)) {
+        console.log("✓ Beide sind Synonyme:", userAnswer, "=", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+    }
+    
+    // 5. Leichte Tippfehler tolerieren (Levenshtein Distance)
+    if (getLevenshteinDistance(userNorm, correctNorm) <= 2) {
+      console.log("✓ Kleiner Tippfehler akzeptiert:", userAnswer);
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 6. Falls Vercel API verfügbar: Prüfe mit AI
+    // WICHTIG: Ersetze "dein-projekt" mit deiner echten Vercel URL!
+    const VERCEL_API = ""; // z.B. "https://vokabeltrainer-api.vercel.app"
+    
+    if (VERCEL_API) {
+      try {
+        const response = await fetch(VERCEL_API + '/api/check-vocab', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            german: vocab.German, 
+            correct: correctAnswer, 
+            userAnswer: userAnswer 
+          })
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log("AI sagt:", result.aiResponse, "-> isCorrect:", result.isCorrect);
+          handleAnswerResult(result.isCorrect, userAnswer, vocab, correctAnswer);
+          return;
+        }
+      } catch (error) {
+        console.error("Vercel API Fehler:", error);
+      }
+    }
+    
+    // Sonst: Falsch
+    handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+  }
+  
+  // Levenshtein Distance für Tippfehler-Toleranz
+  function getLevenshteinDistance(a, b) {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+    
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[b.length][a.length];
   }
   
   function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer) {
