@@ -578,7 +578,15 @@
         db = firebase.database();
         firebaseReady = true;
         updateLoadingStatus('✓ Firebase bereit!');
-        // Loading Screen wird ausgeblendet, Login bleibt sichtbar
+        
+        // Zeige Login-Screen explizit an
+        setTimeout(() => {
+          document.getElementById('loadingScreen').style.display = 'none';
+          const loginScreen = document.getElementById('loginScreen');
+          loginScreen.classList.add('active');
+          loginScreen.style.display = 'block';
+          console.log('Login Screen sollte jetzt sichtbar sein');
+        }, 100);
       } catch (e) {
         document.getElementById('loadingScreen').innerHTML = 
           '<p style="color: #e74c3c;">❌ Firebase Fehler: ' + e.message + '</p>';
