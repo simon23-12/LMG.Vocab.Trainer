@@ -341,7 +341,46 @@
     </div>
     
     <div id="status"></div>
-    
+     <!-- Admin Dashboard Screen -->
+    <div id="adminScreen" class="screen">
+      <h2>👨‍🏫 Lehrer Dashboard</h2>
+      
+      <div class="form-group">
+        <label>Klasse auswählen:</label>
+        <select id="adminClassSelect" onchange="loadClassPerformance()">
+          <option value="">-- Klasse wählen --</option>
+          <option value="5a">5a</option>
+          <option value="5b">5b</option>
+          <option value="5c">5c</option>
+          <option value="5d">5d</option>
+          <option value="6a">6a</option>
+          <option value="6b">6b</option>
+          <option value="6c">6c</option>
+          <option value="6d">6d</option>
+          <option value="7a">7a</option>
+          <option value="7b">7b</option>
+          <option value="7c">7c</option>
+          <option value="7d">7d</option>
+          <option value="8a">8a</option>
+          <option value="8b">8b</option>
+          <option value="8c">8c</option>
+          <option value="8d">8d</option>
+          <option value="9a">9a</option>
+          <option value="9b">9b</option>
+          <option value="9c">9c</option>
+          <option value="9d">9d</option>
+          <option value="10a">10a</option>
+          <option value="10b">10b</option>
+          <option value="10c">10c</option>
+          <option value="10d">10d</option>
+        </select>
+      </div>
+      
+      <div id="studentList" style="margin: 30px 0;"></div>
+      <div id="studentPerformance" style="margin: 30px 0;"></div>
+      
+      <button onclick="logout()" style="background: #e74c3c; margin-top: 30px;">Logout</button>
+    </div>
     <div id="loginScreen" class="screen active">
       <h2>Registrieren</h2>
       <div class="form-group">
