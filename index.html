@@ -210,10 +210,63 @@
       font-size: 48px;
       font-weight: bold;
       margin-bottom: 20px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
     .question-label {
       font-size: 20px;
       opacity: 0.9;
+    }
+    
+    /* Mobile Optimierungen */
+    @media (max-width: 768px) {
+      .question-card {
+        padding: 40px 20px;
+        margin: 20px 0;
+      }
+      .question-word {
+        font-size: 32px;
+      }
+      .question-label {
+        font-size: 16px;
+      }
+      .answer-input {
+        font-size: 18px;
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+      .logo {
+        height: 45px;
+      }
+      .stat-value {
+        font-size: 32px;
+      }
+      .page-box {
+        font-size: 20px;
+      }
+      .page-number {
+        font-size: 22px;
+      }
+    }
+    @media (max-width: 480px) {
+      .question-word {
+        font-size: 24px;
+      }
+      .question-label {
+        font-size: 14px;
+      }
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.4em;
+      }
+      .logo {
+        height: 35px;
+      }
     }
     .answer-input {
       width: 100%;
@@ -278,6 +331,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 15px;
     }
     .result-item.correct {
       background: #d4edda;
@@ -288,9 +342,16 @@
     .result-word {
       font-weight: 600;
       font-size: 18px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      flex: 1;
     }
     .result-answer {
       font-size: 16px;
+      opacity: 0.8;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
       opacity: 0.8;
     }
     
@@ -526,10 +587,14 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     .dashboard-header p {
       color: #999;
       font-size: 16px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     .stats-grid {
       display: grid;
