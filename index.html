@@ -761,7 +761,7 @@
       console.log("User snapshot erhalten, exists:", snap.exists());
       
       if (!snap.exists()) {
-        showStatus("User nicht gefunden!", 'error');
+        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
       }
       
@@ -769,7 +769,7 @@
       console.log("User Daten:", data);
       
       if (data.password !== pass) {
-        showStatus("Falsches Passwort!", 'error');
+        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
       }
       
@@ -854,7 +854,8 @@
   function showPageSelection() {
     document.getElementById('userName').textContent = currentUser.name;
     document.getElementById('userClass').textContent = currentUser.class;
-    
+    // Berechne Dashboard-Statistiken
+    calculateDashboardStats();
     if (allVocabs.length === 0) {
       showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " verfügbar!", 'error');
       return;
@@ -1227,10 +1228,15 @@
       
       console.log("Speichere Performance:", window.currentPerformanceKey, perfData);
       
-      // Speichere in user performance
-      userPerformance[window.currentPerformanceKey] = perfData;
+      // Prüfe ob bereits ein besserer Score existiert
+      const existingPerf = userPerformance[window.currentPerformanceKey];
+      if (existingPerf && existingPerf.percent > percent) {
+        console.log("Bestehender Score ist besser:", existingPerf.percent, "% vs", percent, "%");
+        showStatus('Gut gemacht! Aber dein bisheriger Rekord war besser: ' + existingPerf.percent + '%', 'info');
+        return;
+      }
       
-      // Speichere in Firebase
+      userPerformance[window.currentPerformanceKey] = perfData;
       await db.ref('users/' + currentUser.name + '/performance/' + window.currentPerformanceKey).set(perfData);
       
       console.log('✓ Performance gespeichert in Firebase');
@@ -1239,6 +1245,30 @@
       console.error('Fehler beim Speichern:', error);
       showStatus('Fehler beim Speichern: ' + error.message, 'error');
     }
+  }
+  
+  function calculateDashboardStats() {
+    const perf = userPerformance;
+    const perfEntries = Object.values(perf);
+    
+    if (perfEntries.length === 0) {
+      document.getElementById('totalVocabsPracticed').textContent = '0';
+      document.getElementById('averageAccuracy').textContent = '0%';
+      return;
+    }
+    
+    let totalVocabs = 0;
+    let totalPercent = 0;
+    
+    perfEntries.forEach(entry => {
+      totalVocabs += entry.total || 0;
+      totalPercent += entry.percent || 0;
+    });
+    
+    const avgAccuracy = Math.round(totalPercent / perfEntries.length);
+    
+    document.getElementById('totalVocabsPracticed').textContent = totalVocabs;
+    document.getElementById('averageAccuracy').textContent = avgAccuracy + '%';
   }
   
   function backToSelection() {
