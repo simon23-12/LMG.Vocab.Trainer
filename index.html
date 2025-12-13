@@ -512,6 +512,152 @@
         transform: translateY(0);
       }
     }
+    
+    /* Modern Dashboard Styles */
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.6s ease;
+    }
+    .dashboard-header h2 {
+      font-size: 2.2em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .dashboard-header p {
+      color: #999;
+      font-size: 16px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 50px;
+      animation: slideInUp 0.8s ease;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 2px solid #f0f0f0;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      border-color: #667eea;
+    }
+    .stat-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .stat-value {
+      font-size: 42px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .interval-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 40px;
+      animation: slideInUp 1s ease;
+    }
+    .interval-section h3 {
+      margin: 0 0 20px 0;
+      font-size: 1.3em;
+      color: #333;
+    }
+    .interval-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .interval-controls label {
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+    }
+    .interval-controls select {
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      min-width: 100px;
+    }
+    .interval-controls select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    .interval-controls button {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .interval-controls button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    .pages-section h3 {
+      margin: 0 0 25px 0;
+      font-size: 1.3em;
+      color: #333;
+      animation: slideInUp 1.2s ease;
+    }
+    .modern-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: white;
+      color: #e74c3c;
+      border: 2px solid #e74c3c;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 40px;
+    }
+    .modern-logout:hover {
+      background: #e74c3c;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(231,76,60,0.3);
+    }
   </style>
 </head>
 <body>
@@ -640,31 +786,46 @@
     </div>
     
     <div id="pageSelectionScreen" class="screen">
-      <h2>Willkommen, <span id="userName"></span>! 👋</h2>
-      <p style="color: #666; margin-bottom: 20px;">Klasse: <span id="userClass"></span></p>
+      <div class="dashboard-header">
+        <h2>Willkommen, <span id="userName"></span>! 👋</h2>
+        <p>Klasse: <span id="userClass"></span></p>
+      </div>
+      
       <!-- Dashboard Stats -->
-      <div class="stats" style="margin-bottom: 40px;">
-        <div class="stat-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-          <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">Vokabeln geübt</div>
-          <div class="stat-number" id="totalVocabsPracticed">0</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">📚 Vokabeln geübt</div>
+          <div class="stat-value" id="totalVocabsPracticed">0</div>
         </div>
-        <div class="stat-box" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); color: white;">
-          <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">Accuracy</div>
-          <div class="stat-number" id="averageAccuracy">0%</div>
+        <div class="stat-card">
+          <div class="stat-label">🎯 Accuracy</div>
+          <div class="stat-value" id="averageAccuracy">0%</div>
         </div>
       </div>
-      <div class="interval-selector">
-        <label>Von Seite:</label>
-        <select id="pageFrom"></select>
-        <label>Bis Seite:</label>
-        <select id="pageTo"></select>
-        <button onclick="startIntervalQuiz()">Intervall testen</button>
+      
+      <!-- Interval Section -->
+      <div class="interval-section">
+        <h3>📖 Intervall testen</h3>
+        <div class="interval-controls">
+          <label>Von Seite:</label>
+          <select id="pageFrom"></select>
+          <label>Bis Seite:</label>
+          <select id="pageTo"></select>
+          <button onclick="startIntervalQuiz()">Los geht's! 🚀</button>
+        </div>
       </div>
       
-      <h3>Oder wähle eine einzelne Seite:</h3>
-      <div id="pageGrid" class="page-grid"></div>
+      <!-- Pages Grid -->
+      <div class="pages-section">
+        <h3>📄 Oder wähle eine einzelne Seite:</h3>
+        <div id="pageGrid" class="page-grid"></div>
+      </div>
       
-      <button onclick="logout()" style="background: #e74c3c; margin-top: 30px;">Logout</button>
+      <div style="text-align: center;">
+        <button onclick="logout()" class="modern-logout">
+          <span>🚪</span> Logout
+        </button>
+      </div>
     </div>
     
     <div id="quizScreen" class="screen">
@@ -1498,18 +1659,31 @@
     const avgAccuracy = Math.round(totalPercent / perfEntries.length);
     
     document.getElementById('totalVocabsPracticed').textContent = totalVocabs;
-    document.getElementById('averageAccuracy').textContent = avgAccuracy + '%';
     
-    // Färbe die Accuracy-Box basierend auf dem Durchschnitt
-    const accuracyBox = document.getElementById('averageAccuracy').parentElement;
+    const accuracyElement = document.getElementById('averageAccuracy');
+    accuracyElement.textContent = avgAccuracy + '%';
+    
+    // Färbe den Accuracy-Text basierend auf dem Durchschnitt
     if (avgAccuracy === 100) {
-      accuracyBox.style.background = 'linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%)';
+      accuracyElement.style.background = 'linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
     } else if (avgAccuracy >= 80) {
-      accuracyBox.style.background = 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)';
+      accuracyElement.style.background = 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
     } else if (avgAccuracy >= 50) {
-      accuracyBox.style.background = 'linear-gradient(135deg, #f09819 0%, #edde5d 100%)';
+      accuracyElement.style.background = 'linear-gradient(135deg, #f09819 0%, #edde5d 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
     } else {
-      accuracyBox.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+      accuracyElement.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
     }
   }
   
