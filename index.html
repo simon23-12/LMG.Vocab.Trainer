@@ -349,6 +349,169 @@
       font-size: 20px;
       color: #667eea;
     }
+    
+    /* Modern Landing Page Styles */
+    .landing-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.8s ease;
+    }
+    .welcome-section h2 {
+      font-size: 2em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .welcome-section p {
+      color: #666;
+      font-size: 16px;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      background: #f8f9fa;
+      padding: 8px;
+      border-radius: 12px;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.3s;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .tab:hover:not(.active) {
+      background: #e9ecef;
+    }
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .modern-input {
+      width: 100%;
+      padding: 14px 20px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s;
+      background: white;
+    }
+    .modern-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+      transform: translateY(-2px);
+    }
+    .modern-button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+      margin-top: 20px;
+    }
+    .modern-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    .modern-button:active {
+      transform: translateY(0);
+    }
+    .input-icon {
+      position: relative;
+    }
+    .input-icon input {
+      padding-left: 45px;
+    }
+    .input-icon::before {
+      content: attr(data-icon);
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .feature-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .feature-card {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: #667eea;
+      box-shadow: 0 8px 20px rgba(102,126,234,0.2);
+    }
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .feature-text {
+      font-size: 13px;
+      color: #555;
+      font-weight: 600;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInDown {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -405,57 +568,75 @@
       <button onclick="logout()" style="background: #e74c3c; margin-top: 30px;">Logout</button>
     </div>
     <div id="loginScreen" class="screen active">
-      <h2>Registrieren</h2>
-      <div class="form-group">
-        <label>Name:</label>
-        <input id="regName" placeholder="Dein Name" />
+      <div class="landing-container">
+        <div class="welcome-section">
+          <h2>🚀 Bereit zum Lernen?</h2>
+          <p>Neu hier? Klicke auf "Registrieren".</p>
+        </div>
+        
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('login')">Login</button>
+          <button class="tab" onclick="switchTab('register')">Registrieren</button>
+        </div>
+        
+        <div id="loginTab" class="tab-content active">
+          <div class="form-group">
+            <div class="input-icon" data-icon="👤">
+              <input id="loginName" class="modern-input" placeholder="Dein Name" onkeypress="if(event.key==='Enter') login()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-icon" data-icon="🔒">
+              <input id="loginPass" class="modern-input" placeholder="Passwort" type="password" onkeypress="if(event.key==='Enter') login()" />
+            </div>
+          </div>
+          <button onclick="login()" class="modern-button">Login 🚀</button>
+        </div>
+        
+        <div id="registerTab" class="tab-content">
+          <div class="form-group">
+            <div class="input-icon" data-icon="👤">
+              <input id="regName" class="modern-input" placeholder="Dein Name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-icon" data-icon="🔒">
+              <input id="regPass" class="modern-input" placeholder="Passwort" type="password" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">📚 Deine Klasse:</label>
+            <select id="regClass" class="modern-input">
+              <option value="">-- Klasse wählen --</option>
+              <option value="5a">5a</option>
+              <option value="5b">5b</option>
+              <option value="5c">5c</option>
+              <option value="5d">5d</option>
+              <option value="6a">6a</option>
+              <option value="6b">6b</option>
+              <option value="6c">6c</option>
+              <option value="6d">6d</option>
+              <option value="7a">7a</option>
+              <option value="7b">7b</option>
+              <option value="7c">7c</option>
+              <option value="7d">7d</option>
+              <option value="8a">8a</option>
+              <option value="8b">8b</option>
+              <option value="8c">8c</option>
+              <option value="8d">8d</option>
+              <option value="9a">9a</option>
+              <option value="9b">9b</option>
+              <option value="9c">9c</option>
+              <option value="9d">9d</option>
+              <option value="10a">10a</option>
+              <option value="10b">10b</option>
+              <option value="10c">10c</option>
+              <option value="10d">10d</option>
+            </select>
+          </div>
+          <button onclick="register()" class="modern-button">Account erstellen ✨</button>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Passwort:</label>
-        <input id="regPass" placeholder="Passwort" type="password" />
-      </div>
-      <div class="form-group">
-        <label>Klasse:</label>
-        <select id="regClass">
-          <option value="">-- Klasse wählen --</option>
-          <option value="5a">5a</option>
-          <option value="5b">5b</option>
-          <option value="5c">5c</option>
-          <option value="5d">5d</option>
-          <option value="6a">6a</option>
-          <option value="6b">6b</option>
-          <option value="6c">6c</option>
-          <option value="6d">6d</option>
-          <option value="7a">7a</option>
-          <option value="7b">7b</option>
-          <option value="7c">7c</option>
-          <option value="7d">7d</option>
-          <option value="8a">8a</option>
-          <option value="8b">8b</option>
-          <option value="8c">8c</option>
-          <option value="8d">8d</option>
-          <option value="9a">9a</option>
-          <option value="9b">9b</option>
-          <option value="9c">9c</option>
-          <option value="9d">9d</option>
-          <option value="10a">10a</option>
-          <option value="10b">10b</option>
-          <option value="10c">10c</option>
-          <option value="10d">10d</option>
-        </select>
-      </div>
-      <button onclick="register()">Registrieren</button>
-      
-      <h2>Login</h2>
-      <div class="form-group">
-        <label>Name:</label>
-        <input id="loginName" placeholder="Dein Name" onkeypress="if(event.key==='Enter') login()" />
-      </div>
-      <div class="form-group">
-        <label>Passwort:</label>
-        <input id="loginPass" placeholder="Passwort" type="password" onkeypress="if(event.key==='Enter') login()" />
-      </div>
-      <button onclick="login()">Login</button>
     </div>
     
     <div id="pageSelectionScreen" class="screen">
@@ -677,6 +858,27 @@
     el.textContent = msg;
     el.className = type;
     el.style.display = 'block';
+  }
+  
+  function switchTab(tabName) {
+    // Entferne active Klasse von allen Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    
+    // Verstecke alle Tab-Contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    
+    // Aktiviere gewählten Tab
+    if (tabName === 'login') {
+      document.querySelectorAll('.tab')[0].classList.add('active');
+      document.getElementById('loginTab').classList.add('active');
+    } else {
+      document.querySelectorAll('.tab')[1].classList.add('active');
+      document.getElementById('registerTab').classList.add('active');
+    }
   }
   
   function showScreen(screenId) {
