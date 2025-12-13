@@ -438,7 +438,17 @@
     <div id="pageSelectionScreen" class="screen">
       <h2>Willkommen, <span id="userName"></span>! 👋</h2>
       <p style="color: #666; margin-bottom: 20px;">Klasse: <span id="userClass"></span></p>
-      
+      <!-- Dashboard Stats -->
+      <div class="stats" style="margin-bottom: 40px;">
+        <div class="stat-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">Vokabeln geübt</div>
+          <div class="stat-number" id="totalVocabsPracticed">0</div>
+        </div>
+        <div class="stat-box" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); color: white;">
+          <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">Accuracy</div>
+          <div class="stat-number" id="averageAccuracy">0%</div>
+        </div>
+      </div>
       <div class="interval-selector">
         <label>Von Seite:</label>
         <select id="pageFrom"></select>
