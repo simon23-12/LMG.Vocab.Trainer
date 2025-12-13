@@ -723,6 +723,34 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba(231,76,60,0.3);
     }
+    
+    /* Info Box Styles */
+    .info-box {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-left: 4px solid #2196f3;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      animation: slideInUp 0.6s ease;
+    }
+    .info-box-title {
+      font-weight: 700;
+      color: #1565c0;
+      margin-bottom: 12px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-box-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #0d47a1;
+    }
+    .info-box-list li {
+      margin: 8px 0;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -805,6 +833,15 @@
         </div>
         
         <div id="registerTab" class="tab-content">
+          <div class="info-box">
+            <div class="info-box-title">💡 Wichtige Hinweise</div>
+            <ol class="info-box-list">
+              <li>Bitte melde dich nur mit deinem <strong>Vornamen</strong> als Name an, nicht den Nachnamen benutzen.</li>
+              <li>Schreib dir dein Passwort sicher in den <strong>Schulplaner</strong> oder einen anderen Ort, wo du es jederzeit nachschauen kannst.</li>
+              <li>Bitte wähle die <strong>richtige Klasse</strong> aus, da du sonst falsch zugeordnet wirst.</li>
+            </ol>
+          </div>
+          
           <div class="form-group">
             <div class="input-icon" data-icon="👤">
               <input id="regName" class="modern-input" placeholder="Dein Name" />
