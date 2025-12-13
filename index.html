@@ -1151,6 +1151,17 @@
     }
     
     try {
+      // Prüfe ob Name + Passwort Kombination bereits existiert
+      const existingUser = await db.ref('users/' + name).get();
+      if (existingUser.exists()) {
+        const userData = existingUser.val();
+        if (userData.password === pass) {
+          showStatus("Dieser Account existiert bereits! Bitte logge dich ein oder wähle ein anderes Passwort.", 'error');
+          return;
+        }
+        // Gleicher Name, aber anderes Passwort -> OK, da mehrere Personen gleichen Namen haben können
+      }
+      
       await db.ref('users/' + name).set({ 
         password: pass,
         class: cls,
@@ -1160,10 +1171,11 @@
       alert("Registrierung erfolgreich! 🎉\n\nBitte notiere dir deine Login-Daten sorgfältig:\n\nName: " + name + "\nPasswort: " + pass);
       showStatus("Registrierung erfolgreich! Jetzt einloggen.", 'success');
       
-      // Felder leeren
+      // Felder leeren und zum Login wechseln
       document.getElementById('regName').value = '';
       document.getElementById('regPass').value = '';
       document.getElementById('regClass').value = '';
+      switchTab('login');
     } catch (error) {
       showStatus("Fehler: " + error.message, 'error');
     }
