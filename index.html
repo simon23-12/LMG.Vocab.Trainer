@@ -1151,18 +1151,19 @@
     }
     
     try {
-      // Prüfe ob Name + Passwort Kombination bereits existiert
-      const existingUser = await db.ref('users/' + name).get();
+      // Erstelle eindeutigen Key aus Name + Passwort Hash
+      // So können mehrere Nutzer mit gleichem Namen existieren
+      const userKey = name + '_' + btoa(pass).substring(0, 8); // Base64 encode des Passworts (gekürzt)
+      
+      // Prüfe ob dieser exakte Account bereits existiert
+      const existingUser = await db.ref('users/' + userKey).get();
       if (existingUser.exists()) {
-        const userData = existingUser.val();
-        if (userData.password === pass) {
-          showStatus("Dieser Account existiert bereits! Bitte logge dich ein oder wähle ein anderes Passwort.", 'error');
-          return;
-        }
-        // Gleicher Name, aber anderes Passwort -> OK, da mehrere Personen gleichen Namen haben können
+        showStatus("Dieser Account existiert bereits! Bitte logge dich ein.", 'error');
+        return;
       }
       
-      await db.ref('users/' + name).set({ 
+      await db.ref('users/' + userKey).set({ 
+        name: name,
         password: pass,
         class: cls,
         created: new Date().toISOString(),
@@ -1221,8 +1222,11 @@
     console.log("Kein Teacher-Login, versuche normalen Login...");
     
     try {
-      console.log("Login Versuch für:", name);
-      const snap = await db.ref('users/' + name).get();
+      // Erstelle den gleichen Key wie bei der Registrierung
+      const userKey = name + '_' + btoa(pass).substring(0, 8);
+      
+      console.log("Login Versuch für Key:", userKey);
+      const snap = await db.ref('users/' + userKey).get();
       console.log("User snapshot erhalten, exists:", snap.exists());
       
       if (!snap.exists()) {
@@ -1233,6 +1237,7 @@
       const data = snap.val();
       console.log("User Daten:", data);
       
+      // Passwort nochmal checken zur Sicherheit
       if (data.password !== pass) {
         showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
@@ -1246,10 +1251,11 @@
         jahrgang = data.class.charAt(0);
       }
       
-      console.log("Login erfolgreich:", name, "Klasse:", data.class, "Jahrgang:", jahrgang);
+      console.log("Login erfolgreich:", data.name, "Klasse:", data.class, "Jahrgang:", jahrgang);
       
       currentUser = { 
-        name: name, 
+        name: data.name,
+        userKey: userKey, // Speichere den Key für spätere Updates
         class: data.class,
         jahrgang: jahrgang 
       };
@@ -1705,7 +1711,10 @@
       }
       
       userPerformance[window.currentPerformanceKey] = perfData;
-      await db.ref('users/' + currentUser.name + '/performance/' + window.currentPerformanceKey).set(perfData);
+      
+      // Verwende userKey statt name für Firebase-Pfad
+      const userPath = currentUser.userKey || currentUser.name;
+      await db.ref('users/' + userPath + '/performance/' + window.currentPerformanceKey).set(perfData);
       
       console.log('✓ Performance gespeichert in Firebase');
       showStatus('Performance gespeichert! 💾', 'success');
