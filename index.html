@@ -1809,11 +1809,12 @@
       const allUsers = snap.val();
       const studentsInClass = [];
       
-      for (let username in allUsers) {
-        const user = allUsers[username];
+      for (let userKey in allUsers) {
+        const user = allUsers[userKey];
         if (user.class === selectedClass) {
           studentsInClass.push({
-            name: username,
+            userKey: userKey,  // Der interne Key
+            displayName: user.name || userKey,  // Der echte Name oder fallback zum Key
             performance: user.performance || {}
           });
         }
@@ -1828,8 +1829,8 @@
       studentsInClass.forEach(student => {
         const perfCount = Object.keys(student.performance).length;
         html += `
-          <div class="student-card" onclick="showStudentPerformance('${student.name}')">
-            <div class="student-name">${student.name}</div>
+          <div class="student-card" onclick="showStudentPerformance('${student.userKey}', '${student.displayName}')">
+            <div class="student-name">${student.displayName}</div>
             <div style="font-size: 14px; color: #666; margin-top: 5px;">
               ${perfCount} Seite${perfCount !== 1 ? 'n' : ''} getestet
             </div>
@@ -1846,21 +1847,24 @@
     }
   }
   
-  async function showStudentPerformance(username) {
+  async function showStudentPerformance(userKey, displayName) {
     try {
-      const snap = await db.ref('users/' + username).get();
+      const snap = await db.ref('users/' + userKey).get();
       if (!snap.exists()) return;
       
       const user = snap.val();
       const perf = user.performance || {};
       
+      // Verwende displayName wenn vorhanden, sonst user.name, sonst userKey
+      const name = displayName || user.name || userKey;
+      
       if (Object.keys(perf).length === 0) {
         document.getElementById('studentPerformance').innerHTML = 
-          `<h3>${username}</h3><p>Noch keine Tests absolviert.</p>`;
+          `<h3>${name}</h3><p>Noch keine Tests absolviert.</p>`;
         return;
       }
       
-      let html = `<h3>Performance von ${username} (${user.class})</h3>`;
+      let html = `<h3>Performance von ${name} (${user.class})</h3>`;
       html += '<div class="perf-grid">';
       
       // Sortiere nach Seitennummer
