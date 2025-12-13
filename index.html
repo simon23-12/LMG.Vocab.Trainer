@@ -120,6 +120,9 @@
     .page-box.tested {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
+    .page-box.perfect {
+      background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
+    }
     .page-box.green {
       background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
     }
@@ -896,7 +899,10 @@
       } else {
         // Farbe basierend auf Performance
         if (perf && perf.percent !== undefined) {
-          if (perf.percent >= 80) {
+          if (perf.percent === 100) {
+            box.classList.add('perfect');
+            console.log("Seite", page, "wird HELLGRÜN (100%)");
+          } else if (perf.percent >= 80) {
             box.classList.add('green');
             console.log("Seite", page, "wird GRÜN (", perf.percent, "%)");
           } else if (perf.percent >= 50) {
@@ -1270,6 +1276,18 @@
     
     document.getElementById('totalVocabsPracticed').textContent = totalVocabs;
     document.getElementById('averageAccuracy').textContent = avgAccuracy + '%';
+    
+    // Färbe die Accuracy-Box basierend auf dem Durchschnitt
+    const accuracyBox = document.getElementById('averageAccuracy').parentElement;
+    if (avgAccuracy === 100) {
+      accuracyBox.style.background = 'linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%)';
+    } else if (avgAccuracy >= 80) {
+      accuracyBox.style.background = 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)';
+    } else if (avgAccuracy >= 50) {
+      accuracyBox.style.background = 'linear-gradient(135deg, #f09819 0%, #edde5d 100%)';
+    } else {
+      accuracyBox.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+    }
   }
   
   function backToSelection() {
