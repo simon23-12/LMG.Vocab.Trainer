@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vokabeltrainer - Jahrgang 10</title>
+  <title>LMG Englisch Vokabeltrainer</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -25,6 +25,23 @@
       margin-bottom: 30px;
       text-align: center;
       font-size: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      height: 60px;
+      width: auto;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      font-size: 12px;
+      color: #999;
+      font-style: italic;
     }
     h2 { 
       color: #333; 
@@ -336,7 +353,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>📚 Vokabeltrainer Jahrgang 10</h1>
+    <h1>
+      <img src="data:image/png;base64,UklGRpAUAABXRUJQVlA4WAoAAAAgAAAAUwIAmgAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZWUDggohIAANBjAJ0BKlQCmwA+USiRRiOioaEk0xkYcAoJZW7hdgEf0B/Vex6r93r7T/doq/9l/EP9H4ScxnrL7f/mf6D+V3vy9Rn529gD9H/9N/YeuB5gP2T/cr3iP75+xHuf/wH+Y9gD+mf1n/29hb+3fsJfu16a/7c/Cr+3H7pe1V//+z/6Vfqf/Wu07/HfkV6A+Jzzt7Xeuz+8+KiJZ8e+zH5b+9ft97L/7bxD4Av5F/Nv8H+XH9q9SfaOzXeoX69fYv+L/dvH01m/B3sAfyr+v/83+y8oT5/7An6Z9WP/L/9/np+tf/T/nvgP/Wn/ZC/YD7d/0kKQktC2VVihbKqxQtlVYoWyqsULZVWKFsqrFC2VViha8VBg32ifGRJBSNvayWFSDsV6y3f9JCkJLQtlVYoWyqsSmBcXt3YjCuKuH9is4uL65VN7G/BYLOaCkJLQtlVYoWyqsULZVV+CLZFYcapZIcSOFnfNZR1CDixcUD4tsMn/6SFISWhbKqxQtlVYoWuhU5juHzGiiL9Xgloxriffp2/ku/6SFISWhbKqxQtlVYoVzNyZ/97SdeIzjNq+Y6i2IFszRakWzd1iDu4uuQvz1FnXqqxQtlVYoWyqsULZVV+AeUaqHfNt0LuG7zFuX2M7tMT1hBp0Rr1kbR5dcUoYcj870SHx9cVc2mz0KockXds23LN3lkIxig+U62NsnHftp0LittTi+4/UhbSob/U+4eyrMhK8HZ8QfEjn5Gh4Z5GUJWnI4zBpqVAsR3ouqKl/zxLxO+bo/WMzImBKJGJ3CN6CWDVRGC4KRx4IU3avoiCfspVWfpBmeipv1UkQ/YhTqTvdJ2SuHTOZRkbBNWG2v5JvfDmBEDrfnylb3of4O4X1ZK72xuEjlIAYFTxMIp4kguUWQuxxwH08gFofv+bRjJtPM7RJntXHeA+hH8UNXWmvBz9CckOUExc8I7DyU1+Vj07q74E8ZHgBfk97Q43bjZLU00s3eIJNP4WS8nEtAJtPqEN0z3Tuzj/TpSFfrz0zDjvpR0hkacZLfbv4Dy8Vh+NwzznRYunbgVVihczVYoV2M8ALZVWJAAD+/9g/AADCC8q16IId7O8I+qVRS33+KVmVauirF5Zv8S8v3CibfjcDQhQlb6bvuBMB5QHR1Pg9BxTvz+q+d0TT8osCuQAvQiJv+5DrU5lJMYhMHYxK3sW3IK0fnY+ncqf05VZjFKvm46uPLUDRKUFF10iukNS2I+A/OO6hBb2zQ6lyNDSy/9igomq0AY6Vp2eZQDZZzhV5RC2F1G4yZialb27ydCdkIfbAqGfEP3/SpFGnyoU2xRk3IrDi9TpMp6nBf76Wy4Pb/fwsYebwHSAikEX4sPwVunSZSh/3HngHf0KP+8sIEgg+K33YV+Iss2h6SsG2Mom8OZlVW61ANrPsIIAjIxyxe7dUwAaEhNkrd4Vt4bOkIe9a3x2ltBriSJo7B5fhrWWXtRxadvPNNRqSmEPDOBunBN9kgz/566o9xMTT1OWt5hxRERC/NQgo/7Lbvz7C4fAMKi9svw7aZWOWIYPXVxIkuBRDuRik72puQZordM6YEyup5GEWJ89Fe7M/xM5j5CbP9kJ/sB+1dCYc2z5f89+Guu4B6lXgxvuMNpCSt4yOZhOygfTWQgvwQHGAhGDDAcD7nr5y0CxxYXU/AxcHSahD2tAyhjOMs79LvYNPdOdR1GJhgdnz7nbZpbQ7ir25JT2bpozT4u+A7dGCL7dvKP3BoCnRUavSL22vcTNnAGUKr6uFhtzXHWZirrGh5e8/NJxicB0TDjQ/+3WTqi0e4ckeQ4mGX/+gXHmYRvf7gPM+y5lMiUDs44cLs58Beeui0fy2HWupL2W8fU1A/PO6CuHW6rKzMeM6V8vFxtHiVj8zxHnMbvN7FNmCtZg/9C+hHEel26Kr2uoMeJ+9leE4Jj1MfzJe4s66m/Mvglll4btmEgFnuUz8J4/73Ur/J/KzBq4dRGCwT2imfmjV+Ygwb7/Xct7FsgiexPqB6yYQzpZ5FD1OVQ2h6hlNAJ3NRAD5F6E9Jc2JoI245gL4u1O/+0fyO3kVnXN3QsGMzUUfiyapIVIAAu+Bh38hqhJck9q/FykDZdJsuaQv6o0JC74T/fiBgfyZTJ8qEjL23SW8ZMh0X0v3DFOJJVNu9oAuqRrdXgFw9i1rwITZoQvYlAmklJNIjRJYVJeU3lwiJbgELWoNLh6bfWtPIOeErM4tasA1yFqyGyqgWq+8/s/JRw53l24CvVcE6di9cQcB78O/IlYDcPAbGzq1tLOI0UrjFfETdB5klNhTXoTiStOms6uDL4QNusgVvUL5cPxeTUJNZipbtIan+cnFkvlWxRuDLJACR++W6SnifW3HY67whBK40Qryx2POS26v7xq/eSbproM7/6yG+hAB29u25WxnW1r6NZTGOJiZITDxR65dFvxmlJfWK3fqzn67AGcI8T9CGXIQTkrdzeQfq0REyX055lAvFTdn31HdqChUJkRE884CSHJuuS2/y1OjGQyeGBks/8FbqWO4VZXUA06UKYSqt+urL36B5b81EjNbPtOZC1KwzzX5wHRAQZrNcdGlqkbUgwNiySVg8PQjucktJDtMQDtiL0Ad4r4TWspq/cqrVBLDycdfGHe7VWn65NxcAeW7I7Xtf6VYCn8wJEifl9tZFSvONKygXqCdrfPb/8rhitw5OPg9SoJjJj/nKp4pPp7mlVDnhUEHxTMsTr63jZT7SSvPieZz4iSrz9TRUVu/47ddK5QtHlkvockhkQoCxF0wcBJ2GIGpN+CJVlN9rTzp6KSMKn4aQQavvNWv1cHKhQ+xR9owLaBxqr8zqMkm4LZiAN0Elc4vLsJh/5Qs9F3g+FE28E+VwZSfaKRm8xFE7S1YGVWaqlJBrr0z7F2CN8eP/ZpaeY+0TSVZITOXLS1uGWXK9/P9c4acFEL0BwwnPXj5/AKtsbMQ1dITL5KU509zBPiF3UGVPRW8GUIdMHiAZF2/Vq/SJelgWJcG/rmoJQFqsFcoh59ud1Ty0aHRxiyRN75TZVTSYOPJp/yTMwDuAwWpXjLgksNV6KCgNH8Y0xOp03+AwxEB8Cx1S9h8GIP/9/SI71vk0/QxBy/rQeOQXvRNpisNhVSjzl8jOxCqjHqVSlkOAokaVVU+/ElCFYDXIzQd1ktLf3Uthlcu1WjAXKmspSmuAzapst+jqj7ZGmuUSB5I1ZcLAee7GvAPBVJa+BhVSOxPAVttZBgtzhsKMAQGtrRd770hQG19yxjymN3+b+rBB/gtUKg+a8/vUXQ1IOITXUm7+XsqPZAGSNN6nwIynOgFHFuqPNB/40KKWgBR/4y/Wa5YwNnei5iIEHpnHwDIlVbuBHT9RlAyuzIJuqYA+AIuz2/TIOxJP7kb8gMwKceEAtq4BHor07SOyRHgiNvPaPZlbhkvLlNB/0JPrTzpJQf1GXcdFm5dmF5ZQbBqgLTvm00pC5vcWsHapXfPbFt4Yg/TZgI78RYnb9Pyqj43m7/6F0sDPvY23Utclqd8q9hsP/Hwrx98PR+1OPQdp/6pCbTZK4xd20rjueh4so5s9dOxEKLgieFpHTk4c1+68lC6dAD/b2gUr9vO5V83BBU49qPXsiZRe4gUbzr35dJAepo1LEeMv+fZLM9DHrWXSmncHEElCPuqW5Mi83t9TPO5sWuLSdCD98+HL8c+Ss5HT3c+fv4nWXbDh2ZWfBWnaJD+/dacla6GUv2tYd68/H16RdIFEoJgo4BsU/HU0ruNCBmWIhk8+zrZ+3wWxd07oM7cnSVdDfeBHlpACzl7UAhD+awjdtsDO3lhlUVcO2BN5fceaEx8I0UeQ8fZPx3+eiNgPS28KGDOxZfJ32NcLz+LfYUK6KlcZDo/F5fG77jQEE6HYH5dbV9/ivL4TbEJ3Hpp35TJwM+Y9YuUfiHqH5RfehhQ0o3ie1anUYrkb7qGwqeIYj09LZUfeXDDXAb1PGPascL2gH9sT39XDVqNg9E0aTxjWzB1FIGVJ/dtIg9rQlAvUK1CaijMYeO6Pmv8H89gJc2uq/yNzotIKYFJz/skCLIkaaBrZjvd2Ie+S1tTHCz07G25kqeHfPIVavD34p6/1R27o/sziocm3pTu6mJ2h+PL9cYNKJ7Bml+/REnwy69RXt+SBcKJrlKZZSVzfSaUyLD93T8AMMlvZWEKxUjmXyenH0nkcr9J3W9nO2niVu/xPw+M3OUmpbm+OcL4YBQDhOxvEi7oGmWzzgJW/HaNqGNBGjLPcoXzB/RUfVi8FgHHhroFxxU/acPQtG2cruFt5b5g9gIvKHwIBC4SIdDO/qg4/Df8aph534sXlYqaBmZoCDg0bo2VqdtrZ7fSeFQR+bx/BJMHfRJJFJUXbJ5WB7fhWPOTCksrxDyT7e85XbUPdwLDL6LTZt5qsey9uA3ccKEI/PTNmXIzNa24Z2GsRu8k8e8GtaiYyWdxbqV28KZcY62gpeDnCL4MbOzOGYLMwsremtOEli/Rg7EHtWSKxJOiujca4/xdqOQ1Vh2toinQ+uQT3qnP1TbKQhTifm38YFJs5HrFAfGpC0sp/Y4NelTdd6/TvixXo+SVVTLpdQ5y38oyF9Ks2Ccu9KcjfGUmCMmArMGfG4jrFYGFjql9Ej1e902hBPDeZZLbaEc+KKFh1V1t22Lf5LBtcDCtle2ngN/Z9fMVOPi3vzQ1H7C5jwMp8Iq8RI4rblNKDQoj2B/i9XjxJYs6yx63D+6wrb1quykLHpUUMrj/KRKO/CJzuu2GHTdNm7HPe88xLWfd2KVtGmK9XR+ZWxjmtCZzqOTT6XRSfxOtrcKq1dn6JbO+7MLxPmm8Lh+NEuDFoXxXhocy5alE9cDNJGj9wHbgmSQfwf5urr5lwT6iquUvYdi1av+zqaQcItfZTvKeD52NJwq02f7eB+89+Fc+jygqKcFJ8aKteslu0aZmxGfk87XYatspKsTzfvmzt6p3m67Jh+Zc6ad/9SpcrxK/m7pIYVVsg3H3F/PzvQR+3SiSL6xeq460gzQqDoQzX/s32H/K3yX4MB4BwEcrPb9Py/Ga4LttzuSVLNf5H5G/MbvU1MkifGS3McC1UVJMMbHTC1GGWvhswSDIEkBWEMT83EYtQ+9dOkw+3t3bNgR204pPG+wn+7xJiWtrDRoalIXivgudp5yXeggrYhdxaggSdRIAykjPjJnhJjW8GnXOYxp2vpGrEyvz+0d12WLz7DXueJMKCURr4oGOFSAaAm0tys5QB/g6aD4O6eiwmCD6aDKNSDfGTCOpSfmbYgpZ19tU3qsJqjrN/NbYpo4ilmxaKEnCcF65/59SJUOkVN5PeAw6z4b95Z5RmfSxYdMQgmjVQzFnNv0vbozDaZ3P8aCV+69v87gAXJ2RdVjmU4Uz0Wl9mi/z32ii8fk94ygZF8vnv4bpWySPQ1oTNxpv6EgA1ThdV6kcaQOJMM2R7q53tfaMx1UlaeefSiWxQd42vcbmONj4jGrRe5RqjUzpnhsvKuN1LUd3lpOZPUVXRc/XM2DiJ6eRoHETokbAf/vg6qI+ECLtoS/Gdx3s35GRGkOrClqGGGeNgEFh/LpdgjgaVzotgxMdiwFphYuQR7Ru/296+tBhUyuCEz+Fua0OfKzf/eO6fhmq97jFr+7q+odlBjSyEObCcY8g8KqaDZpp/Yn/cM6mG8gVsZ2aGx33zBAaNl0lkjKo839zlutIwRJUITYEhmQN3OonYGJ/i7FG2Fu4YGco9CS85343I7L+M85rdql9l/g/J2ulv8JbgBBd/f1EHRy0mtO1LWsH6DfnrudiJRc0f4RmkR1IjRkjhW8sJj+qTyVLtrD0auHQ+XPeqqU+uErVb1eAzkjX8znabvAv5QNizp8HCXArrlj0bRghm5aLjpZJFykMgE3EpTnkejkRaamfEkygfdKAjOF8Xzp0kNev5HRZ2Cf6EROfoBto5Wv7Qhf17+HlPg6brVDJ4JwyRJkMd/xoy5bS9ckvJpl7x9L2MjrWG/zfcgyfDJjAtVoHiy9ZkUOTDTXPm74EgbfGdesl9/fP47Dzk4hLnx/wv1j86r/v2j87ZaZcq3VDzjpDaVeoyT9jVo4pMYrrnjtkSvsuQ6PTtAut/GvF1nPHshVcgdN/5Bh4l7qNhxe5/+Kg3dvJP3ruSWpbKR/7tp9IPfjqlPqPkJyPn5N+cQ52QTqYQEiGJpF9LekIq87luHecaJYdWm8yIN9R+HqBiCuqfcXo8qZWN1K+GCHLWncrHp6N49vKZooruIQM6iwe5e2J4TwSwhcEYpDavQ6azpFtU9LLb35s0+A9N4u7FlFTIUAAAAAAADEtHlM45z+iwZnvYJ/m6AAAAA==" alt="LMG Logo" class="logo">
+      LMG Englisch Vokabeltrainer
+    </h1>
     
     <div id="loadingScreen" class="loading" style="display: none;">
       <p>⏳ Lade Firebase...</p>
@@ -429,11 +449,11 @@
       <h2>Login</h2>
       <div class="form-group">
         <label>Name:</label>
-        <input id="loginName" placeholder="Dein Name" />
+        <input id="loginName" placeholder="Dein Name" onkeypress="if(event.key==='Enter') login()" />
       </div>
       <div class="form-group">
         <label>Passwort:</label>
-        <input id="loginPass" placeholder="Passwort" type="password" />
+        <input id="loginPass" placeholder="Passwort" type="password" onkeypress="if(event.key==='Enter') login()" />
       </div>
       <button onclick="login()">Login</button>
     </div>
@@ -515,6 +535,7 @@
         <button onclick="logout()" style="background: #e74c3c;">Logout</button>
       </div>
     </div>
+    <div class="footer">From Simon with love ❤️</div>
   </div>
   
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
