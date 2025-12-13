@@ -1739,22 +1739,81 @@
       
       console.log("Speichere Performance:", window.currentPerformanceKey, perfData);
       
-      // Prüfe ob bereits ein besserer Score existiert
+      // Verwende userKey statt name für Firebase-Pfad
+      const userPath = currentUser.userKey || currentUser.name;
+      
+      // Prüfe ob es ein Intervall-Test ist
+      const isIntervalTest = window.currentPerformanceKey.startsWith('interval_');
+      
+      if (isIntervalTest) {
+        // Bei Intervall: Berechne Performance pro Seite
+        console.log("Intervall-Test erkannt, berechne Performance pro Seite...");
+        
+        // Gruppiere Antworten nach Seite
+        const pageStats = {};
+        
+        answers.forEach(answer => {
+          // Finde die Vokabel um die Seite zu bekommen
+          const vocab = quizVocabs.find(v => v.German === answer.question);
+          if (vocab) {
+            const page = parseInt(vocab.Page);
+            if (!pageStats[page]) {
+              pageStats[page] = { correct: 0, total: 0 };
+            }
+            pageStats[page].total++;
+            if (answer.isCorrect) {
+              pageStats[page].correct++;
+            }
+          }
+        });
+        
+        // Speichere jede Seite einzeln
+        for (let page in pageStats) {
+          const stats = pageStats[page];
+          const pagePercent = Math.round((stats.correct / stats.total) * 100);
+          const pageKey = 'page_' + page;
+          
+          // Prüfe ob bereits besserer Score existiert
+          const existingPagePerf = userPerformance[pageKey];
+          if (existingPagePerf && existingPagePerf.percent >= pagePercent) {
+            console.log(`Seite ${page}: Bestehender Score besser (${existingPagePerf.percent}% vs ${pagePercent}%)`);
+            continue;
+          }
+          
+          const pageData = {
+            percent: pagePercent,
+            score: stats.correct,
+            total: stats.total,
+            timestamp: new Date().toISOString(),
+            date: new Date().toLocaleDateString('de-DE'),
+            fromInterval: window.currentPerformanceKey
+          };
+          
+          console.log(`Speichere Seite ${page}:`, pageData);
+          userPerformance[pageKey] = pageData;
+          await db.ref('users/' + userPath + '/performance/' + pageKey).set(pageData);
+        }
+        
+        showStatus('Performance gespeichert! Einzelne Seiten aktualisiert. 💾', 'success');
+      }
+      
+      // Speichere auch den Gesamt-Intervall-Score (wie bisher)
       const existingPerf = userPerformance[window.currentPerformanceKey];
       if (existingPerf && existingPerf.percent > percent) {
         console.log("Bestehender Score ist besser:", existingPerf.percent, "% vs", percent, "%");
-        showStatus('Gut gemacht! Aber dein bisheriger Rekord war besser: ' + existingPerf.percent + '%', 'info');
+        if (!isIntervalTest) {
+          showStatus('Gut gemacht! Aber dein bisheriger Rekord war besser: ' + existingPerf.percent + '%', 'info');
+        }
         return;
       }
       
       userPerformance[window.currentPerformanceKey] = perfData;
-      
-      // Verwende userKey statt name für Firebase-Pfad
-      const userPath = currentUser.userKey || currentUser.name;
       await db.ref('users/' + userPath + '/performance/' + window.currentPerformanceKey).set(perfData);
       
       console.log('✓ Performance gespeichert in Firebase');
-      showStatus('Performance gespeichert! 💾', 'success');
+      if (!isIntervalTest) {
+        showStatus('Performance gespeichert! 💾', 'success');
+      }
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
       showStatus('Fehler beim Speichern: ' + error.message, 'error');
