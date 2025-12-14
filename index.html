@@ -1614,8 +1614,19 @@
     const userNorm = userAnswer.toLowerCase().trim();
     const correctNorm = correctAnswer.toLowerCase().trim();
     
+    // Erstelle auch eine Version OHNE Klammer-Inhalte für Vergleich
+    // "subject (school)" → "subject"
+    const correctWithoutBrackets = correctNorm.replace(/\s*\([^)]*\)/g, '').trim();
+    
     // 1. Exakte Übereinstimmung (case-insensitive ist schon durch normalisierung)
     if (userNorm === correctNorm) {
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 1a. Übereinstimmung OHNE Klammer-Inhalt (Klammer-Wörter sind optional)
+    if (userNorm === correctWithoutBrackets) {
+      console.log("✓ Richtig ohne Klammer-Zusatz:", userAnswer);
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
@@ -1623,22 +1634,28 @@
     // 1b. NEUE REGEL: Wenn das korrekte Wort in der Antwort enthalten ist, akzeptieren
     // Beispiele: "stop" in "bus stop", "table" in "a table", "the table"
     // Aber nur wenn es als ganzes Wort vorkommt (nicht Teil eines anderen Wortes)
-    const correctWords = correctNorm.split(/\s+/); // Teile richtige Antwort in Wörter
-    const userWords = userNorm.split(/\s+/);       // Teile User-Antwort in Wörter
     
-    // Prüfe ob ALLE Wörter der richtigen Antwort in der User-Antwort vorkommen
-    const allCorrectWordsPresent = correctWords.every(word => {
-      // Überspringe sehr kurze Wörter wie "a", "an", "the", "to"
-      if (word.length <= 2 && !['go', 'do', 'be', 'is', 'am', 'at', 'in', 'on'].includes(word)) {
-        return true; // Ignoriere Artikel und Präpositionen
+    // Prüfe mit BEIDEN Versionen: mit und ohne Klammern
+    const correctVersions = [correctNorm, correctWithoutBrackets];
+    
+    for (let correctVersion of correctVersions) {
+      const correctWords = correctVersion.split(/\s+/); // Teile richtige Antwort in Wörter
+      const userWords = userNorm.split(/\s+/);          // Teile User-Antwort in Wörter
+      
+      // Prüfe ob ALLE Wörter der richtigen Antwort in der User-Antwort vorkommen
+      const allCorrectWordsPresent = correctWords.every(word => {
+        // Überspringe sehr kurze Wörter wie "a", "an", "the", "to"
+        if (word.length <= 2 && !['go', 'do', 'be', 'is', 'am', 'at', 'in', 'on'].includes(word)) {
+          return true; // Ignoriere Artikel und Präpositionen
+        }
+        return userWords.includes(word);
+      });
+      
+      if (allCorrectWordsPresent && correctWords.length > 0) {
+        console.log("✓ Alle wichtigen Wörter enthalten:", userAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
       }
-      return userWords.includes(word);
-    });
-    
-    if (allCorrectWordsPresent && correctWords.length > 0) {
-      console.log("✓ Alle wichtigen Wörter enthalten:", userAnswer);
-      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
-      return;
     }
     
     // 2. ERWEITERTE VERB-PRÜFUNG - alle Variationen akzeptieren
