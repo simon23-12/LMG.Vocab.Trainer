@@ -1611,8 +1611,26 @@
     const correctAnswer = vocab.English;
     
     // Normalisiere beide Antworten
-    const userNorm = userAnswer.toLowerCase().trim();
-    const correctNorm = correctAnswer.toLowerCase().trim();
+    let userNorm = userAnswer.toLowerCase().trim();
+    let correctNorm = correctAnswer.toLowerCase().trim();
+    
+    // Ersetze Abkürzungen mit vollen Wörtern für flexibleren Vergleich
+    const expandAbbreviations = (text) => {
+      return text
+        .replace(/\bsb\./gi, 'somebody')
+        .replace(/\bsb\b/gi, 'somebody')
+        .replace(/\bsth\./gi, 'something')
+        .replace(/\bsth\b/gi, 'something')
+        .trim();
+    };
+    
+    // Erweitere beide Versionen
+    const userExpanded = expandAbbreviations(userNorm);
+    const correctExpanded = expandAbbreviations(correctNorm);
+    
+    // Nutze die erweiterten Versionen für Vergleiche
+    userNorm = userExpanded;
+    correctNorm = correctExpanded;
     
     // Erstelle auch eine Version OHNE Klammer-Inhalte für Vergleich
     // "subject (school)" → "subject"
