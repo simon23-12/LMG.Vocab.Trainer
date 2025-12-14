@@ -748,6 +748,101 @@
       color: #0d47a1;
     }
     .info-box-list li {
+    
+    /* Leaderboard Styles */
+    .leaderboard-section {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 30px 0;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: slideInUp 0.8s ease;
+    }
+    .leaderboard-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .leaderboard-header h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.5em;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .leaderboard-month {
+      color: #667eea;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+    .leaderboard-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+      border-radius: 12px;
+      transition: all 0.3s;
+      animation: slideInLeft 0.5s ease;
+    }
+    .leaderboard-item:nth-child(1) { animation-delay: 0.1s; }
+    .leaderboard-item:nth-child(2) { animation-delay: 0.15s; }
+    .leaderboard-item:nth-child(3) { animation-delay: 0.2s; }
+    .leaderboard-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102,126,234,0.15);
+    }
+    .leaderboard-rank {
+      font-size: 1.3em;
+      font-weight: 700;
+      min-width: 40px;
+      text-align: center;
+    }
+    .leaderboard-item:nth-child(1) .leaderboard-rank {
+      color: #FFD700;
+      font-size: 1.6em;
+    }
+    .leaderboard-item:nth-child(2) .leaderboard-rank {
+      color: #C0C0C0;
+      font-size: 1.5em;
+    }
+    .leaderboard-item:nth-child(3) .leaderboard-rank {
+      color: #CD7F32;
+      font-size: 1.4em;
+    }
+    .leaderboard-name {
+      flex: 1;
+      font-weight: 600;
+      color: #333;
+      font-size: 1.05em;
+    }
+    .leaderboard-item.current-user {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .leaderboard-item.current-user .leaderboard-name,
+    .leaderboard-item.current-user .leaderboard-score {
+      color: white;
+    }
+    .leaderboard-score {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 1.1em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .leaderboard-item.current-user .leaderboard-score {
+      color: white;
+    }
+    
       margin: 8px 0;
       line-height: 1.5;
     }
@@ -903,6 +998,16 @@
           <div class="stat-label">🎯 Accuracy</div>
           <div class="stat-value" id="averageAccuracy">0%</div>
         </div>
+      </div>
+      
+      <!-- Leaderboard Section -->
+      <div id="leaderboardSection" class="leaderboard-section">
+        <div class="leaderboard-header">
+          <h3>🏆 Top 10 <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
+        </div>
+        <ol id="leaderboardList" class="leaderboard-list">
+          <!-- Wird dynamisch befüllt -->
+        </ol>
       </div>
       
       <!-- Interval Section -->
@@ -1364,6 +1469,10 @@
     document.getElementById('userClass').textContent = currentUser.class;
     // Berechne Dashboard-Statistiken
     calculateDashboardStats();
+    
+    // Lade Leaderboard
+    loadLeaderboard();
+    
     if (allVocabs.length === 0) {
       showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " verfügbar!", 'error');
       return;
@@ -2011,6 +2120,113 @@
       accuracyElement.style.webkitBackgroundClip = 'text';
       accuracyElement.style.webkitTextFillColor = 'transparent';
       accuracyElement.style.backgroundClip = 'text';
+    }
+  }
+  
+  async function loadLeaderboard() {
+    try {
+      // Hole aktuellen Monat und Jahr
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1; // 1-12
+      const currentYear = now.getFullYear();
+      const monthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`; // "2025-12"
+      
+      // Monatsname für Anzeige
+      const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                         'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+      document.getElementById('leaderboardMonth').textContent = monthNames[currentMonth - 1] + ' ' + currentYear;
+      
+      // Lade alle User der gleichen Klasse
+      const usersSnap = await db.ref('users').get();
+      if (!usersSnap.exists()) {
+        document.getElementById('leaderboardList').innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Daten verfügbar</li>';
+        return;
+      }
+      
+      const allUsers = usersSnap.val();
+      const classUsers = [];
+      
+      // Filtere User nach Klasse und zähle Vokabeln für diesen Monat
+      for (let userKey in allUsers) {
+        const user = allUsers[userKey];
+        
+        // Nur User der gleichen Klasse
+        if (user.class !== currentUser.class) continue;
+        
+        // Exkludiere Test-Accounts
+        const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
+        if (testAccounts.includes(user.name.toLowerCase())) {
+          console.log('Überspringe Test-Account:', user.name);
+          continue;
+        }
+        
+        // Zähle Vokabeln die in diesem Monat geübt wurden
+        let monthVocabs = 0;
+        if (user.performance) {
+          for (let perfKey in user.performance) {
+            const perf = user.performance[perfKey];
+            // Prüfe ob Timestamp in diesem Monat liegt
+            if (perf.timestamp) {
+              const perfDate = new Date(perf.timestamp);
+              const perfMonth = perfDate.getMonth() + 1;
+              const perfYear = perfDate.getFullYear();
+              
+              if (perfMonth === currentMonth && perfYear === currentYear) {
+                monthVocabs += (perf.total || 0);
+              }
+            }
+          }
+        }
+        
+        classUsers.push({
+          userKey: userKey,
+          name: user.name,
+          vocabs: monthVocabs
+        });
+      }
+      
+      // Sortiere nach Vokabeln (absteigend)
+      classUsers.sort((a, b) => b.vocabs - a.vocabs);
+      
+      // Zeige nur Top 10
+      const top10 = classUsers.slice(0, 10);
+      
+      // Rendere Leaderboard
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '';
+      
+      if (top10.length === 0) {
+        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Aktivität in diesem Monat</li>';
+        return;
+      }
+      
+      top10.forEach((user, index) => {
+        const li = document.createElement('li');
+        li.className = 'leaderboard-item';
+        
+        // Highlight current user
+        if (user.userKey === currentUser.userKey) {
+          li.classList.add('current-user');
+        }
+        
+        // Rang-Emojis
+        let rankEmoji = '';
+        if (index === 0) rankEmoji = '🥇';
+        else if (index === 1) rankEmoji = '🥈';
+        else if (index === 2) rankEmoji = '🥉';
+        
+        li.innerHTML = `
+          <span class="leaderboard-rank">${rankEmoji || (index + 1)}</span>
+          <span class="leaderboard-name">${user.name}</span>
+          <span class="leaderboard-score">📚 ${user.vocabs}</span>
+        `;
+        
+        list.appendChild(li);
+      });
+      
+    } catch (error) {
+      console.error('Leaderboard Fehler:', error);
+      document.getElementById('leaderboardList').innerHTML = '<li style="text-align:center; padding:20px; color:#e74c3c;">Fehler beim Laden</li>';
     }
   }
   
