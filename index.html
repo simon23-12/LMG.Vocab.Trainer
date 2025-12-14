@@ -1455,22 +1455,75 @@
       return;
     }
     
-    const vocabs = allVocabs.filter(v => {
+    // Sammle alle Vokabeln im Intervall
+    const allIntervalVocabs = allVocabs.filter(v => {
       const page = parseInt(v.Page);
       return page >= from && page <= to;
     });
     
-    if (vocabs.length < 10) {
+    if (allIntervalVocabs.length < 10) {
       showStatus("Zu wenig Vokabeln in diesem Intervall (mindestens 10 benötigt)!", 'error');
       return;
     }
     
-    startQuiz(vocabs, 'interval_' + from + '_' + to);
+    // Gruppiere Vokabeln nach Seiten
+    const vocabsByPage = {};
+    allIntervalVocabs.forEach(v => {
+      const page = parseInt(v.Page);
+      if (!vocabsByPage[page]) {
+        vocabsByPage[page] = [];
+      }
+      vocabsByPage[page].push(v);
+    });
+    
+    const pages = Object.keys(vocabsByPage).map(p => parseInt(p));
+    const pageCount = pages.length;
+    
+    let selectedVocabs = [];
+    
+    if (pageCount === 1) {
+      // Nur eine Seite: 15 Vokabeln von dieser Seite
+      const shuffled = vocabsByPage[pages[0]].sort(() => 0.5 - Math.random());
+      selectedVocabs = shuffled.slice(0, Math.min(15, shuffled.length));
+    } else if (pageCount === 2) {
+      // Zwei Seiten: je ~7-8 Vokabeln (gesamt 15)
+      pages.forEach(page => {
+        const shuffled = vocabsByPage[page].sort(() => 0.5 - Math.random());
+        const count = Math.ceil(15 / 2);
+        selectedVocabs = selectedVocabs.concat(shuffled.slice(0, Math.min(count, shuffled.length)));
+      });
+    } else {
+      // 3+ Seiten: Wähle zufällig 3 Seiten, je 5 Vokabeln
+      const shuffledPages = pages.sort(() => 0.5 - Math.random());
+      const selectedPages = shuffledPages.slice(0, 3);
+      
+      selectedPages.forEach(page => {
+        const shuffled = vocabsByPage[page].sort(() => 0.5 - Math.random());
+        selectedVocabs = selectedVocabs.concat(shuffled.slice(0, Math.min(5, shuffled.length)));
+      });
+    }
+    
+    // Prüfe ob genug Vokabeln gesammelt wurden
+    if (selectedVocabs.length < 10) {
+      showStatus("Zu wenig Vokabeln verfügbar! Wähle ein größeres Intervall.", 'error');
+      return;
+    }
+    
+    // Shuffle final selection
+    selectedVocabs = selectedVocabs.sort(() => 0.5 - Math.random());
+    
+    startQuiz(selectedVocabs, 'interval_' + from + '_' + to, true);
   }
   
-  function startQuiz(vocabPool, performanceKey = null) {
-    const shuffled = vocabPool.sort(() => 0.5 - Math.random());
-    quizVocabs = shuffled.slice(0, Math.min(10, vocabPool.length));
+  function startQuiz(vocabPool, performanceKey = null, isPreselected = false) {
+    if (isPreselected) {
+      // Vokabeln wurden bereits intelligent ausgewählt (bei Intervall)
+      quizVocabs = vocabPool;
+    } else {
+      // Normale Auswahl: shuffle und nimm bis zu 10
+      const shuffled = vocabPool.sort(() => 0.5 - Math.random());
+      quizVocabs = shuffled.slice(0, Math.min(10, vocabPool.length));
+    }
     
     currentQuestionIndex = 0;
     score = 0;
@@ -1767,9 +1820,16 @@
           }
         });
         
-        // Speichere jede Seite einzeln
+        // Speichere jede Seite einzeln (nur wenn mindestens 5 Vokabeln getestet wurden)
         for (let page in pageStats) {
           const stats = pageStats[page];
+          
+          // Nur speichern wenn mindestens 5 Vokabeln von dieser Seite getestet wurden
+          if (stats.total < 5) {
+            console.log(`Seite ${page}: Zu wenig Vokabeln getestet (${stats.total}), überspringe Speicherung`);
+            continue;
+          }
+          
           const pagePercent = Math.round((stats.correct / stats.total) * 100);
           const pageKey = 'page_' + page;
           
