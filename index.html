@@ -1601,16 +1601,13 @@
       return;
     }
     
-    // Zeige "Wird geprüft..." Nachricht
-    document.getElementById('feedback').textContent = "🤔 Prüfe Antwort...";
-    document.getElementById('feedback').className = 'feedback checking';
     document.getElementById('submitBtn').disabled = true;
     
-    // Prüfe Antwort mit AI
-    checkAnswerWithAI(userAnswer, vocab);
+    // Prüfe Antwort (ohne AI, nur mit Regeln und Synonymen)
+    checkAnswer(userAnswer, vocab);
   }
   
-  async function checkAnswerWithAI(userAnswer, vocab) {
+  function checkAnswer(userAnswer, vocab) {
     const correctAnswer = vocab.English;
     
     // Normalisiere beide Antworten
@@ -1703,9 +1700,10 @@
       return;
     }
     
-    // WICHTIGE LOGIK:
+    // WICHTIGE LOGIK (OHNE AI):
     // - Distance 1-2: Wort ist ÄHNLICH → wahrscheinlich Tippfehler → FALSCH
-    // - Distance >2: Wort ist ANDERS → könnte Synonym sein → AI fragen
+    // - Distance >2: Wort ist ANDERS → unbekanntes Synonym → FALSCH
+    // Nur exakte Übereinstimmungen und definierte Synonyme werden akzeptiert!
     
     if (distance >= 1 && distance <= 2) {
       // Kleine Abweichung = Tippfehler
@@ -1714,42 +1712,9 @@
       return;
     }
     
-    // 6. Falls Vercel API verfügbar: Prüfe mit AI (für komplett andere Wörter = mögliche Synonyme)
-    const VERCEL_API = "https://vercel-ap-ivocab.vercel.app";
-    
-    if (VERCEL_API) {
-      try {
-        console.log("🤖 Rufe Vercel API auf für:", userAnswer, "vs", correctAnswer);
-        
-        const response = await fetch(VERCEL_API + '/api/check-vocab', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            german: vocab.German, 
-            correct: correctAnswer, 
-            userAnswer: userAnswer,
-            strictMode: true  // Strenge Bewertung: Tippfehler = falsch
-          })
-        });
-        
-        console.log("Response status:", response.status);
-        
-        if (response.ok) {
-          const result = await response.json();
-          console.log("✅ API Antwort:", result);
-          console.log("AI sagt:", result.aiResponse, "-> isCorrect:", result.isCorrect);
-          handleAnswerResult(result.isCorrect, userAnswer, vocab, correctAnswer);
-          return;
-        } else {
-          const errorText = await response.text();
-          console.error("❌ API Error:", response.status, errorText);
-        }
-      } catch (error) {
-        console.error("❌ Vercel API Fehler:", error);
-      }
-    }
-    
-    // Sonst: Falsch
+    // 7. Alles andere: Falsch (keine AI-Prüfung mehr)
+    // Wenn wir bis hier gekommen sind, ist die Antwort nicht korrekt
+    console.log("❌ Antwort nicht erkannt. Bitte exakte Schreibweise oder definiertes Synonym verwenden.");
     handleAnswerResult(false, userAnswer, vocab, correctAnswer);
   }
   
