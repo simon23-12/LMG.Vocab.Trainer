@@ -1617,38 +1617,82 @@
     const userNorm = userAnswer.toLowerCase().trim();
     const correctNorm = correctAnswer.toLowerCase().trim();
     
-    // 1. Exakte Übereinstimmung
+    // 1. Exakte Übereinstimmung (case-insensitive ist schon durch normalisierung)
     if (userNorm === correctNorm) {
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 2. Prüfe mit/ohne "to" bei Verben
-    const userWithoutTo = userNorm.replace(/^to\s+/, '');
-    const correctWithoutTo = correctNorm.replace(/^to\s+/, '');
-    if (userWithoutTo === correctWithoutTo) {
+    // 2. ERWEITERTE VERB-PRÜFUNG - alle Variationen akzeptieren
+    // Entferne (to), to, (To), (TO) etc. und vergleiche nur das Verb
+    const cleanVerb = (text) => {
+      return text
+        .toLowerCase()
+        .replace(/^\(to\)\s*/i, '')  // Entferne (to), (To), (TO)
+        .replace(/^to\s+/i, '')       // Entferne to, To, TO
+        .trim();
+    };
+    
+    const userVerbClean = cleanVerb(userNorm);
+    const correctVerbClean = cleanVerb(correctNorm);
+    
+    if (userVerbClean === correctVerbClean) {
+      console.log("✓ Verb akzeptiert (verschiedene to-Varianten):", userAnswer, "=", correctAnswer);
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 3. Prüfe Synonyme
+    // 3. Prüfe Synonyme aus dem hardcoded Dictionary
     const correctSynonyms = synonyms[correctNorm] || [];
     if (correctSynonyms.includes(userNorm)) {
-      console.log("✓ Synonym akzeptiert:", userAnswer, "für", correctAnswer);
+      console.log("✓ Synonym akzeptiert (Dictionary):", userAnswer, "für", correctAnswer);
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 4. Prüfe ob Userantwort in der Synonym-Liste der richtigen Antwort ist
-    for (let key in synonyms) {
-      if (synonyms[key].includes(correctNorm) && synonyms[key].includes(userNorm)) {
-        console.log("✓ Beide sind Synonyme:", userAnswer, "=", correctAnswer);
+    // 4. Prüfe Synonyme aus den Vokabel-Daten (vocab.synonyms)
+    if (vocab.synonyms && Array.isArray(vocab.synonyms)) {
+      const vocabSynonyms = vocab.synonyms.map(s => s.toLowerCase().trim());
+      
+      // Prüfe direkt
+      if (vocabSynonyms.includes(userNorm)) {
+        console.log("✓ Synonym akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+      
+      // Prüfe auch ohne (to) für Verben
+      const vocabSynonymsClean = vocabSynonyms.map(s => cleanVerb(s));
+      if (vocabSynonymsClean.includes(userVerbClean)) {
+        console.log("✓ Synonym-Verb akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
     }
     
-    // 5. INTELLIGENTE TIPPFEHLER-ERKENNUNG
+    // 5. Prüfe ob Userantwort in der Synonym-Liste der richtigen Antwort ist (Dictionary)
+    for (let key in synonyms) {
+      // Prüfe direkt
+      if (synonyms[key].includes(correctNorm) && synonyms[key].includes(userNorm)) {
+        console.log("✓ Beide sind Synonyme (Dictionary):", userAnswer, "=", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+      
+      // Prüfe auch ohne (to) für Verben
+      const keyClean = cleanVerb(key);
+      const synonymsClean = synonyms[key].map(s => cleanVerb(s));
+      const correctClean = cleanVerb(correctNorm);
+      
+      if ((keyClean === correctClean || synonymsClean.includes(correctClean)) && 
+          (keyClean === userVerbClean || synonymsClean.includes(userVerbClean))) {
+        console.log("✓ Beide sind Synonyme-Verben (Dictionary):", userAnswer, "=", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+    }
+    
+    // 6. INTELLIGENTE TIPPFEHLER-ERKENNUNG
     const distance = getLevenshteinDistance(userNorm, correctNorm);
     
     // Prüfe auf offensichtlichen Nonsense (mehrere gleiche Buchstaben hintereinander)
