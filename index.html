@@ -1649,28 +1649,28 @@
       return;
     }
     
-    // 1b. NEUE REGEL: Wenn das korrekte Wort in der Antwort enthalten ist, akzeptieren
-    // Beispiele: "stop" in "bus stop", "table" in "a table", "the table"
-    // Aber nur wenn es als ganzes Wort vorkommt (nicht Teil eines anderen Wortes)
+    // 1b. RADIKALE VEREINFACHUNG: Wenn die User-Antwort (min. 4 Buchstaben) 
+    // IRGENDWO in der korrekten Antwort vorkommt, ist es richtig.
+    // Das vermeidet Grenzfälle und ist großzügig bei Variationen.
     
-    // Prüfe mit BEIDEN Versionen: mit und ohne Klammern
-    const correctVersions = [correctNorm, correctWithoutBrackets];
+    // Entferne Leerzeichen für Substring-Check
+    const userNoSpaces = userNorm.replace(/\s+/g, '');
+    const correctNoSpaces = correctNorm.replace(/\s+/g, '');
+    const correctNoSpacesNoBrackets = correctWithoutBrackets.replace(/\s+/g, '');
     
-    for (let correctVersion of correctVersions) {
-      const correctWords = correctVersion.split(/\s+/); // Teile richtige Antwort in Wörter
-      const userWords = userNorm.split(/\s+/);          // Teile User-Antwort in Wörter
+    // Prüfe ob User-Eingabe lang genug ist (min. 4 Buchstaben)
+    if (userNoSpaces.length >= 4) {
+      // Prüfe ob die User-Antwort in der korrekten Antwort enthalten ist
+      if (correctNoSpaces.includes(userNoSpaces) || correctNoSpacesNoBrackets.includes(userNoSpaces)) {
+        console.log("✓ User-Antwort in Lösung enthalten:", userAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
       
-      // Prüfe ob ALLE Wörter der richtigen Antwort in der User-Antwort vorkommen
-      const allCorrectWordsPresent = correctWords.every(word => {
-        // Überspringe sehr kurze Wörter wie "a", "an", "the", "to"
-        if (word.length <= 2 && !['go', 'do', 'be', 'is', 'am', 'at', 'in', 'on'].includes(word)) {
-          return true; // Ignoriere Artikel und Präpositionen
-        }
-        return userWords.includes(word);
-      });
-      
-      if (allCorrectWordsPresent && correctWords.length > 0) {
-        console.log("✓ Alle wichtigen Wörter enthalten:", userAnswer);
+      // ODER: Prüfe ob die korrekte Antwort in der User-Antwort enthalten ist
+      // (z.B. User: "newspaper", Richtig: "paper")
+      if (userNoSpaces.includes(correctNoSpaces) || userNoSpaces.includes(correctNoSpacesNoBrackets)) {
+        console.log("✓ Lösung in User-Antwort enthalten:", userAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
