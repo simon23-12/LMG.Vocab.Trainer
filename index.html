@@ -1949,9 +1949,6 @@
       }
     }
     
-    // 6. INTELLIGENTE TIPPFEHLER-ERKENNUNG
-    const distance = getLevenshteinDistance(userNorm, correctNorm);
-    
     // Prüfe auf offensichtlichen Nonsense (mehrere gleiche Buchstaben hintereinander)
     const hasNonsense = /(.)\1{3,}/.test(userNorm); // 4+ gleiche Buchstaben nacheinander
     if (hasNonsense) {
@@ -1960,10 +1957,10 @@
       return;
     }
     
-    // NEU: Prüfe auf BUCHSTABENDREHER (Transposition)
-    // "girl" vs "gilr" = 1 Dreher, "whale" vs "whael" = 1 Dreher
-    // Mindestlänge: 3 Buchstaben (nicht bei "is", "to" etc.)
-    if (distance === 2 && userNorm.length >= 3 && correctNorm.length >= 3) {
+    // 6. BUCHSTABENDREHER-PRÜFUNG (unabhängig von Distance!)
+    // "door" vs "doro", "window" vs "wnidow", "cupboard" vs "cupboadr"
+    // Mindestlänge: 3 Buchstaben
+    if (userNorm.length >= 3 && correctNorm.length >= 3 && userNorm.length === correctNorm.length) {
       const transPos = findTransposition(userNorm, correctNorm);
       if (transPos >= 0) {
         console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
@@ -1971,6 +1968,9 @@
         return;
       }
     }
+    
+    // 7. INTELLIGENTE TIPPFEHLER-ERKENNUNG
+    const distance = getLevenshteinDistance(userNorm, correctNorm);
     
     // WICHTIGE LOGIK (OHNE AI):
     // - Distance 1-2: Wort ist ÄHNLICH → wahrscheinlich Tippfehler → FALSCH
