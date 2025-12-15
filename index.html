@@ -1810,6 +1810,14 @@
     let userNorm = userAnswer.toLowerCase().trim();
     let correctNorm = correctAnswer.toLowerCase().trim();
     
+    // Entferne Satzzeichen wie "...", ".", "!", "?" etc.
+    const removePunctuation = (text) => {
+      return text.replace(/[.!?,;:…]+$/g, '').trim(); // Entferne am Ende
+    };
+    
+    userNorm = removePunctuation(userNorm);
+    correctNorm = removePunctuation(correctNorm);
+    
     // Ersetze Abkürzungen mit vollen Wörtern für flexibleren Vergleich
     const expandAbbreviations = (text) => {
       return text
@@ -1953,12 +1961,15 @@
     }
     
     // NEU: Prüfe auf BUCHSTABENDREHER (Transposition)
-    // "girl" vs "gilr" = 1 Dreher
-    if (distance === 2 && hasTransposition(userNorm, correctNorm)) {
-      console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
-      const swappedPosition = findTransposition(userNorm, correctNorm);
-      handleAnswerResult('half', userAnswer, vocab, correctAnswer, swappedPosition);
-      return;
+    // "girl" vs "gilr" = 1 Dreher, "whale" vs "whael" = 1 Dreher
+    // Mindestlänge: 3 Buchstaben (nicht bei "is", "to" etc.)
+    if (distance === 2 && userNorm.length >= 3 && correctNorm.length >= 3) {
+      const transPos = findTransposition(userNorm, correctNorm);
+      if (transPos >= 0) {
+        console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
+        handleAnswerResult('half', userAnswer, vocab, correctAnswer, transPos);
+        return;
+      }
     }
     
     // WICHTIGE LOGIK (OHNE AI):
@@ -1979,10 +1990,11 @@
     handleAnswerResult(false, userAnswer, vocab, correctAnswer);
   }
   
-  // Prüfe ob es einen Buchstabendreher gibt
-  function hasTransposition(a, b) {
-    if (Math.abs(a.length - b.length) !== 0) return false; // Muss gleiche Länge haben
+  // Finde Position des Buchstabendrehers (verbesserte Version)
+  function findTransposition(a, b) {
+    if (a.length !== b.length) return -1;
     
+    // Finde alle Positionen die unterschiedlich sind
     let diffs = [];
     for (let i = 0; i < a.length; i++) {
       if (a[i] !== b[i]) {
@@ -1990,24 +2002,17 @@
       }
     }
     
-    // Genau 2 Unterschiede, die nebeneinander liegen und vertauscht sind
-    if (diffs.length === 2) {
-      const [i, j] = diffs;
-      if (j === i + 1 && a[i] === b[j] && a[j] === b[i]) {
-        return true; // Buchstabendreher gefunden!
-      }
+    // Muss genau 2 Unterschiede geben
+    if (diffs.length !== 2) return -1;
+    
+    const [pos1, pos2] = diffs;
+    
+    // Prüfe ob es ein Dreher ist (Buchstaben sind vertauscht)
+    // "gilr" vs "girl": Position 1,2 -> g[i]l[r] vs g[i]r[l] -> i!=i ABER l==l und r==r vertauscht
+    if (a[pos1] === b[pos2] && a[pos2] === b[pos1]) {
+      return Math.min(pos1, pos2); // Gib die erste Position zurück
     }
     
-    return false;
-  }
-  
-  // Finde Position des Buchstabendrehers
-  function findTransposition(a, b) {
-    for (let i = 0; i < a.length - 1; i++) {
-      if (a[i] !== b[i] && a[i] === b[i+1] && a[i+1] === b[i]) {
-        return i; // Position des Drehers
-      }
-    }
     return -1;
   }
   
