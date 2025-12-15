@@ -1961,7 +1961,9 @@
     // "door" vs "doro", "window" vs "wnidow", "cupboard" vs "cupboadr"
     // Mindestlänge: 3 Buchstaben
     if (userNorm.length >= 3 && correctNorm.length >= 3 && userNorm.length === correctNorm.length) {
+      console.log("Prüfe Buchstabendreher:", userNorm, "vs", correctNorm);
       const transPos = findTransposition(userNorm, correctNorm);
+      console.log("Transposition Position:", transPos);
       if (transPos >= 0) {
         console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
         handleAnswerResult('half', userAnswer, vocab, correctAnswer, transPos);
