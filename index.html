@@ -1958,8 +1958,16 @@
     }
     
     // 6. BUCHSTABENDREHER-PRÜFUNG (unabhängig von Distance!)
-    // "door" vs "doro", "window" vs "wnidow", "cupboard" vs "cupboadr"
+    // "door" vs "doro", "window" vs "wnidow", "cupboard" vs "cupboadr"  
     // Mindestlänge: 3 Buchstaben
+    console.log("Vor Buchstabendreher-Check:", {
+      userLength: userNorm.length,
+      correctLength: correctNorm.length,
+      sameLength: userNorm.length === correctNorm.length,
+      userNorm,
+      correctNorm
+    });
+    
     if (userNorm.length >= 3 && correctNorm.length >= 3 && userNorm.length === correctNorm.length) {
       console.log("Prüfe Buchstabendreher:", userNorm, "vs", correctNorm);
       const transPos = findTransposition(userNorm, correctNorm);
@@ -1969,6 +1977,8 @@
         handleAnswerResult('half', userAnswer, vocab, correctAnswer, transPos);
         return;
       }
+    } else {
+      console.log("Buchstabendreher-Check übersprungen (Längen-Check failed)");
     }
     
     // 7. INTELLIGENTE TIPPFEHLER-ERKENNUNG
