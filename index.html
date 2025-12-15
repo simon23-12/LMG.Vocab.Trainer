@@ -1840,15 +1840,18 @@
     // "subject (school)" → "subject"
     const correctWithoutBrackets = correctNorm.replace(/\s*\([^)]*\)/g, '').trim();
     
+    // WICHTIG: Nutze die Version OHNE Klammern für weitere Prüfungen!
+    const correctNoBrackets = correctWithoutBrackets;
+    const userNoBrackets = userNorm;
+    
     // 1. Exakte Übereinstimmung (case-insensitive ist schon durch normalisierung)
-    if (userNorm === correctNorm) {
+    if (userNoBrackets === correctNoBrackets) {
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 1a. Übereinstimmung OHNE Klammer-Inhalt (Klammer-Wörter sind optional)
-    if (userNorm === correctWithoutBrackets) {
-      console.log("✓ Richtig ohne Klammer-Zusatz:", userAnswer);
+    // 1a. Übereinstimmung MIT Original (falls Klammern im Original waren)
+    if (userNorm === correctNorm) {
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
@@ -1858,14 +1861,13 @@
     // Das vermeidet Grenzfälle und ist großzügig bei Variationen.
     
     // Entferne Leerzeichen für Substring-Check
-    const userNoSpaces = userNorm.replace(/\s+/g, '');
-    const correctNoSpaces = correctNorm.replace(/\s+/g, '');
-    const correctNoSpacesNoBrackets = correctWithoutBrackets.replace(/\s+/g, '');
+    const userNoSpaces = userNoBrackets.replace(/\s+/g, '');
+    const correctNoSpaces = correctNoBrackets.replace(/\s+/g, '');
     
     // Prüfe ob User-Eingabe lang genug ist (min. 4 Buchstaben)
     if (userNoSpaces.length >= 4) {
       // Prüfe ob die User-Antwort in der korrekten Antwort enthalten ist
-      if (correctNoSpaces.includes(userNoSpaces) || correctNoSpacesNoBrackets.includes(userNoSpaces)) {
+      if (correctNoSpaces.includes(userNoSpaces)) {
         console.log("✓ User-Antwort in Lösung enthalten:", userAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
@@ -1873,7 +1875,7 @@
       
       // ODER: Prüfe ob die korrekte Antwort in der User-Antwort enthalten ist
       // (z.B. User: "newspaper", Richtig: "paper")
-      if (userNoSpaces.includes(correctNoSpaces) || userNoSpaces.includes(correctNoSpacesNoBrackets)) {
+      if (userNoSpaces.includes(correctNoSpaces)) {
         console.log("✓ Lösung in User-Antwort enthalten:", userAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
@@ -1890,8 +1892,8 @@
         .trim();
     };
     
-    const userVerbClean = cleanVerb(userNorm);
-    const correctVerbClean = cleanVerb(correctNorm);
+    const userVerbClean = cleanVerb(userNoBrackets);
+    const correctVerbClean = cleanVerb(correctNoBrackets);
     
     if (userVerbClean === correctVerbClean) {
       console.log("✓ Verb akzeptiert (verschiedene to-Varianten):", userAnswer, "=", correctAnswer);
@@ -1961,16 +1963,16 @@
     // "door" vs "doro", "window" vs "wnidow", "cupboard" vs "cupboadr"  
     // Mindestlänge: 3 Buchstaben
     console.log("Vor Buchstabendreher-Check:", {
-      userLength: userNorm.length,
-      correctLength: correctNorm.length,
-      sameLength: userNorm.length === correctNorm.length,
-      userNorm,
-      correctNorm
+      userLength: userNoBrackets.length,
+      correctLength: correctNoBrackets.length,
+      sameLength: userNoBrackets.length === correctNoBrackets.length,
+      userNoBrackets,
+      correctNoBrackets
     });
     
-    if (userNorm.length >= 3 && correctNorm.length >= 3 && userNorm.length === correctNorm.length) {
-      console.log("Prüfe Buchstabendreher:", userNorm, "vs", correctNorm);
-      const transPos = findTransposition(userNorm, correctNorm);
+    if (userNoBrackets.length >= 3 && correctNoBrackets.length >= 3 && userNoBrackets.length === correctNoBrackets.length) {
+      console.log("Prüfe Buchstabendreher:", userNoBrackets, "vs", correctNoBrackets);
+      const transPos = findTransposition(userNoBrackets, correctNoBrackets);
       console.log("Transposition Position:", transPos);
       if (transPos >= 0) {
         console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
@@ -1982,7 +1984,7 @@
     }
     
     // 7. INTELLIGENTE TIPPFEHLER-ERKENNUNG
-    const distance = getLevenshteinDistance(userNorm, correctNorm);
+    const distance = getLevenshteinDistance(userNoBrackets, correctNoBrackets);
     
     // WICHTIGE LOGIK (OHNE AI):
     // - Distance 1-2: Wort ist ÄHNLICH → wahrscheinlich Tippfehler → FALSCH
