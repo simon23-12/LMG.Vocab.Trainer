@@ -294,6 +294,11 @@
       background: #f8d7da;
       color: #721c24;
     }
+    .feedback.half {
+      background: #fff3cd;
+      color: #856404;
+      border: 2px solid #ffc107;
+    }
     
     .score-display {
       text-align: center;
@@ -338,6 +343,10 @@
     }
     .result-item.wrong {
       background: #f8d7da;
+    }
+    .result-item.half {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
     }
     .result-word {
       font-weight: 600;
@@ -758,6 +767,40 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       animation: slideInUp 0.8s ease;
     }
+    .leaderboard-section.collapsed .leaderboard-content {
+      display: none;
+    }
+    .leaderboard-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .leaderboard-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    .leaderboard-toggle-icon {
+      transition: transform 0.3s;
+    }
+    .leaderboard-section:not(.collapsed) .leaderboard-toggle-icon {
+      transform: rotate(180deg);
+    }
+    .leaderboard-content {
+      margin-top: 20px;
+      animation: slideInUp 0.5s ease;
+    }
     .leaderboard-header {
       text-align: center;
       margin-bottom: 25px;
@@ -841,6 +884,12 @@
     }
     .leaderboard-item.current-user .leaderboard-score {
       color: white;
+    }
+    .leaderboard-loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 1.1em;
     }
     
       margin: 8px 0;
@@ -1019,13 +1068,20 @@
       </div>
       
       <!-- Leaderboard Section -->
-      <div id="leaderboardSection" class="leaderboard-section">
-        <div class="leaderboard-header">
-          <h3>🏆 Top 10 Leaderboard <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
+      <div id="leaderboardSection" class="leaderboard-section collapsed">
+        <button class="leaderboard-toggle" onclick="toggleLeaderboard()">
+          <span>🏆</span>
+          <span>Top 10 Leaderboard anzeigen</span>
+          <span class="leaderboard-toggle-icon">▼</span>
+        </button>
+        <div class="leaderboard-content">
+          <div class="leaderboard-header">
+            <h3>🏆 Top 10 Leaderboard <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
+          </div>
+          <ol id="leaderboardList" class="leaderboard-list">
+            <!-- Wird dynamisch befüllt -->
+          </ol>
         </div>
-        <ol id="leaderboardList" class="leaderboard-list">
-          <!-- Wird dynamisch befüllt -->
-        </ol>
       </div>
       
       <div style="text-align: center;">
@@ -1425,6 +1481,26 @@
       const vocabPath = 'vocabulary' + currentUser.jahrgang;
       console.log("Lade Vokabeln von:", vocabPath);
       
+      // CACHE-CHECK: Prüfe ob Vokabeln im localStorage sind
+      const cacheKey = 'vocabs_' + currentUser.jahrgang;
+      const cacheTimeKey = 'vocabs_time_' + currentUser.jahrgang;
+      const cached = localStorage.getItem(cacheKey);
+      const cacheTime = localStorage.getItem(cacheTimeKey);
+      
+      // Cache ist 7 Tage gültig
+      const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 Tage in ms
+      const now = Date.now();
+      
+      if (cached && cacheTime && (now - parseInt(cacheTime)) < CACHE_DURATION) {
+        console.log("✓ Vokabeln aus Cache geladen (gespart: ~200 KB Download)");
+        allVocabs = JSON.parse(cached);
+        showStatus("Vokabeln geladen! ✓", 'success');
+        console.log("Vokabeln aus Cache:", allVocabs.length);
+        console.log("=== loadVocabs ENDE (aus Cache) ===");
+        return;
+      }
+      
+      console.log("Cache miss oder veraltet, lade von Firebase...");
       console.log("Rufe db.ref().get() auf...");
       const snap = await db.ref(vocabPath).get();
       console.log("Snapshot erhalten!");
@@ -1445,6 +1521,15 @@
       allVocabs = Object.values(data);
       console.log("Vokabeln geladen:", allVocabs.length, "für Jahrgang", currentUser.jahrgang);
       
+      // CACHE: Speichere im localStorage
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(allVocabs));
+        localStorage.setItem(cacheTimeKey, now.toString());
+        console.log("✓ Vokabeln im Cache gespeichert");
+      } catch (e) {
+        console.warn("localStorage voll, ignoriere Cache:", e);
+      }
+      
       if (allVocabs.length > 0) {
         console.log("Erste Vokabel:", allVocabs[0]);
       }
@@ -1453,6 +1538,8 @@
       
       if (allVocabs.length === 0) {
         showStatus("Vokabeln sind leer!", 'error');
+      } else {
+        showStatus("Vokabeln geladen! ✓", 'success');
       }
       
       console.log("=== loadVocabs ENDE ===");
@@ -1470,8 +1557,8 @@
     // Berechne Dashboard-Statistiken
     calculateDashboardStats();
     
-    // Lade Leaderboard
-    loadLeaderboard();
+    // Leaderboard NICHT automatisch laden - nur bei Klick
+    // loadLeaderboard(); // ❌ Entfernt für Performance
     
     if (allVocabs.length === 0) {
       showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " verfügbar!", 'error');
@@ -1865,6 +1952,15 @@
       return;
     }
     
+    // NEU: Prüfe auf BUCHSTABENDREHER (Transposition)
+    // "girl" vs "gilr" = 1 Dreher
+    if (distance === 2 && hasTransposition(userNorm, correctNorm)) {
+      console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
+      const swappedPosition = findTransposition(userNorm, correctNorm);
+      handleAnswerResult('half', userAnswer, vocab, correctAnswer, swappedPosition);
+      return;
+    }
+    
     // WICHTIGE LOGIK (OHNE AI):
     // - Distance 1-2: Wort ist ÄHNLICH → wahrscheinlich Tippfehler → FALSCH
     // - Distance >2: Wort ist ANDERS → unbekanntes Synonym → FALSCH
@@ -1881,6 +1977,38 @@
     // Wenn wir bis hier gekommen sind, ist die Antwort nicht korrekt
     console.log("❌ Antwort nicht erkannt. Bitte exakte Schreibweise oder definiertes Synonym verwenden.");
     handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+  }
+  
+  // Prüfe ob es einen Buchstabendreher gibt
+  function hasTransposition(a, b) {
+    if (Math.abs(a.length - b.length) !== 0) return false; // Muss gleiche Länge haben
+    
+    let diffs = [];
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        diffs.push(i);
+      }
+    }
+    
+    // Genau 2 Unterschiede, die nebeneinander liegen und vertauscht sind
+    if (diffs.length === 2) {
+      const [i, j] = diffs;
+      if (j === i + 1 && a[i] === b[j] && a[j] === b[i]) {
+        return true; // Buchstabendreher gefunden!
+      }
+    }
+    
+    return false;
+  }
+  
+  // Finde Position des Buchstabendrehers
+  function findTransposition(a, b) {
+    for (let i = 0; i < a.length - 1; i++) {
+      if (a[i] !== b[i] && a[i] === b[i+1] && a[i+1] === b[i]) {
+        return i; // Position des Drehers
+      }
+    }
+    return -1;
   }
   
   // Levenshtein Distance für Tippfehler-Toleranz
@@ -1912,12 +2040,37 @@
     return matrix[b.length][a.length];
   }
   
-  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer) {
-    if (isCorrect) {
+  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer, transpositionPos) {
+    let scoreIncrement = 0;
+    
+    if (isCorrect === 'half') {
+      // HALBRICHTIG: Buchstabendreher
+      scoreIncrement = 0.5;
+      score += 0.5;
+      
+      // Markiere den Dreher rot
+      let markedAnswer = userAnswer;
+      if (transpositionPos >= 0 && transpositionPos < userAnswer.length - 1) {
+        const before = userAnswer.substring(0, transpositionPos);
+        const char1 = userAnswer[transpositionPos];
+        const char2 = userAnswer[transpositionPos + 1];
+        const after = userAnswer.substring(transpositionPos + 2);
+        markedAnswer = before + '<span style="color:#e74c3c; font-weight:700;">' + char1 + char2 + '</span>' + after;
+      }
+      
+      document.getElementById('feedback').innerHTML = "⚠️ Fast! Buchstabendreher: " + markedAnswer + " → Richtig: " + correctAnswer;
+      document.getElementById('feedback').className = 'feedback half';
+      
+    } else if (isCorrect) {
+      // RICHTIG
+      scoreIncrement = 1;
       score++;
       document.getElementById('feedback').textContent = "✓ Richtig!";
       document.getElementById('feedback').className = 'feedback correct';
+      
     } else {
+      // FALSCH
+      scoreIncrement = 0;
       document.getElementById('feedback').textContent = "✗ Falsch! Richtig: " + correctAnswer;
       document.getElementById('feedback').className = 'feedback wrong';
     }
@@ -1926,7 +2079,8 @@
       question: vocab.German,
       correct: correctAnswer,
       user: userAnswer || "(keine Antwort)",
-      isCorrect: isCorrect
+      isCorrect: isCorrect === 'half' ? 'half' : isCorrect,
+      scoreValue: scoreIncrement
     });
     
     setTimeout(() => {
@@ -1947,17 +2101,30 @@
     
     answers.forEach(answer => {
       const item = document.createElement('div');
-      item.className = 'result-item ' + (answer.isCorrect ? 'correct' : 'wrong');
+      
+      // Bestimme die Klasse basierend auf dem Status
+      let statusClass = 'wrong';
+      let statusIcon = '✗';
+      if (answer.isCorrect === true) {
+        statusClass = 'correct';
+        statusIcon = '✓';
+      } else if (answer.isCorrect === 'half') {
+        statusClass = 'half';
+        statusIcon = '⚠️';
+      }
+      
+      item.className = 'result-item ' + statusClass;
       item.innerHTML = `
         <div>
           <div class="result-word">${answer.question}</div>
           <div class="result-answer">
             Deine Antwort: ${answer.user}<br>
             Richtig: ${answer.correct}
+            ${answer.isCorrect === 'half' ? '<br><small style="color:#856404;">Buchstabendreher - halbe Punkte</small>' : ''}
           </div>
         </div>
         <div style="font-size: 24px;">
-          ${answer.isCorrect ? '✓' : '✗'}
+          ${statusIcon}
         </div>
       `;
       resultsList.appendChild(item);
@@ -2061,10 +2228,12 @@
         return;
       }
       
+      // OPTIMISTISCHES UPDATE: Aktualisiere lokal sofort (kein Reload nötig!)
       userPerformance[window.currentPerformanceKey] = perfData;
+      
       await db.ref('users/' + userPath + '/performance/' + window.currentPerformanceKey).set(perfData);
       
-      console.log('✓ Performance gespeichert in Firebase');
+      console.log('✓ Performance gespeichert in Firebase (Delta Update)');
       if (!isIntervalTest) {
         showStatus('Performance gespeichert! 💾', 'success');
       }
@@ -2125,6 +2294,10 @@
   
   async function loadLeaderboard() {
     try {
+      // Zeige Loading
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '<li class="leaderboard-loading">Lade Leaderboard... ⏳</li>';
+      
       // Hole aktuellen Monat und Jahr
       const now = new Date();
       const currentMonth = now.getMonth() + 1; // 1-12
@@ -2139,7 +2312,7 @@
       // Lade alle User der gleichen Klasse
       const usersSnap = await db.ref('users').get();
       if (!usersSnap.exists()) {
-        document.getElementById('leaderboardList').innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Daten verfügbar</li>';
+        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Daten verfügbar</li>';
         return;
       }
       
@@ -2192,7 +2365,6 @@
       const top10 = classUsers.slice(0, 10);
       
       // Rendere Leaderboard
-      const list = document.getElementById('leaderboardList');
       list.innerHTML = '';
       
       if (top10.length === 0) {
@@ -2230,6 +2402,34 @@
     }
   }
   
+  // Cache für Leaderboard
+  let leaderboardCache = null;
+  let leaderboardCacheTime = null;
+  
+  async function toggleLeaderboard() {
+    const section = document.getElementById('leaderboardSection');
+    const isCollapsed = section.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+      // Öffnen
+      section.classList.remove('collapsed');
+      
+      // Lade Daten (mit 5-Minuten Cache)
+      const now = Date.now();
+      if (!leaderboardCache || (now - leaderboardCacheTime) > 5*60*1000) {
+        console.log('Lade Leaderboard (nicht gecached oder veraltet)');
+        await loadLeaderboard();
+        leaderboardCache = true;
+        leaderboardCacheTime = now;
+      } else {
+        console.log('Zeige gecachtes Leaderboard');
+      }
+    } else {
+      // Schließen
+      section.classList.add('collapsed');
+    }
+  }
+  
   function backToSelection() {
     // Lade Performance neu, damit die Farben aktualisiert werden
     showPageSelection();
@@ -2239,6 +2439,8 @@
     currentUser = null;
     userPerformance = {};
     allVocabs = [];
+    leaderboardCache = null; // Cache zurücksetzen
+    leaderboardCacheTime = null;
     document.getElementById('adminClassSelect').value = '';
     document.getElementById('studentList').innerHTML = '';
     document.getElementById('studentPerformance').innerHTML = '';
