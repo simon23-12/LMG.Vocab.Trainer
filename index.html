@@ -1380,6 +1380,37 @@
     }
   }
   
+  
+  // ============================================
+  // SEPARATE ADMIN LOGIN FUNKTION
+  // ============================================
+  async function adminLogin(password) {
+    console.log("=== ADMIN LOGIN START ===");
+    try {
+      showStatus("Admin-Login läuft...", 'info');
+      const adminEmail = 'teacher@lmg-vokabel.internal';
+      
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(adminEmail, password);
+      console.log("✓ Admin Firebase Auth erfolgreich!");
+      
+      currentUser = { 
+        name: 'teacher', 
+        class: 'admin',
+        jahrgang: 'admin',
+        isAdmin: true,
+        uid: userCredential.user.uid
+      };
+      
+      showScreen('adminScreen');
+      showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
+      console.log("=== ADMIN LOGIN ENDE ===");
+      
+    } catch (error) {
+      console.error("Admin-Login Fehler:", error);
+      showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
+    }
+  }
+  
   async function login() {
     console.log("=== LOGIN START ===");
     
@@ -1400,40 +1431,12 @@
       return;
     }
     
-    // ============================================
-    // ADMIN LOGIN via Firebase Auth
-    // ============================================
+    // Admin Login wird separat behandelt
     if (name === 'teacher') {
-      console.log("Teacher-Login erkannt - versuche Firebase Auth...");
-      try {
-        showStatus("Admin-Login läuft...", 'info');
-        const adminEmail = 'teacher@lmg-vokabel.internal';
-        const userCredential = await firebase.auth().signInWithEmailAndPassword(adminEmail, pass);
-        console.log("✓ Admin Firebase Auth erfolgreich!");
-        
-        currentUser = { 
-          name: 'teacher', 
-          class: 'admin',
-          jahrgang: 'admin',
-          isAdmin: true,
-          uid: userCredential.user.uid
-        };
-        
-        showScreen('adminScreen');
-        showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
-        console.log("=== LOGIN ENDE (Admin) ===");
-        return; // WICHTIG: Beende Funktion hier!
-        
-      } catch (authError) {
-        console.error("Admin-Login fehlgeschlagen:", authError);
-        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
-        return; // WICHTIG: Beende auch bei Fehler!
-      }
+      await adminLogin(pass);
+      return; // STOP hier - kein weiterer Code!
     }
     
-    // ============================================
-    // AB HIER: NUR NOCH NORMALER USER LOGIN
-    // ============================================
     console.log("Normaler User-Login...");
     
     try {
