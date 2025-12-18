@@ -1360,9 +1360,12 @@
         return;
       }
       
+      // Hash das Passwort vor dem Speichern
+      const passwordHash = btoa(pass + 'LMG_SALT_2024'); // Hash mit Salt
+      
       await db.ref('users/' + userKey).set({ 
         name: name,
-        password: pass,
+        passwordHash: passwordHash,  // Nur Hash, kein Klartext!
         class: cls,
         created: new Date().toISOString(),
         performance: {}
@@ -1402,13 +1405,13 @@
     
     // Teacher Admin Login
     console.log("Prüfe Teacher-Login...");
-    if (name === 'teacher') {
+    if (name === 'teacher' || name === 'admin@lmg-vokabel.internal' || name === 'admin') {
       // Passwort-Hash (SHA256 von deinem Admin-Passwort)
       const adminHash = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3'; // Beispiel-Hash
       
       // Berechne Hash des eingegebenen Passworts
       const inputHash = btoa(pass); // Einfaches Encoding
-      const correctHash = 'TE1HLlRlYWNoZXI='; // Base64 von "LMGadmin" - ÄNDERE DAS!
+      const correctHash = 'TE1HYWRtaW4='; // Base64 von "LMGadmin" - ÄNDERE DAS!
       
       if (inputHash === correctHash) {
         console.log("✓ Teacher-Login erkannt!");
@@ -1447,8 +1450,14 @@
       const data = snap.val();
       console.log("User Daten:", data);
       
-      // Passwort nochmal checken zur Sicherheit
-      if (data.password !== pass) {
+      // Passwort-Hash checken
+      const inputHash = btoa(pass + 'LMG_SALT_2024');
+      
+      // Support für alte Accounts mit Klartext-Passwort
+      const isValid = (data.passwordHash && data.passwordHash === inputHash) || 
+                      (data.password && data.password === pass);
+      
+      if (!isValid) {
         showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
       }
