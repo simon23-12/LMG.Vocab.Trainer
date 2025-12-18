@@ -1115,6 +1115,11 @@
           <div class="stat-label">ðŸŽ¯ Accuracy</div>
           <div class="stat-value" id="averageAccuracy">0%</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">🔥 Streak</div>
+          <div class="stat-value"><span class="streak-flame" id="streakDays">0</span></div>
+          <div style="font-size: 14px; color: #666; margin-top: 8px;" id="streakMessage">Übe auch morgen um deinen Streak zu halten :)</div>
+        </div>
       </div>
       
       <!-- Interval Section -->
@@ -2370,11 +2375,14 @@
   }
   
   function calculateStreak() {
+    const streakElement = document.getElementById('streakDays');
+    if (!streakElement) return; // Element existiert noch nicht
+    
     const perf = userPerformance;
     const perfEntries = Object.values(perf);
     
     if (perfEntries.length === 0) {
-      document.getElementById('streakDays').textContent = '0';
+      streakElement.textContent = '0';
       return;
     }
     
@@ -2392,14 +2400,13 @@
     const sortedDays = Array.from(daysWithActivity).sort().reverse();
     
     if (sortedDays.length === 0) {
-      document.getElementById('streakDays').textContent = '0';
+      if (document.getElementById('streakDays')) document.getElementById('streakDays').textContent = '0';
       return;
     }
     
     // Berechne Streak von heute rückwärts
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString().split('T')[0];
     
     let streak = 0;
     let currentDate = new Date(today);
@@ -2411,7 +2418,7 @@
     
     // Wenn letzte Aktivität mehr als 1 Tag her ist, Streak = 0
     if (daysDiff > 1) {
-      document.getElementById('streakDays').textContent = '0';
+      if (document.getElementById('streakDays')) document.getElementById('streakDays').textContent = '0';
       return;
     }
     
@@ -2429,7 +2436,7 @@
       }
     }
     
-    document.getElementById('streakDays').textContent = streak;
+    if (document.getElementById('streakDays')) document.getElementById('streakDays').textContent = streak;
   }
   
   function calculateDashboardStats() {
@@ -2439,7 +2446,7 @@
     if (perfEntries.length === 0) {
       document.getElementById('totalVocabsPracticed').textContent = '0';
       document.getElementById('averageAccuracy').textContent = '0%';
-      document.getElementById('streakDays').textContent = '0';
+      if (document.getElementById('streakDays')) document.getElementById('streakDays').textContent = '0';
       return;
     }
     
@@ -2457,9 +2464,6 @@
     
     const accuracyElement = document.getElementById('averageAccuracy');
     accuracyElement.textContent = avgAccuracy + '%';
-    
-    // Berechne Streak
-    calculateStreak();
     
     // FÃ¤rbe den Accuracy-Text basierend auf dem Durchschnitt
     if (avgAccuracy === 100) {
@@ -2500,7 +2504,7 @@
       // Monatsname fÃ¼r Anzeige
       const monthNames = ['Januar', 'Februar', 'MÃ¤rz', 'April', 'Mai', 'Juni',
                          'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-      document.getElementById('leaderboardMonth').textContent = monthNames[currentMonth - 1] + ' ' + currentYear;
+      document.getElementById('leaderboardMonth').textContent = currentUser.class + ' Leaderboard ' + monthNames[currentMonth - 1] + ' ' + currentYear;
       
       // Lade alle User der gleichen Klasse
       const usersSnap = await db.ref('users').get();
