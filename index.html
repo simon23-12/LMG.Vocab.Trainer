@@ -1341,11 +1341,6 @@
       return;
     }
     
-    if (pass.length < 6) {
-      showStatus("Passwort muss mindestens 6 Zeichen lang sein!", 'error');
-      return;
-    }
-    
     // Extrahiere Jahrgang aus Klasse (z.B. "7b" -> "7")
     const jahrgang = cls.charAt(0);
     if (!['5','6','7','8','9'].includes(jahrgang) && !cls.startsWith('10')) {
@@ -1354,29 +1349,25 @@
     }
     
     try {
-      // Erstelle eindeutigen userKey
-      const userKey = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString(36);
-      const authEmail = userKey + '@lmg-vokabel.app';
+      // Erstelle eindeutigen Key aus Name + Passwort Hash
+      // So können mehrere Nutzer mit gleichem Namen existieren
+      const userKey = name + '_' + btoa(pass).substring(0, 8); // Base64 encode des Passworts (gekürzt)
       
-      showStatus("Erstelle Account...", 'info');
-      console.log("Erstelle Firebase Auth User:", authEmail);
+      // Prüfe ob dieser exakte Account bereits existiert
+      const existingUser = await db.ref('users/' + userKey).get();
+      if (existingUser.exists()) {
+        showStatus("Dieser Account existiert bereits! Bitte logge dich ein.", 'error');
+        return;
+      }
       
-      // Erstelle Firebase Auth User
-      const userCredential = await firebase.auth().createUserWithEmailAndPassword(authEmail, pass);
-      const uid = userCredential.user.uid;
-      
-      console.log("Firebase Auth User erstellt:", uid);
-      
-      // Speichere User-Daten in Realtime Database
-      await db.ref('users/' + uid).set({ 
+      await db.ref('users/' + userKey).set({ 
         name: name,
-        userKey: userKey,
+        password: pass,
         class: cls,
         created: new Date().toISOString(),
         performance: {}
       });
-      
-      alert("Registrierung erfolgreich! 🎉\n\nDeine Login-Daten:\nName: " + name + "\n\n⚠️ WICHTIG: Merke dir dein Passwort!");
+      alert("Registrierung erfolgreich! 🎉\n\nBitte notiere dir deine Login-Daten sorgfältig:\n\nName: " + name + "\nPasswort: " + pass);
       showStatus("Registrierung erfolgreich! Jetzt einloggen.", 'success');
       
       // Felder leeren und zum Login wechseln
@@ -1385,12 +1376,7 @@
       document.getElementById('regClass').value = '';
       switchTab('login');
     } catch (error) {
-      console.error("Registrierungsfehler:", error);
-      if (error.code === 'auth/email-already-in-use') {
-        showStatus("Dieser Name ist bereits vergeben. Bitte wähle einen anderen!", 'error');
-      } else {
-        showStatus("Fehler: " + error.message, 'error');
-      }
+      showStatus("Fehler: " + error.message, 'error');
     }
   }
   
@@ -1445,65 +1431,26 @@
     console.log("Kein Teacher-Login, versuche normalen Login...");
     
     try {
-      showStatus("Login läuft...", 'info');
+      // Erstelle den gleichen Key wie bei der Registrierung
+      const userKey = name + '_' + btoa(pass).substring(0, 8);
       
-      // Suche User nach Name in Datenbank
-      console.log("Suche User mit Name:", name);
-      const usersSnap = await db.ref('users').orderByChild('name').equalTo(name).get();
+      console.log("Login Versuch für Key:", userKey);
+      const snap = await db.ref('users/' + userKey).get();
+      console.log("User snapshot erhalten, exists:", snap.exists());
       
-      if (!usersSnap.exists()) {
-        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
-        console.log("Kein User mit diesem Namen gefunden");
-        return;
-      }
-      
-      // Hole Firebase Auth UID
-      let targetUid = null;
-      let targetUserKey = null;
-      usersSnap.forEach(child => {
-        targetUid = child.key;
-        targetUserKey = child.val().userKey;
-      });
-      
-      if (!targetUid) {
-        showStatus("User-Daten unvollständig!", 'error');
-        return;
-      }
-      
-      // Fallback für alte User ohne userKey
-      if (!targetUserKey) {
-        console.log("⚠️ User hat kein userKey - erstelle temporären");
-        targetUserKey = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + targetUid.substring(0, 8);
-      }
-      
-      console.log("User gefunden - UID:", targetUid);
-      
-      // Login mit Firebase Auth
-      const authEmail = targetUserKey + '@lmg-vokabel.app';
-      console.log("Firebase Auth Login für:", authEmail);
-      
-      try {
-        const userCredential = await firebase.auth().signInWithEmailAndPassword(authEmail, pass);
-        console.log("✓ Firebase Auth erfolgreich - UID:", userCredential.user.uid);
-      } catch (authError) {
-        console.error("Auth Login fehlgeschlagen:", authError.code);
-        if (authError.code === 'auth/wrong-password' || authError.code === 'auth/user-not-found') {
-          showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
-        } else {
-          showStatus("Login-Fehler: " + authError.message, 'error');
-        }
-        return;
-      }
-      
-      // Lade User-Daten
-      const snap = await db.ref('users/' + targetUid).get();
       if (!snap.exists()) {
-        showStatus("Fehler beim Laden der User-Daten", 'error');
+        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
       }
       
       const data = snap.val();
-      console.log("User Daten geladen:", data.name, data.class);
+      console.log("User Daten:", data);
+      
+      // Passwort nochmal checken zur Sicherheit
+      if (data.password !== pass) {
+        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
+        return;
+      }
       
       // Extrahiere Jahrgang aus Klasse (5a -> "5", 10b -> "10")
       let jahrgang;
@@ -1517,10 +1464,9 @@
       
       currentUser = { 
         name: data.name,
-        userKey: targetUid, // Firebase UID als Key
+        userKey: userKey, // Speichere den Key für spätere Updates
         class: data.class,
-        jahrgang: jahrgang,
-        uid: targetUid
+        jahrgang: jahrgang 
       };
       userPerformance = data.performance || {};
       
