@@ -1420,13 +1420,15 @@
         showScreen('adminScreen');
         showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
         console.log("=== LOGIN ENDE (Teacher) ===");
-        return;
+        return; // Beende Funktion hier - kein weiterer Code!
       } catch (authError) {
         console.error("Admin-Login fehlgeschlagen:", authError);
         showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
-        return;
+        return; // Beende bei Fehler
       }
     }
+    
+    // Ab hier nur noch normaler User-Login
     
     console.log("Kein Teacher-Login, versuche normalen Login...");
     
