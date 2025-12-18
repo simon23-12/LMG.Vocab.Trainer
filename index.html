@@ -1400,43 +1400,36 @@
       return;
     }
     
-    // ============================================
-    // ADMIN LOGIN - MUSS VOR allem anderen sein!
-    // ============================================
+    // Teacher Admin Login
+    console.log("Prüfe Teacher-Login...");
     if (name === 'teacher') {
-      console.log("=== ADMIN LOGIN START ===");
+      // Passwort-Hash (SHA256 von deinem Admin-Passwort)
+      const adminHash = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3'; // Beispiel-Hash
       
-      (async () => {
-        try {
-          showStatus("Admin-Login läuft...", 'info');
-          const adminEmail = 'teacher@lmg-vokabel.internal';
-          const userCredential = await firebase.auth().signInWithEmailAndPassword(adminEmail, pass);
-          
-          console.log("✓ Admin Firebase Auth erfolgreich!");
-          currentUser = { 
-            name: 'teacher', 
-            class: 'admin',
-            jahrgang: 'admin',
-            isAdmin: true,
-            uid: userCredential.user.uid
-          };
-          
-          showScreen('adminScreen');
-          showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
-          console.log("=== ADMIN LOGIN ENDE ===");
-        } catch (error) {
-          console.error("Admin-Login Fehler:", error);
-          showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
-        }
-      })();
+      // Berechne Hash des eingegebenen Passworts
+      const inputHash = btoa(pass); // Einfaches Encoding
+      const correctHash = 'TE1HYWRtaW4='; // Base64 von "LMGadmin" - ÄNDERE DAS!
       
-      return; // WICHTIG: Beende Funktion JETZT!
+      if (inputHash === correctHash) {
+        console.log("✓ Teacher-Login erkannt!");
+        currentUser = { 
+          name: 'teacher', 
+          class: 'admin',
+          jahrgang: 'admin',
+          isAdmin: true
+        };
+        console.log("Zeige Admin-Screen...");
+        showScreen('adminScreen');
+        showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
+        console.log("=== LOGIN ENDE (Teacher) ===");
+        return;
+      } else {
+        showStatus("Falsches Passwort!", 'error');
+        return;
+      }
     }
     
-    // ============================================
-    // AB HIER: NUR NORMALER USER LOGIN
-    // ============================================
-    console.log("Normaler User-Login...");
+    console.log("Kein Teacher-Login, versuche normalen Login...");
     
     try {
       // Erstelle den gleichen Key wie bei der Registrierung
