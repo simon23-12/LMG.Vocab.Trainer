@@ -1465,9 +1465,15 @@
         targetUserKey = child.val().userKey;
       });
       
-      if (!targetUid || !targetUserKey) {
+      if (!targetUid) {
         showStatus("User-Daten unvollständig!", 'error');
         return;
+      }
+      
+      // Fallback für alte User ohne userKey
+      if (!targetUserKey) {
+        console.log("⚠️ User hat kein userKey - erstelle temporären");
+        targetUserKey = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + targetUid.substring(0, 8);
       }
       
       console.log("User gefunden - UID:", targetUid);
