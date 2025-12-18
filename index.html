@@ -1157,6 +1157,20 @@
     appId: "1:743231387214:web:166169b25f72616280351f"
   };
   
+
+  // ============================================
+  // SHA-256 HASH FUNKTION (Einweg!)
+  // ============================================
+  async function hashPassword(password) {
+    const salt = 'LMG_VOKABEL_2024_SECURE_SALT';
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password + salt);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
+  
   let app, db;
   let currentUser = null;
   let userPerformance = {};
@@ -1360,12 +1374,13 @@
         return;
       }
       
-      // Hash das Passwort vor dem Speichern
-      const passwordHash = btoa(pass + 'LMG_SALT_2024'); // Hash mit Salt
+      // Hash Passwort mit SHA-256 (nicht umkehrbar!)
+      const passwordHash = await hashPassword(pass);
+      console.log("Passwort-Hash erstellt (SHA-256)");
       
       await db.ref('users/' + userKey).set({ 
         name: name,
-        passwordHash: passwordHash,  // Nur Hash, kein Klartext!
+        passwordHash: passwordHash,  // Nur Hash, NICHT umkehrbar!
         class: cls,
         created: new Date().toISOString(),
         performance: {}
@@ -1450,17 +1465,19 @@
       const data = snap.val();
       console.log("User Daten:", data);
       
-      // Passwort-Hash checken
-      const inputHash = btoa(pass + 'LMG_SALT_2024');
+      // Hash Passwort für Vergleich
+      const inputHash = await hashPassword(pass);
       
-      // Support für alte Accounts mit Klartext-Passwort
-      const isValid = (data.passwordHash && data.passwordHash === inputHash) || 
-                      (data.password && data.password === pass);
+      // Support für alte Accounts (Klartext oder Base64)
+      const isValidHash = data.passwordHash && data.passwordHash === inputHash;
+      const isValidLegacy = data.password && data.password === pass;
       
-      if (!isValid) {
+      if (!isValidHash && !isValidLegacy) {
         showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
       }
+      
+      console.log(isValidHash ? "✓ SHA-256 Hash Login" : "✓ Legacy Login");
       
       // Extrahiere Jahrgang aus Klasse (5a -> "5", 10b -> "10")
       let jahrgang;
