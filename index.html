@@ -1400,14 +1400,16 @@
       return;
     }
     
-    // Teacher Admin Login - via Firebase Auth
-    console.log("Prüfe Teacher-Login...");
+    // ============================================
+    // ADMIN LOGIN via Firebase Auth
+    // ============================================
     if (name === 'teacher') {
+      console.log("Teacher-Login erkannt - versuche Firebase Auth...");
       try {
         showStatus("Admin-Login läuft...", 'info');
         const adminEmail = 'teacher@lmg-vokabel.internal';
         const userCredential = await firebase.auth().signInWithEmailAndPassword(adminEmail, pass);
-        console.log("✓ Teacher-Login erfolgreich via Firebase Auth!");
+        console.log("✓ Admin Firebase Auth erfolgreich!");
         
         currentUser = { 
           name: 'teacher', 
@@ -1416,21 +1418,23 @@
           isAdmin: true,
           uid: userCredential.user.uid
         };
-        console.log("Zeige Admin-Screen...");
+        
         showScreen('adminScreen');
         showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
-        console.log("=== LOGIN ENDE (Teacher) ===");
-        return; // Beende Funktion hier - kein weiterer Code!
+        console.log("=== LOGIN ENDE (Admin) ===");
+        return; // WICHTIG: Beende Funktion hier!
+        
       } catch (authError) {
         console.error("Admin-Login fehlgeschlagen:", authError);
         showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
-        return; // Beende bei Fehler
+        return; // WICHTIG: Beende auch bei Fehler!
       }
     }
     
-    // Ab hier nur noch normaler User-Login
-    
-    console.log("Kein Teacher-Login, versuche normalen Login...");
+    // ============================================
+    // AB HIER: NUR NOCH NORMALER USER LOGIN
+    // ============================================
+    console.log("Normaler User-Login...");
     
     try {
       // Erstelle den gleichen Key wie bei der Registrierung
