@@ -905,19 +905,19 @@
     </h1>
     
     <div id="loadingScreen" class="loading" style="display: none;">
-      <p>â³ Lade Firebase...</p>
+      <p>⏳ Lade Firebase...</p>
       <p id="loadingStatus" style="font-size: 14px; margin-top: 10px;"></p>
     </div>
     
     <div id="status"></div>
      <!-- Admin Dashboard Screen -->
     <div id="adminScreen" class="screen">
-      <h2>ðŸ‘¨â€ðŸ« Lehrer Dashboard</h2>
+      <h2>👨‍🏫 Lehrer Dashboard</h2>
       
       <div class="form-group">
-        <label>Klasse auswÃ¤hlen:</label>
+        <label>Klasse auswählen:</label>
         <select id="adminClassSelect" onchange="loadClassPerformance()">
-          <option value="">-- Klasse wÃ¤hlen --</option>
+          <option value="">-- Klasse wählen --</option>
           <option value="5a">5a</option>
           <option value="5b">5b</option>
           <option value="5c">5c</option>
@@ -953,7 +953,7 @@
     <div id="loginScreen" class="screen active">
       <div class="landing-container">
         <div class="welcome-section">
-          <h2>ðŸš€ Bereit zum Lernen?</h2>
+          <h2>🚀 Bereit zum Lernen?</h2>
           <p>Neu hier? Klicke auf "Registrieren".</p>
         </div>
         
@@ -964,42 +964,42 @@
         
         <div id="loginTab" class="tab-content active">
           <div class="form-group">
-            <div class="input-icon" data-icon="ðŸ‘¤">
+            <div class="input-icon" data-icon="👤">
               <input id="loginName" class="modern-input" placeholder="Dein Name" onkeypress="if(event.key==='Enter') login()" />
             </div>
           </div>
           <div class="form-group">
-            <div class="input-icon" data-icon="ðŸ”’">
+            <div class="input-icon" data-icon="🔒">
               <input id="loginPass" class="modern-input" placeholder="Passwort" type="password" onkeypress="if(event.key==='Enter') login()" />
             </div>
           </div>
-          <button onclick="login()" class="modern-button">Login ðŸš€</button>
+          <button onclick="login()" class="modern-button">Login 🚀</button>
         </div>
         
         <div id="registerTab" class="tab-content">
           <div class="info-box">
-            <div class="info-box-title">ðŸ’¡ Wichtige Hinweise</div>
+            <div class="info-box-title">💡 Wichtige Hinweise</div>
             <ol class="info-box-list">
               <li>Bitte melde dich nur mit deinem <strong>Vornamen</strong> als Name an, nicht den Nachnamen benutzen.</li>
               <li>Schreib dir dein Passwort sicher in den <strong>Schulplaner</strong> oder einen anderen Ort, wo du es jederzeit nachschauen kannst.</li>
-              <li>Bitte wÃ¤hle die <strong>richtige Klasse</strong> aus, da du sonst falsch zugeordnet wirst.</li>
+              <li>Bitte wähle die <strong>richtige Klasse</strong> aus, da du sonst falsch zugeordnet wirst.</li>
             </ol>
           </div>
           
           <div class="form-group">
-            <div class="input-icon" data-icon="ðŸ‘¤">
+            <div class="input-icon" data-icon="👤">
               <input id="regName" class="modern-input" placeholder="Dein Name" />
             </div>
           </div>
           <div class="form-group">
-            <div class="input-icon" data-icon="ðŸ”’">
+            <div class="input-icon" data-icon="🔒">
               <input id="regPass" class="modern-input" placeholder="Passwort" type="password" />
             </div>
           </div>
           <div class="form-group">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">ðŸ“š Deine Klasse:</label>
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">📚 Deine Klasse:</label>
             <select id="regClass" class="modern-input">
-              <option value="">-- Klasse wÃ¤hlen --</option>
+              <option value="">-- Klasse wählen --</option>
               <option value="5a">5a</option>
               <option value="5b">5b</option>
               <option value="5c">5c</option>
@@ -1026,67 +1026,67 @@
               <option value="10d">10d</option>
             </select>
           </div>
-          <button onclick="register()" class="modern-button">Account erstellen âœ¨</button>
+          <button onclick="register()" class="modern-button">Account erstellen ✨</button>
         </div>
       </div>
     </div>
     
     <div id="pageSelectionScreen" class="screen">
       <div class="dashboard-header">
-        <h2>Willkommen, <span id="userName"></span>! ðŸ‘‹</h2>
+        <h2>Willkommen, <span id="userName"></span>! 👋</h2>
         <p>Klasse: <span id="userClass"></span></p>
       </div>
       
       <!-- Dashboard Stats -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">ðŸ“š Vokabeln geÃ¼bt</div>
+          <div class="stat-label">📚 Vokabeln geübt</div>
           <div class="stat-value" id="totalVocabsPracticed">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">ðŸŽ¯ Accuracy</div>
+          <div class="stat-label">🎯 Accuracy</div>
           <div class="stat-value" id="averageAccuracy">0%</div>
         </div>
       </div>
       
       <!-- Interval Section -->
       <div class="interval-section">
-        <h3>ðŸ“– Intervall testen</h3>
+        <h3>📖 Intervall testen</h3>
         <div class="interval-controls">
           <label>Von Seite:</label>
           <select id="pageFrom"></select>
           <label>Bis Seite:</label>
           <select id="pageTo"></select>
-          <button onclick="startIntervalQuiz()">Los geht's! ðŸš€</button>
+          <button onclick="startIntervalQuiz()">Los geht's! 🚀</button>
         </div>
       </div>
       
       <!-- Pages Grid -->
       <div class="pages-section">
-        <h3>ðŸ“„ Oder wÃ¤hle eine einzelne Seite:</h3>
+        <h3>📄 Oder wähle eine einzelne Seite:</h3>
         <div id="pageGrid" class="page-grid"></div>
       </div>
       
       <!-- Leaderboard Section -->
       <div id="leaderboardSection" class="leaderboard-section collapsed">
         <button class="leaderboard-toggle" onclick="toggleLeaderboard()">
-          <span>ðŸ†</span>
+          <span>🏆</span>
           <span>Top 10 Leaderboard anzeigen</span>
-          <span class="leaderboard-toggle-icon">â–¼</span>
+          <span class="leaderboard-toggle-icon">▼</span>
         </button>
         <div class="leaderboard-content">
           <div class="leaderboard-header">
-            <h3>ðŸ† Top 10 Leaderboard <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
+            <h3>🏆 Top 10 Leaderboard <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
           </div>
           <ol id="leaderboardList" class="leaderboard-list">
-            <!-- Wird dynamisch befÃ¼llt -->
+            <!-- Wird dynamisch befüllt -->
           </ol>
         </div>
       </div>
       
       <div style="text-align: center;">
         <button onclick="logout()" class="modern-logout">
-          <span>ðŸšª</span> Logout
+          <span>🚪</span> Logout
         </button>
       </div>
     </div>
@@ -1100,7 +1100,7 @@
       </div>
       
       <div class="question-card">
-        <div class="question-label">Ãœbersetze ins Englische:</div>
+        <div class="question-label">Übersetze ins Englische:</div>
         <div class="question-word" id="questionWord">Wort</div>
       </div>
       
@@ -1121,7 +1121,7 @@
     </div>
     
     <div id="resultsScreen" class="screen">
-      <h2>ðŸŽ‰ Quiz beendet!</h2>
+      <h2>🎉 Quiz beendet!</h2>
       
       <div class="score-display">
         <div class="score-circle">
@@ -1140,7 +1140,7 @@
         <button onclick="logout()" style="background: #e74c3c;">Logout</button>
       </div>
     </div>
-    <div class="footer">From Simon with love â¤ï¸</div>
+    <div class="footer">From Simon with love ❤️</div>
   </div>
   
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1169,7 +1169,7 @@
   let timeLeft = 15;
   let firebaseReady = false;
   
-  // Synonym-Dictionary fÃ¼r hÃ¤ufige Vokabeln
+  // Synonym-Dictionary für häufige Vokabeln
   const synonyms = {
     'house': ['home', 'dwelling', 'residence'],
     'home': ['house', 'dwelling', 'residence'],
@@ -1245,8 +1245,8 @@
           setTimeout(tryInit, 200);
         } else {
           document.getElementById('loadingScreen').innerHTML = 
-            '<p style="color: #e74c3c;">âŒ Firebase konnte nicht geladen werden.</p>' +
-            '<p style="font-size: 14px;">Bitte Seite neu laden oder als HTML-Datei lokal Ã¶ffnen.</p>';
+            '<p style="color: #e74c3c;">❌ Firebase konnte nicht geladen werden.</p>' +
+            '<p style="font-size: 14px;">Bitte Seite neu laden oder als HTML-Datei lokal öffnen.</p>';
         }
         return;
       }
@@ -1255,7 +1255,7 @@
         app = firebase.initializeApp(firebaseConfig);
         db = firebase.database();
         firebaseReady = true;
-        updateLoadingStatus('âœ“ Firebase bereit!');
+        updateLoadingStatus('✓ Firebase bereit!');
         
         // Zeige Login-Screen explizit an
         document.getElementById('loadingScreen').style.display = 'none';
@@ -1264,58 +1264,11 @@
         console.log('Login Screen angezeigt');
       } catch (e) {
         document.getElementById('loadingScreen').innerHTML = 
-          '<p style="color: #e74c3c;">âŒ Firebase Fehler: ' + e.message + '</p>';
+          '<p style="color: #e74c3c;">❌ Firebase Fehler: ' + e.message + '</p>';
       }
     }
-
-  
-  // === SICHERHEITSSCHUTZ GEGEN CONSOLE-EXPLOITS ===
-  // Verhindere direkten Zugriff auf Firebase DB in der Console
-  (function() {
-    // Speichere die echte db Referenz intern
-    const _realDb = db;
     
-    // Überschreibe db im globalen Scope
-    window.db = {
-      ref: function() {
-        throw new Error("Zugriff verweigert - Bitte nutze die App-Oberfläche");
-      }
-    };
-    
-    // Ersetze alle db.ref() Aufrufe intern mit _realDb.ref()
-    // Dies geschieht zur Laufzeit in den Funktionen
-    const originalRef = _realDb.ref.bind(_realDb);
-    
-    // Sichere Wrapper-Funktion
-    window._secureDbCall = function(path) {
-      // Prüfe ob User eingeloggt ist
-      if (!currentUser) {
-        throw new Error("Nicht eingeloggt");
-      }
-      return originalRef(path);
-    };
-    
-    // Schütze auch firebase global
-    if (window.firebase) {
-      const realFirebase = window.firebase;
-      window.firebase = new Proxy(realFirebase, {
-        get: function(target, prop) {
-          if (prop === 'database') {
-            return function() {
-              throw new Error("Direkter Datenbankzugriff nicht erlaubt");
-            };
-          }
-          return target[prop];
-        }
-      });
-    }
-    
-    console.log("%c⚠️ SICHERHEITSHINWEIS", "color: red; font-size: 20px; font-weight: bold;");
-    console.log("%cDer direkte Zugriff auf die Datenbank über die Console ist deaktiviert.", "font-size: 14px;");
-    console.log("%cVersuche nicht, die App zu manipulieren!", "font-size: 14px;");
-  })();
-  
-  tryInit();
+    tryInit();
   }
   
   if (document.readyState === 'loading') {
@@ -1342,7 +1295,7 @@
       content.classList.remove('active');
     });
     
-    // Aktiviere gewÃ¤hlten Tab
+    // Aktiviere gewählten Tab
     if (tabName === 'login') {
       document.querySelectorAll('.tab')[0].classList.add('active');
       document.getElementById('loginTab').classList.add('active');
@@ -1353,7 +1306,7 @@
   }
   
   function showScreen(screenId) {
-    console.log("showScreen aufgerufen fÃ¼r:", screenId);
+    console.log("showScreen aufgerufen für:", screenId);
     
     // Verstecke alle Screens
     document.querySelectorAll('.screen').forEach(s => {
@@ -1362,20 +1315,20 @@
       console.log("Verstecke:", s.id);
     });
     
-    // Zeige gewÃ¼nschten Screen
+    // Zeige gewünschten Screen
     const screen = document.getElementById(screenId);
     if (screen) {
       screen.classList.add('active');
       screen.style.display = 'block';
-      console.log("âœ“ Zeige Screen:", screenId);
+      console.log("✓ Zeige Screen:", screenId);
     } else {
-      console.error("âŒ Screen nicht gefunden:", screenId);
+      console.error("❌ Screen nicht gefunden:", screenId);
     }
   }
   
   async function register() {
     if (!firebaseReady) {
-      showStatus("Firebase lÃ¤dt noch...", 'error');
+      showStatus("Firebase lädt noch...", 'error');
       return;
     }
     
@@ -1384,23 +1337,23 @@
     const cls = document.getElementById('regClass').value;
     
     if (!name || !pass || !cls) {
-      showStatus("Bitte alle Felder ausfÃ¼llen!", 'error');
+      showStatus("Bitte alle Felder ausfüllen!", 'error');
       return;
     }
     
     // Extrahiere Jahrgang aus Klasse (z.B. "7b" -> "7")
     const jahrgang = cls.charAt(0);
     if (!['5','6','7','8','9'].includes(jahrgang) && !cls.startsWith('10')) {
-      showStatus("UngÃ¼ltige Klasse!", 'error');
+      showStatus("Ungültige Klasse!", 'error');
       return;
     }
     
     try {
       // Erstelle eindeutigen Key aus Name + Passwort Hash
-      // So kÃ¶nnen mehrere Nutzer mit gleichem Namen existieren
-      const userKey = name + '_' + btoa(pass).substring(0, 8); // Base64 encode des Passworts (gekÃ¼rzt)
+      // So können mehrere Nutzer mit gleichem Namen existieren
+      const userKey = name + '_' + btoa(pass).substring(0, 8); // Base64 encode des Passworts (gekürzt)
       
-      // PrÃ¼fe ob dieser exakte Account bereits existiert
+      // Prüfe ob dieser exakte Account bereits existiert
       const existingUser = await db.ref('users/' + userKey).get();
       if (existingUser.exists()) {
         showStatus("Dieser Account existiert bereits! Bitte logge dich ein.", 'error');
@@ -1414,7 +1367,7 @@
         created: new Date().toISOString(),
         performance: {}
       });
-      alert("Registrierung erfolgreich! ðŸŽ‰\n\nBitte notiere dir deine Login-Daten sorgfÃ¤ltig:\n\nName: " + name + "\nPasswort: " + pass);
+      alert("Registrierung erfolgreich! 🎉\n\nBitte notiere dir deine Login-Daten sorgfältig:\n\nName: " + name + "\nPasswort: " + pass);
       showStatus("Registrierung erfolgreich! Jetzt einloggen.", 'success');
       
       // Felder leeren und zum Login wechseln
@@ -1431,7 +1384,7 @@
     console.log("=== LOGIN START ===");
     
     if (!firebaseReady) {
-      showStatus("Firebase lÃ¤dt noch...", 'error');
+      showStatus("Firebase lädt noch...", 'error');
       console.log("Firebase nicht bereit");
       return;
     }
@@ -1448,9 +1401,9 @@
     }
     
     // Teacher Admin Login
-    console.log("PrÃ¼fe Teacher-Login...");
+    console.log("Prüfe Teacher-Login...");
     if (name === 'teacher' && pass === 'LMGadmin') {
-      console.log("âœ“ Teacher-Login erkannt!");
+      console.log("✓ Teacher-Login erkannt!");
       currentUser = { 
         name: 'teacher', 
         class: 'admin',
@@ -1459,7 +1412,7 @@
       };
       console.log("Zeige Admin-Screen...");
       showScreen('adminScreen');
-      showStatus("Willkommen im Lehrer-Dashboard! ðŸ‘¨â€ðŸ«", 'success');
+      showStatus("Willkommen im Lehrer-Dashboard! 👨‍🏫", 'success');
       console.log("=== LOGIN ENDE (Teacher) ===");
       return;
     }
@@ -1470,12 +1423,12 @@
       // Erstelle den gleichen Key wie bei der Registrierung
       const userKey = name + '_' + btoa(pass).substring(0, 8);
       
-      console.log("Login Versuch fÃ¼r Key:", userKey);
+      console.log("Login Versuch für Key:", userKey);
       const snap = await db.ref('users/' + userKey).get();
       console.log("User snapshot erhalten, exists:", snap.exists());
       
       if (!snap.exists()) {
-        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte Ã¼berprÃ¼fe das noch einmal :)", 'error');
+        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
       }
       
@@ -1484,7 +1437,7 @@
       
       // Passwort nochmal checken zur Sicherheit
       if (data.password !== pass) {
-        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte Ã¼berprÃ¼fe das noch einmal :)", 'error');
+        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
         return;
       }
       
@@ -1500,7 +1453,7 @@
       
       currentUser = { 
         name: data.name,
-        userKey: userKey, // Speichere den Key fÃ¼r spÃ¤tere Updates
+        userKey: userKey, // Speichere den Key für spätere Updates
         class: data.class,
         jahrgang: jahrgang 
       };
@@ -1528,20 +1481,20 @@
       const vocabPath = 'vocabulary' + currentUser.jahrgang;
       console.log("Lade Vokabeln von:", vocabPath);
       
-      // CACHE-CHECK: PrÃ¼fe ob Vokabeln im localStorage sind
+      // CACHE-CHECK: Prüfe ob Vokabeln im localStorage sind
       const cacheKey = 'vocabs_' + currentUser.jahrgang;
       const cacheTimeKey = 'vocabs_time_' + currentUser.jahrgang;
       const cached = localStorage.getItem(cacheKey);
       const cacheTime = localStorage.getItem(cacheTimeKey);
       
-      // Cache ist 7 Tage gÃ¼ltig
+      // Cache ist 7 Tage gültig
       const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 Tage in ms
       const now = Date.now();
       
       if (cached && cacheTime && (now - parseInt(cacheTime)) < CACHE_DURATION) {
-        console.log("âœ“ Vokabeln aus Cache geladen (gespart: ~200 KB Download)");
+        console.log("✓ Vokabeln aus Cache geladen (gespart: ~200 KB Download)");
         allVocabs = JSON.parse(cached);
-        showStatus("Vokabeln geladen! âœ“", 'success');
+        showStatus("Vokabeln geladen! ✓", 'success');
         console.log("Vokabeln aus Cache:", allVocabs.length);
         console.log("=== loadVocabs ENDE (aus Cache) ===");
         return;
@@ -1555,7 +1508,7 @@
       
       if (!snap.exists()) {
         console.log("Snapshot existiert NICHT");
-        showStatus("Keine Vokabeln fÃ¼r Jahrgang " + currentUser.jahrgang + " gefunden!", 'error');
+        showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " gefunden!", 'error');
         allVocabs = [];
         return;
       }
@@ -1566,13 +1519,13 @@
       console.log("Data keys:", data ? Object.keys(data).length : 'null');
       
       allVocabs = Object.values(data);
-      console.log("Vokabeln geladen:", allVocabs.length, "fÃ¼r Jahrgang", currentUser.jahrgang);
+      console.log("Vokabeln geladen:", allVocabs.length, "für Jahrgang", currentUser.jahrgang);
       
       // CACHE: Speichere im localStorage
       try {
         localStorage.setItem(cacheKey, JSON.stringify(allVocabs));
         localStorage.setItem(cacheTimeKey, now.toString());
-        console.log("âœ“ Vokabeln im Cache gespeichert");
+        console.log("✓ Vokabeln im Cache gespeichert");
       } catch (e) {
         console.warn("localStorage voll, ignoriere Cache:", e);
       }
@@ -1586,7 +1539,7 @@
       if (allVocabs.length === 0) {
         showStatus("Vokabeln sind leer!", 'error');
       } else {
-        showStatus("Vokabeln geladen! âœ“", 'success');
+        showStatus("Vokabeln geladen! ✓", 'success');
       }
       
       console.log("=== loadVocabs ENDE ===");
@@ -1605,10 +1558,10 @@
     calculateDashboardStats();
     
     // Leaderboard NICHT automatisch laden - nur bei Klick
-    // loadLeaderboard(); // âŒ Entfernt fÃ¼r Performance
+    // loadLeaderboard(); // ❌ Entfernt für Performance
     
     if (allVocabs.length === 0) {
-      showStatus("Keine Vokabeln fÃ¼r Jahrgang " + currentUser.jahrgang + " verfÃ¼gbar!", 'error');
+      showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " verfügbar!", 'error');
       return;
     }
     
@@ -1648,10 +1601,10 @@
         if (perf && perf.percent !== undefined) {
           if (perf.percent === 100) {
             box.classList.add('perfect');
-            console.log("Seite", page, "wird HELLGRÃœN (100%)");
+            console.log("Seite", page, "wird HELLGRÜN (100%)");
           } else if (perf.percent >= 80) {
             box.classList.add('green');
-            console.log("Seite", page, "wird GRÃœN (", perf.percent, "%)");
+            console.log("Seite", page, "wird GRÜN (", perf.percent, "%)");
           } else if (perf.percent >= 50) {
             box.classList.add('yellow');
             console.log("Seite", page, "wird GELB (", perf.percent, "%)");
@@ -1677,7 +1630,7 @@
     });
     
     showScreen('pageSelectionScreen');
-    showStatus("Bereit zum Lernen! ðŸš€", 'success');
+    showStatus("Bereit zum Lernen! 🚀", 'success');
   }
   
   function startPageQuiz(page) {
@@ -1705,7 +1658,7 @@
     });
     
     if (allIntervalVocabs.length < 10) {
-      showStatus("Zu wenig Vokabeln in diesem Intervall (mindestens 10 benÃ¶tigt)!", 'error');
+      showStatus("Zu wenig Vokabeln in diesem Intervall (mindestens 10 benötigt)!", 'error');
       return;
     }
     
@@ -1736,7 +1689,7 @@
         selectedVocabs = selectedVocabs.concat(shuffled.slice(0, Math.min(count, shuffled.length)));
       });
     } else {
-      // 3+ Seiten: WÃ¤hle zufÃ¤llig 3 Seiten, je 5 Vokabeln
+      // 3+ Seiten: Wähle zufällig 3 Seiten, je 5 Vokabeln
       const shuffledPages = pages.sort(() => 0.5 - Math.random());
       const selectedPages = shuffledPages.slice(0, 3);
       
@@ -1746,9 +1699,9 @@
       });
     }
     
-    // PrÃ¼fe ob genug Vokabeln gesammelt wurden
+    // Prüfe ob genug Vokabeln gesammelt wurden
     if (selectedVocabs.length < 10) {
-      showStatus("Zu wenig Vokabeln verfÃ¼gbar! WÃ¤hle ein grÃ¶ÃŸeres Intervall.", 'error');
+      showStatus("Zu wenig Vokabeln verfügbar! Wähle ein größeres Intervall.", 'error');
       return;
     }
     
@@ -1760,7 +1713,7 @@
   
   function startQuiz(vocabPool, performanceKey = null, isPreselected = false) {
     if (isPreselected) {
-      // Vokabeln wurden bereits intelligent ausgewÃ¤hlt (bei Intervall)
+      // Vokabeln wurden bereits intelligent ausgewählt (bei Intervall)
       quizVocabs = vocabPool;
     } else {
       // Normale Auswahl: shuffle und nimm bis zu 10
@@ -1833,7 +1786,7 @@
         user: "(keine Antwort)",
         isCorrect: false
       });
-      document.getElementById('feedback').textContent = "â° Zeit abgelaufen! Richtig wÃ¤re: " + vocab.English;
+      document.getElementById('feedback').textContent = "⏰ Zeit abgelaufen! Richtig wäre: " + vocab.English;
       document.getElementById('feedback').className = 'feedback wrong';
       document.getElementById('submitBtn').disabled = true;
       
@@ -1846,7 +1799,7 @@
     
     document.getElementById('submitBtn').disabled = true;
     
-    // PrÃ¼fe Antwort (ohne AI, nur mit Regeln und Synonymen)
+    // Prüfe Antwort (ohne AI, nur mit Regeln und Synonymen)
     checkAnswer(userAnswer, vocab);
   }
   
@@ -1859,13 +1812,13 @@
     
     // Entferne Satzzeichen wie "...", ".", "!", "?" etc.
     const removePunctuation = (text) => {
-      return text.replace(/[.!?,;:â€¦]+$/g, '').trim(); // Entferne am Ende
+      return text.replace(/[.!?,;:…]+$/g, '').trim(); // Entferne am Ende
     };
     
     userNorm = removePunctuation(userNorm);
     correctNorm = removePunctuation(correctNorm);
     
-    // Ersetze AbkÃ¼rzungen mit vollen WÃ¶rtern fÃ¼r flexibleren Vergleich
+    // Ersetze Abkürzungen mit vollen Wörtern für flexibleren Vergleich
     const expandAbbreviations = (text) => {
       return text
         .replace(/\bsb\./gi, 'somebody')
@@ -1879,25 +1832,25 @@
     const userExpanded = expandAbbreviations(userNorm);
     const correctExpanded = expandAbbreviations(correctNorm);
     
-    // Nutze die erweiterten Versionen fÃ¼r Vergleiche
+    // Nutze die erweiterten Versionen für Vergleiche
     userNorm = userExpanded;
     correctNorm = correctExpanded;
     
-    // Erstelle auch eine Version OHNE Klammer-Inhalte fÃ¼r Vergleich
-    // "subject (school)" â†’ "subject"
+    // Erstelle auch eine Version OHNE Klammer-Inhalte für Vergleich
+    // "subject (school)" → "subject"
     const correctWithoutBrackets = correctNorm.replace(/\s*\([^)]*\)/g, '').trim();
     
-    // WICHTIG: Nutze die Version OHNE Klammern fÃ¼r weitere PrÃ¼fungen!
+    // WICHTIG: Nutze die Version OHNE Klammern für weitere Prüfungen!
     const correctNoBrackets = correctWithoutBrackets;
     const userNoBrackets = userNorm;
     
-    // 1. Exakte Ãœbereinstimmung (case-insensitive ist schon durch normalisierung)
+    // 1. Exakte Übereinstimmung (case-insensitive ist schon durch normalisierung)
     if (userNoBrackets === correctNoBrackets) {
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 1a. Ãœbereinstimmung MIT Original (falls Klammern im Original waren)
+    // 1a. Übereinstimmung MIT Original (falls Klammern im Original waren)
     if (userNorm === correctNorm) {
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
@@ -1905,31 +1858,31 @@
     
     // 1b. RADIKALE VEREINFACHUNG: Wenn die User-Antwort (min. 4 Buchstaben) 
     // IRGENDWO in der korrekten Antwort vorkommt, ist es richtig.
-    // Das vermeidet GrenzfÃ¤lle und ist groÃŸzÃ¼gig bei Variationen.
+    // Das vermeidet Grenzfälle und ist großzügig bei Variationen.
     
-    // Entferne Leerzeichen fÃ¼r Substring-Check
+    // Entferne Leerzeichen für Substring-Check
     const userNoSpaces = userNoBrackets.replace(/\s+/g, '');
     const correctNoSpaces = correctNoBrackets.replace(/\s+/g, '');
     
-    // PrÃ¼fe ob User-Eingabe lang genug ist (min. 4 Buchstaben)
+    // Prüfe ob User-Eingabe lang genug ist (min. 4 Buchstaben)
     if (userNoSpaces.length >= 4) {
-      // PrÃ¼fe ob die User-Antwort in der korrekten Antwort enthalten ist
+      // Prüfe ob die User-Antwort in der korrekten Antwort enthalten ist
       if (correctNoSpaces.includes(userNoSpaces)) {
-        console.log("âœ“ User-Antwort in LÃ¶sung enthalten:", userAnswer);
+        console.log("✓ User-Antwort in Lösung enthalten:", userAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
       
-      // ODER: PrÃ¼fe ob die korrekte Antwort in der User-Antwort enthalten ist
+      // ODER: Prüfe ob die korrekte Antwort in der User-Antwort enthalten ist
       // (z.B. User: "newspaper", Richtig: "paper")
       if (userNoSpaces.includes(correctNoSpaces)) {
-        console.log("âœ“ LÃ¶sung in User-Antwort enthalten:", userAnswer);
+        console.log("✓ Lösung in User-Antwort enthalten:", userAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
     }
     
-    // 2. ERWEITERTE VERB-PRÃœFUNG - alle Variationen akzeptieren
+    // 2. ERWEITERTE VERB-PRÜFUNG - alle Variationen akzeptieren
     // Entferne (to), to, (To), (TO) etc. und vergleiche nur das Verb
     const cleanVerb = (text) => {
       return text
@@ -1943,72 +1896,72 @@
     const correctVerbClean = cleanVerb(correctNoBrackets);
     
     if (userVerbClean === correctVerbClean) {
-      console.log("âœ“ Verb akzeptiert (verschiedene to-Varianten):", userAnswer, "=", correctAnswer);
+      console.log("✓ Verb akzeptiert (verschiedene to-Varianten):", userAnswer, "=", correctAnswer);
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 3. PrÃ¼fe Synonyme aus dem hardcoded Dictionary
+    // 3. Prüfe Synonyme aus dem hardcoded Dictionary
     const correctSynonyms = synonyms[correctNorm] || [];
     if (correctSynonyms.includes(userNorm)) {
-      console.log("âœ“ Synonym akzeptiert (Dictionary):", userAnswer, "fÃ¼r", correctAnswer);
+      console.log("✓ Synonym akzeptiert (Dictionary):", userAnswer, "für", correctAnswer);
       handleAnswerResult(true, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 4. PrÃ¼fe Synonyme aus den Vokabel-Daten (vocab.synonyms)
+    // 4. Prüfe Synonyme aus den Vokabel-Daten (vocab.synonyms)
     if (vocab.synonyms && Array.isArray(vocab.synonyms)) {
       const vocabSynonyms = vocab.synonyms.map(s => s.toLowerCase().trim());
       
-      // PrÃ¼fe direkt
+      // Prüfe direkt
       if (vocabSynonyms.includes(userNorm)) {
-        console.log("âœ“ Synonym akzeptiert (Vokabel-Daten):", userAnswer, "fÃ¼r", correctAnswer);
+        console.log("✓ Synonym akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
       
-      // PrÃ¼fe auch ohne (to) fÃ¼r Verben
+      // Prüfe auch ohne (to) für Verben
       const vocabSynonymsClean = vocabSynonyms.map(s => cleanVerb(s));
       if (vocabSynonymsClean.includes(userVerbClean)) {
-        console.log("âœ“ Synonym-Verb akzeptiert (Vokabel-Daten):", userAnswer, "fÃ¼r", correctAnswer);
+        console.log("✓ Synonym-Verb akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
     }
     
-    // 5. PrÃ¼fe ob Userantwort in der Synonym-Liste der richtigen Antwort ist (Dictionary)
+    // 5. Prüfe ob Userantwort in der Synonym-Liste der richtigen Antwort ist (Dictionary)
     for (let key in synonyms) {
-      // PrÃ¼fe direkt
+      // Prüfe direkt
       if (synonyms[key].includes(correctNorm) && synonyms[key].includes(userNorm)) {
-        console.log("âœ“ Beide sind Synonyme (Dictionary):", userAnswer, "=", correctAnswer);
+        console.log("✓ Beide sind Synonyme (Dictionary):", userAnswer, "=", correctAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
       
-      // PrÃ¼fe auch ohne (to) fÃ¼r Verben
+      // Prüfe auch ohne (to) für Verben
       const keyClean = cleanVerb(key);
       const synonymsClean = synonyms[key].map(s => cleanVerb(s));
       const correctClean = cleanVerb(correctNorm);
       
       if ((keyClean === correctClean || synonymsClean.includes(correctClean)) && 
           (keyClean === userVerbClean || synonymsClean.includes(userVerbClean))) {
-        console.log("âœ“ Beide sind Synonyme-Verben (Dictionary):", userAnswer, "=", correctAnswer);
+        console.log("✓ Beide sind Synonyme-Verben (Dictionary):", userAnswer, "=", correctAnswer);
         handleAnswerResult(true, userAnswer, vocab, correctAnswer);
         return;
       }
     }
     
-    // PrÃ¼fe auf offensichtlichen Nonsense (mehrere gleiche Buchstaben hintereinander)
+    // Prüfe auf offensichtlichen Nonsense (mehrere gleiche Buchstaben hintereinander)
     const hasNonsense = /(.)\1{3,}/.test(userNorm); // 4+ gleiche Buchstaben nacheinander
     if (hasNonsense) {
-      console.log("âŒ Nonsense-Eingabe erkannt");
+      console.log("❌ Nonsense-Eingabe erkannt");
       handleAnswerResult(false, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 6. BUCHSTABENDREHER-PRÃœFUNG (unabhÃ¤ngig von Distance!)
+    // 6. BUCHSTABENDREHER-PRÜFUNG (unabhängig von Distance!)
     // "door" vs "doro", "window" vs "wnidow", "cupboard" vs "cupboadr"  
-    // MindestlÃ¤nge: 3 Buchstaben
+    // Mindestlänge: 3 Buchstaben
     console.log("Vor Buchstabendreher-Check:", {
       userLength: userNoBrackets.length,
       correctLength: correctNoBrackets.length,
@@ -2018,36 +1971,36 @@
     });
     
     if (userNoBrackets.length >= 3 && correctNoBrackets.length >= 3 && userNoBrackets.length === correctNoBrackets.length) {
-      console.log("PrÃ¼fe Buchstabendreher:", userNoBrackets, "vs", correctNoBrackets);
+      console.log("Prüfe Buchstabendreher:", userNoBrackets, "vs", correctNoBrackets);
       const transPos = findTransposition(userNoBrackets, correctNoBrackets);
       console.log("Transposition Position:", transPos);
       if (transPos >= 0) {
-        console.log("âš ï¸ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
+        console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
         handleAnswerResult('half', userAnswer, vocab, correctAnswer, transPos);
         return;
       }
     } else {
-      console.log("Buchstabendreher-Check Ã¼bersprungen (LÃ¤ngen-Check failed)");
+      console.log("Buchstabendreher-Check übersprungen (Längen-Check failed)");
     }
     
     // 7. INTELLIGENTE TIPPFEHLER-ERKENNUNG
     const distance = getLevenshteinDistance(userNoBrackets, correctNoBrackets);
     
     // WICHTIGE LOGIK (OHNE AI):
-    // - Distance 1-2: Wort ist Ã„HNLICH â†’ wahrscheinlich Tippfehler â†’ FALSCH
-    // - Distance >2: Wort ist ANDERS â†’ unbekanntes Synonym â†’ FALSCH
-    // Nur exakte Ãœbereinstimmungen und definierte Synonyme werden akzeptiert!
+    // - Distance 1-2: Wort ist ÄHNLICH → wahrscheinlich Tippfehler → FALSCH
+    // - Distance >2: Wort ist ANDERS → unbekanntes Synonym → FALSCH
+    // Nur exakte Übereinstimmungen und definierte Synonyme werden akzeptiert!
     
     if (distance >= 1 && distance <= 2) {
       // Kleine Abweichung = Tippfehler
-      console.log("âŒ Tippfehler erkannt (Distance:", distance, ")");
+      console.log("❌ Tippfehler erkannt (Distance:", distance, ")");
       handleAnswerResult(false, userAnswer, vocab, correctAnswer);
       return;
     }
     
-    // 7. Alles andere: Falsch (keine AI-PrÃ¼fung mehr)
+    // 7. Alles andere: Falsch (keine AI-Prüfung mehr)
     // Wenn wir bis hier gekommen sind, ist die Antwort nicht korrekt
-    console.log("âŒ Antwort nicht erkannt. Bitte exakte Schreibweise oder definiertes Synonym verwenden.");
+    console.log("❌ Antwort nicht erkannt. Bitte exakte Schreibweise oder definiertes Synonym verwenden.");
     handleAnswerResult(false, userAnswer, vocab, correctAnswer);
   }
   
@@ -2068,16 +2021,16 @@
     
     const [pos1, pos2] = diffs;
     
-    // PrÃ¼fe ob es ein Dreher ist (Buchstaben sind vertauscht)
+    // Prüfe ob es ein Dreher ist (Buchstaben sind vertauscht)
     // "gilr" vs "girl": Position 1,2 -> g[i]l[r] vs g[i]r[l] -> i!=i ABER l==l und r==r vertauscht
     if (a[pos1] === b[pos2] && a[pos2] === b[pos1]) {
-      return Math.min(pos1, pos2); // Gib die erste Position zurÃ¼ck
+      return Math.min(pos1, pos2); // Gib die erste Position zurück
     }
     
     return -1;
   }
   
-  // Levenshtein Distance fÃ¼r Tippfehler-Toleranz
+  // Levenshtein Distance für Tippfehler-Toleranz
   function getLevenshteinDistance(a, b) {
     if (a.length === 0) return b.length;
     if (b.length === 0) return a.length;
@@ -2124,20 +2077,20 @@
         markedAnswer = before + '<span style="color:#e74c3c; font-weight:700;">' + char1 + char2 + '</span>' + after;
       }
       
-      document.getElementById('feedback').innerHTML = "âš ï¸ Fast! Buchstabendreher: " + markedAnswer + " â†’ Richtig: " + correctAnswer;
+      document.getElementById('feedback').innerHTML = "⚠️ Fast! Buchstabendreher: " + markedAnswer + " → Richtig: " + correctAnswer;
       document.getElementById('feedback').className = 'feedback half';
       
     } else if (isCorrect) {
       // RICHTIG
       scoreIncrement = 1;
       score++;
-      document.getElementById('feedback').textContent = "âœ“ Richtig!";
+      document.getElementById('feedback').textContent = "✓ Richtig!";
       document.getElementById('feedback').className = 'feedback correct';
       
     } else {
       // FALSCH
       scoreIncrement = 0;
-      document.getElementById('feedback').textContent = "âœ— Falsch! Richtig: " + correctAnswer;
+      document.getElementById('feedback').textContent = "✗ Falsch! Richtig: " + correctAnswer;
       document.getElementById('feedback').className = 'feedback wrong';
     }
     
@@ -2170,13 +2123,13 @@
       
       // Bestimme die Klasse basierend auf dem Status
       let statusClass = 'wrong';
-      let statusIcon = 'âœ—';
+      let statusIcon = '✗';
       if (answer.isCorrect === true) {
         statusClass = 'correct';
-        statusIcon = 'âœ“';
+        statusIcon = '✓';
       } else if (answer.isCorrect === 'half') {
         statusClass = 'half';
-        statusIcon = 'âš ï¸';
+        statusIcon = '⚠️';
       }
       
       item.className = 'result-item ' + statusClass;
@@ -2219,10 +2172,10 @@
       
       console.log("Speichere Performance:", window.currentPerformanceKey, perfData);
       
-      // Verwende userKey statt name fÃ¼r Firebase-Pfad
+      // Verwende userKey statt name für Firebase-Pfad
       const userPath = currentUser.userKey || currentUser.name;
       
-      // PrÃ¼fe ob es ein Intervall-Test ist
+      // Prüfe ob es ein Intervall-Test ist
       const isIntervalTest = window.currentPerformanceKey.startsWith('interval_');
       
       if (isIntervalTest) {
@@ -2253,14 +2206,14 @@
           
           // Nur speichern wenn mindestens 5 Vokabeln von dieser Seite getestet wurden
           if (stats.total < 5) {
-            console.log(`Seite ${page}: Zu wenig Vokabeln getestet (${stats.total}), Ã¼berspringe Speicherung`);
+            console.log(`Seite ${page}: Zu wenig Vokabeln getestet (${stats.total}), überspringe Speicherung`);
             continue;
           }
           
           const pagePercent = Math.round((stats.correct / stats.total) * 100);
           const pageKey = 'page_' + page;
           
-          // PrÃ¼fe ob bereits besserer Score existiert
+          // Prüfe ob bereits besserer Score existiert
           const existingPagePerf = userPerformance[pageKey];
           if (existingPagePerf && existingPagePerf.percent >= pagePercent) {
             console.log(`Seite ${page}: Bestehender Score besser (${existingPagePerf.percent}% vs ${pagePercent}%)`);
@@ -2281,7 +2234,7 @@
           await db.ref('users/' + userPath + '/performance/' + pageKey).set(pageData);
         }
         
-        showStatus('Performance gespeichert! Einzelne Seiten aktualisiert. ðŸ’¾', 'success');
+        showStatus('Performance gespeichert! Einzelne Seiten aktualisiert. 💾', 'success');
       }
       
       // Speichere auch den Gesamt-Intervall-Score (wie bisher)
@@ -2294,14 +2247,14 @@
         return;
       }
       
-      // OPTIMISTISCHES UPDATE: Aktualisiere lokal sofort (kein Reload nÃ¶tig!)
+      // OPTIMISTISCHES UPDATE: Aktualisiere lokal sofort (kein Reload nötig!)
       userPerformance[window.currentPerformanceKey] = perfData;
       
       await db.ref('users/' + userPath + '/performance/' + window.currentPerformanceKey).set(perfData);
       
-      console.log('âœ“ Performance gespeichert in Firebase (Delta Update)');
+      console.log('✓ Performance gespeichert in Firebase (Delta Update)');
       if (!isIntervalTest) {
-        showStatus('Performance gespeichert! ðŸ’¾', 'success');
+        showStatus('Performance gespeichert! 💾', 'success');
       }
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
@@ -2334,7 +2287,7 @@
     const accuracyElement = document.getElementById('averageAccuracy');
     accuracyElement.textContent = avgAccuracy + '%';
     
-    // FÃ¤rbe den Accuracy-Text basierend auf dem Durchschnitt
+    // Färbe den Accuracy-Text basierend auf dem Durchschnitt
     if (avgAccuracy === 100) {
       accuracyElement.style.background = 'linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%)';
       accuracyElement.style.webkitBackgroundClip = 'text';
@@ -2362,7 +2315,7 @@
     try {
       // Zeige Loading
       const list = document.getElementById('leaderboardList');
-      list.innerHTML = '<li class="leaderboard-loading">Lade Leaderboard... â³</li>';
+      list.innerHTML = '<li class="leaderboard-loading">Lade Leaderboard... ⏳</li>';
       
       // Hole aktuellen Monat und Jahr
       const now = new Date();
@@ -2370,22 +2323,22 @@
       const currentYear = now.getFullYear();
       const monthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`; // "2025-12"
       
-      // Monatsname fÃ¼r Anzeige
-      const monthNames = ['Januar', 'Februar', 'MÃ¤rz', 'April', 'Mai', 'Juni',
+      // Monatsname für Anzeige
+      const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
                          'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
       document.getElementById('leaderboardMonth').textContent = monthNames[currentMonth - 1] + ' ' + currentYear;
       
       // Lade alle User der gleichen Klasse
       const usersSnap = await db.ref('users').get();
       if (!usersSnap.exists()) {
-        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Daten verfÃ¼gbar</li>';
+        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Daten verfügbar</li>';
         return;
       }
       
       const allUsers = usersSnap.val();
       const classUsers = [];
       
-      // Filtere User nach Klasse und zÃ¤hle Vokabeln fÃ¼r diesen Monat
+      // Filtere User nach Klasse und zähle Vokabeln für diesen Monat
       for (let userKey in allUsers) {
         const user = allUsers[userKey];
         
@@ -2395,16 +2348,16 @@
         // Exkludiere Test-Accounts
         const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
         if (testAccounts.includes(user.name.toLowerCase())) {
-          console.log('Ãœberspringe Test-Account:', user.name);
+          console.log('Überspringe Test-Account:', user.name);
           continue;
         }
         
-        // ZÃ¤hle Vokabeln die in diesem Monat geÃ¼bt wurden
+        // Zähle Vokabeln die in diesem Monat geübt wurden
         let monthVocabs = 0;
         if (user.performance) {
           for (let perfKey in user.performance) {
             const perf = user.performance[perfKey];
-            // PrÃ¼fe ob Timestamp in diesem Monat liegt
+            // Prüfe ob Timestamp in diesem Monat liegt
             if (perf.timestamp) {
               const perfDate = new Date(perf.timestamp);
               const perfMonth = perfDate.getMonth() + 1;
@@ -2434,7 +2387,7 @@
       list.innerHTML = '';
       
       if (top10.length === 0) {
-        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine AktivitÃ¤t in diesem Monat</li>';
+        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Aktivität in diesem Monat</li>';
         return;
       }
       
@@ -2449,14 +2402,14 @@
         
         // Rang-Emojis
         let rankEmoji = '';
-        if (index === 0) rankEmoji = 'ðŸ¥‡';
-        else if (index === 1) rankEmoji = 'ðŸ¥ˆ';
-        else if (index === 2) rankEmoji = 'ðŸ¥‰';
+        if (index === 0) rankEmoji = '🥇';
+        else if (index === 1) rankEmoji = '🥈';
+        else if (index === 2) rankEmoji = '🥉';
         
         li.innerHTML = `
           <span class="leaderboard-rank">${rankEmoji || (index + 1)}</span>
           <span class="leaderboard-name">${user.name}</span>
-          <span class="leaderboard-score">ðŸ“š ${user.vocabs}</span>
+          <span class="leaderboard-score">📚 ${user.vocabs}</span>
         `;
         
         list.appendChild(li);
@@ -2468,7 +2421,7 @@
     }
   }
   
-  // Cache fÃ¼r Leaderboard
+  // Cache für Leaderboard
   let leaderboardCache = null;
   let leaderboardCacheTime = null;
   
@@ -2477,7 +2430,7 @@
     const isCollapsed = section.classList.contains('collapsed');
     
     if (isCollapsed) {
-      // Ã–ffnen
+      // Öffnen
       section.classList.remove('collapsed');
       
       // Lade Daten (mit 5-Minuten Cache)
@@ -2491,7 +2444,7 @@
         console.log('Zeige gecachtes Leaderboard');
       }
     } else {
-      // SchlieÃŸen
+      // Schließen
       section.classList.add('collapsed');
     }
   }
@@ -2505,7 +2458,7 @@
     currentUser = null;
     userPerformance = {};
     allVocabs = [];
-    leaderboardCache = null; // Cache zurÃ¼cksetzen
+    leaderboardCache = null; // Cache zurücksetzen
     leaderboardCacheTime = null;
     document.getElementById('adminClassSelect').value = '';
     document.getElementById('studentList').innerHTML = '';
@@ -2523,11 +2476,11 @@
     }
     
     try {
-      showStatus("Lade SchÃ¼ler von Klasse " + selectedClass + "...", 'info');
+      showStatus("Lade Schüler von Klasse " + selectedClass + "...", 'info');
       
       const snap = await db.ref('users').get();
       if (!snap.exists()) {
-        document.getElementById('studentList').innerHTML = '<p>Keine SchÃ¼ler gefunden.</p>';
+        document.getElementById('studentList').innerHTML = '<p>Keine Schüler gefunden.</p>';
         return;
       }
       
@@ -2546,11 +2499,11 @@
       }
       
       if (studentsInClass.length === 0) {
-        document.getElementById('studentList').innerHTML = '<p>Keine SchÃ¼ler in dieser Klasse gefunden.</p>';
+        document.getElementById('studentList').innerHTML = '<p>Keine Schüler in dieser Klasse gefunden.</p>';
         return;
       }
       
-      let html = '<h3>SchÃ¼ler in Klasse ' + selectedClass + ':</h3>';
+      let html = '<h3>Schüler in Klasse ' + selectedClass + ':</h3>';
       studentsInClass.forEach(student => {
         const perfCount = Object.keys(student.performance).length;
         html += `
@@ -2564,7 +2517,7 @@
       });
       
       document.getElementById('studentList').innerHTML = html;
-      showStatus("âœ“ " + studentsInClass.length + " SchÃ¼ler gefunden", 'success');
+      showStatus("✓ " + studentsInClass.length + " Schüler gefunden", 'success');
       
     } catch (error) {
       showStatus("Fehler: " + error.message, 'error');
