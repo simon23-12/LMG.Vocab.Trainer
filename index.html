@@ -2555,6 +2555,46 @@
     showStatus("Erfolgreich ausgeloggt!", 'info');
   }
   
+  // AUTO-LOGOUT bei Seite schließen/refresh
+  window.addEventListener('beforeunload', function(e) {
+    // Nur loggen wenn User eingeloggt ist UND Session-Daten existieren
+    if (currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+      
+      // Berechne Session-Stats
+      let sessionVocabs = 0;
+      let totalCorrect = 0;
+      let totalQuestions = 0;
+      
+      for (let key in sessionPerformance) {
+        const perf = sessionPerformance[key];
+        sessionVocabs += (perf.total || 0);
+        totalCorrect += (perf.score || 0);
+        totalQuestions += (perf.total || 0);
+      }
+      
+      const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+      
+      if (sessionVocabs > 0) {
+        // Verwende navigator.sendBeacon für zuverlässiges Logging beim Schließen
+        const logData = {
+          timestamp: new Date().toISOString(),
+          user: "Ein Schüler",
+          class: currentUser.class || "unbekannt",
+          vocabularyCount: sessionVocabs,
+          accuracy: sessionAccuracy
+        };
+        
+        const logId = Date.now() + '_' + currentUser.userKey;
+        
+        // sendBeacon ist asynchron und funktioniert auch wenn Seite schließt
+        const url = `https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app/usage_logs/${logId}.json`;
+        navigator.sendBeacon(url, JSON.stringify(logData));
+        
+        console.log('✓ Auto-Logout Log gesendet:', sessionVocabs, 'Vokabeln');
+      }
+    }
+  });
+  
   // ADMIN FUNCTIONS
   async function loadClassPerformance() {
     const selectedClass = document.getElementById('adminClassSelect').value;
