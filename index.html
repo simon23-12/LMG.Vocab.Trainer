@@ -389,6 +389,11 @@
       gap: 10px;
       margin-top: 20px;
     }
+    .student-perf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+    }
     .perf-item {
       padding: 10px;
       background: white;
@@ -2884,13 +2889,14 @@
       }
       
       let html = '<h3>Schüler in Klasse ' + selectedClass + ':</h3>';
-      studentsInClass.forEach(student => {
+      studentsInClass.forEach((student, index) => {
         const perfCount = Object.keys(student.performance).length;
+        const studentId = 'student_' + index; // Unique ID für jeden Schüler
         
-        // Baue Performance-Grid direkt in die Card
+        // Baue Performance-Grid
         let perfHtml = '';
         if (perfCount > 0) {
-          perfHtml = '<div class="perf-grid" style="margin-top: 15px;">';
+          perfHtml = `<div id="${studentId}_perf" class="student-perf-grid" style="display: none; margin-top: 15px;">`;
           
           // Sortiere Performance nach Seitennummer
           const sorted = Object.entries(student.performance).sort((a, b) => {
@@ -2920,10 +2926,15 @@
         }
         
         html += `
-          <div class="student-card">
-            <div class="student-name">${student.displayName}</div>
-            <div style="font-size: 14px; color: #666; margin-top: 5px;">
-              ${perfCount} Seite${perfCount !== 1 ? 'n' : ''} getestet
+          <div class="student-card" onclick="toggleStudentPerf('${studentId}')" style="cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div class="student-name">${student.displayName}</div>
+                <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                  ${perfCount} Seite${perfCount !== 1 ? 'n' : ''} getestet
+                </div>
+              </div>
+              <div id="${studentId}_icon" style="font-size: 20px; transition: transform 0.3s;">▼</div>
             </div>
             ${perfHtml}
           </div>
@@ -2936,6 +2947,24 @@
     } catch (error) {
       showStatus("Fehler: " + error.message, 'error');
       console.error(error);
+    }
+  }
+  
+  // Toggle Student Performance sichtbar/unsichtbar
+  function toggleStudentPerf(studentId) {
+    const perfDiv = document.getElementById(studentId + '_perf');
+    const icon = document.getElementById(studentId + '_icon');
+    
+    if (!perfDiv) return;
+    
+    if (perfDiv.style.display === 'none') {
+      // Aufklappen
+      perfDiv.style.display = 'grid';
+      icon.style.transform = 'rotate(180deg)';
+    } else {
+      // Zuklappen
+      perfDiv.style.display = 'none';
+      icon.style.transform = 'rotate(0deg)';
     }
   }
   
