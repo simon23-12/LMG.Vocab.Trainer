@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1174,6 +1175,7 @@
   let app, db;
   let currentUser = null;
   let userPerformance = {};
+  let sessionPerformance = {}; // NEU: Trackt nur diese Session
   let allVocabs = [];
   let quizVocabs = [];
   let currentQuestionIndex = 0;
@@ -1496,6 +1498,7 @@
         jahrgang: jahrgang 
       };
       userPerformance = data.performance || {};
+      sessionPerformance = {}; // Reset Session-Tracking beim Login
       
       console.log("Rufe loadVocabs auf...");
       await loadVocabs();
@@ -2269,6 +2272,7 @@
           
           console.log(`Speichere Seite ${page}:`, pageData);
           userPerformance[pageKey] = pageData;
+          sessionPerformance[pageKey] = pageData; // Track für Session
           await db.ref('users/' + userPath + '/performance/' + pageKey).set(pageData);
         }
         
@@ -2287,6 +2291,7 @@
       
       // OPTIMISTISCHES UPDATE: Aktualisiere lokal sofort (kein Reload nötig!)
       userPerformance[window.currentPerformanceKey] = perfData;
+      sessionPerformance[window.currentPerformanceKey] = perfData; // Track für Session
       
       await db.ref('users/' + userPath + '/performance/' + window.currentPerformanceKey).set(perfData);
       
@@ -2501,9 +2506,10 @@
         let totalCorrect = 0;
         let totalQuestions = 0;
         
-        if (userPerformance && Object.keys(userPerformance).length > 0) {
-          for (let key in userPerformance) {
-            const perf = userPerformance[key];
+        // Verwende sessionPerformance statt userPerformance!
+        if (sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+          for (let key in sessionPerformance) {
+            const perf = sessionPerformance[key];
             sessionVocabs += (perf.total || 0);
             totalCorrect += (perf.score || 0);
             totalQuestions += (perf.total || 0);
@@ -2538,6 +2544,7 @@
     // Standard Logout
     currentUser = null;
     userPerformance = {};
+    sessionPerformance = {}; // Reset auch Session-Tracking
     allVocabs = [];
     leaderboardCache = null; // Cache zurücksetzen
     leaderboardCacheTime = null;
