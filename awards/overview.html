@@ -253,6 +253,263 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Animation Overlay */
+        .animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .animation-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Animation Card Styles */
+        .animation-container {
+            position: relative;
+            width: 450px;
+            max-width: 90vw;
+            height: 600px;
+            max-height: 90vh;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.8);
+            border-radius: 50%;
+            animation: particleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-200px) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        .award-animation-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: cardSlideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes cardSlideIn {
+            0% {
+                transform: translateY(100px) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .unlock-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            animation: textGlow 2s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        @keyframes textGlow {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                             0 0 30px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        .badge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+
+        .rotating-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            border: 3px dashed rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: rotate 8s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .award-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            animation: badgePop 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s backwards,
+                       badgeFloat 3s ease-in-out 1.3s infinite;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes badgePop {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes badgeFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .star-burst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            pointer-events: none;
+        }
+
+        .star-ray {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 150px;
+            background: linear-gradient(to top, transparent, rgba(255, 215, 0, 0.6), transparent);
+            transform-origin: bottom center;
+            animation: rayExpand 1s ease-out 0.5s backwards;
+        }
+
+        @keyframes rayExpand {
+            0% {
+                height: 0;
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                height: 150px;
+                opacity: 0;
+            }
+        }
+
+        .achievement-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0 10px;
+            animation: fadeInUp 0.8s ease-out 1s backwards;
+        }
+
+        .achievement-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out 1.2s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out 1.6s backwards;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            animation: confettiFall 3s ease-in-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -279,6 +536,32 @@
 
         <div class="awards-grid" id="awardsGrid">
             <!-- Awards werden hier dynamisch eingefügt -->
+        </div>
+    </div>
+
+    <!-- Animation Overlay (versteckt bis Award freigeschaltet wird) -->
+    <div class="animation-overlay" id="animationOverlay">
+        <div class="animation-container">
+            <div class="particles" id="particles"></div>
+            <div id="confetti-container"></div>
+
+            <div class="award-animation-card">
+                <div class="unlock-header">🎉 Achievement Unlocked! 🎉</div>
+                
+                <div class="badge-container">
+                    <div class="rotating-ring"></div>
+                    <div class="star-burst" id="starBurst"></div>
+                    <img src="images/first10.png" alt="First Step Star" class="award-image">
+                </div>
+                
+                <div class="achievement-name">First Step Star</div>
+                <div class="achievement-description">
+                    Du hast deine ersten 10 Vokabeln richtig beantwortet!<br>
+                    Großartige Arbeit! 🌟
+                </div>
+                
+                <button class="continue-btn" onclick="closeAnimation()">Awesome! 🚀</button>
+            </div>
         </div>
     </div>
 
@@ -366,8 +649,10 @@
 
                 console.log('🎉 Award freigeschaltet!');
                 
-                // Öffne Animation in neuem Fenster/Tab
-                window.open('display.html?award=first-step-star', '_blank', 'width=500,height=700');
+                // Zeige Animation als Overlay (kein Popup!)
+                setTimeout(() => {
+                    showAnimation();
+                }, 500);
                 
                 return true; // Gerade eben freigeschaltet
             } catch (error) {
@@ -437,7 +722,71 @@
 
         // Initialize
         renderAward();
+
+        // Animation Functions
+        function showAnimation() {
+            const overlay = document.getElementById('animationOverlay');
+            overlay.classList.add('active');
+            
+            createParticles();
+            createStarBurst();
+            createConfetti();
+            playUnlockSound();
+        }
+
+        function closeAnimation() {
+            const overlay = document.getElementById('animationOverlay');
+            overlay.classList.remove('active');
+            
+            // Reload Award display
+            location.reload();
+        }
+
+        window.closeAnimation = closeAnimation;
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            container.innerHTML = ''; // Clear old particles
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        function createStarBurst() {
+            const burst = document.getElementById('starBurst');
+            burst.innerHTML = ''; // Clear old rays
+            for (let i = 0; i < 12; i++) {
+                const ray = document.createElement('div');
+                ray.className = 'star-ray';
+                ray.style.transform = `translate(-50%, -100%) rotate(${i * 30}deg)`;
+                burst.appendChild(ray);
+            }
+        }
+
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = ''; // Clear old confetti
+            const colors = ['#FFD700', '#FF69B4', '#00CED1', '#FF6347', '#9370DB', '#32CD32'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.animationDuration = (2 + Math.random()) + 's';
+                container.appendChild(confetti);
+            }
+        }
+
+        function playUnlockSound() {
+            console.log('🎵 Achievement unlocked sound!');
+        }
     </script>
 </body>
 </html>
-
