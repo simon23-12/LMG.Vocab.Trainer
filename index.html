@@ -1048,6 +1048,14 @@
           <div class="stat-label">🎯 Accuracy</div>
           <div class="stat-value" id="averageAccuracy">0%</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">🔥 Tage am Stück</div>
+          <div class="stat-value" id="currentStreak">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🏆 Rekord</div>
+          <div class="stat-value" id="bestStreak">0</div>
+        </div>
       </div>
       
       <!-- Interval Section -->
@@ -1385,7 +1393,10 @@
         passwordHash: passwordHash,  // Nur Hash, NICHT umkehrbar!
         class: cls,
         created: new Date().toISOString(),
-        performance: {}
+        performance: {},
+        currentStreak: 0,
+        bestStreak: 0,
+        lastActivityDate: null
       });
       alert("Registrierung erfolgreich! 🎉\n\nBitte notiere dir deine Login-Daten sorgfältig:\n\nName: " + name + "\nPasswort: " + pass);
       showStatus("Registrierung erfolgreich! Jetzt einloggen.", 'success');
@@ -1495,7 +1506,10 @@
         name: data.name,
         userKey: userKey, // Speichere den Key für spätere Updates
         class: data.class,
-        jahrgang: jahrgang 
+        jahrgang: jahrgang,
+        currentStreak: data.currentStreak || 0,
+        bestStreak: data.bestStreak || 0,
+        lastActivityDate: data.lastActivityDate || null
       };
       userPerformance = data.performance || {};
       sessionPerformance = {}; // Reset Session-Tracking beim Login
@@ -2299,10 +2313,96 @@
       if (!isIntervalTest) {
         showStatus('Performance gespeichert! 💾', 'success');
       }
+      
+      // UPDATE STREAK nach erfolgreichem Üben
+      await updateStreak();
+      
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
       showStatus('Fehler beim Speichern: ' + error.message, 'error');
     }
+  }
+  
+  // STREAK HELPER FUNCTIONS
+  function isWeekday(date) {
+    const day = date.getDay();
+    return day >= 1 && day <= 5; // Mo-Fr
+  }
+  
+  function getLastSchoolday(fromDate) {
+    const date = new Date(fromDate);
+    date.setHours(0, 0, 0, 0);
+    
+    // Gehe zurück bis zum letzten Schultag
+    do {
+      date.setDate(date.getDate() - 1);
+    } while (!isWeekday(date));
+    
+    return date;
+  }
+  
+  function getDateString(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString().split('T')[0]; // YYYY-MM-DD
+  }
+  
+  async function updateStreak() {
+    if (!currentUser) return;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayString = getDateString(today);
+    
+    // Hole User-Daten
+    const userRef = db.ref('users/' + currentUser.userKey);
+    const snapshot = await userRef.get();
+    const userData = snapshot.val();
+    
+    let currentStreak = userData.currentStreak || 0;
+    let bestStreak = userData.bestStreak || 0;
+    let lastActivityDate = userData.lastActivityDate || null;
+    
+    // Prüfe ob heute schon geübt wurde
+    if (lastActivityDate === todayString) {
+      console.log('Heute schon geübt, Streak bleibt:', currentStreak);
+      return; // Streak bleibt gleich
+    }
+    
+    // Prüfe ob wir am letzten Schultag geübt haben
+    const lastSchoolday = getLastSchoolday(today);
+    const lastSchooldayString = getDateString(lastSchoolday);
+    
+    if (lastActivityDate === lastSchooldayString) {
+      // Streak geht weiter!
+      currentStreak += 1;
+      console.log('✓ Streak geht weiter:', currentStreak);
+    } else if (!lastActivityDate || new Date(lastActivityDate) < lastSchoolday) {
+      // Streak unterbrochen - Reset!
+      currentStreak = 1;
+      console.log('✗ Streak unterbrochen, Reset zu 1');
+    }
+    
+    // Update Best Streak
+    if (currentStreak > bestStreak) {
+      bestStreak = currentStreak;
+      console.log('🏆 Neuer Rekord:', bestStreak);
+    }
+    
+    // Speichere in Firebase
+    await userRef.update({
+      currentStreak: currentStreak,
+      bestStreak: bestStreak,
+      lastActivityDate: todayString
+    });
+    
+    // Update lokale Kopie
+    currentUser.currentStreak = currentStreak;
+    currentUser.bestStreak = bestStreak;
+    currentUser.lastActivityDate = todayString;
+    
+    // Update UI
+    calculateDashboardStats();
   }
   
   function calculateDashboardStats() {
@@ -2352,6 +2452,10 @@
       accuracyElement.style.webkitTextFillColor = 'transparent';
       accuracyElement.style.backgroundClip = 'text';
     }
+    
+    // Zeige Streak-Statistiken
+    document.getElementById('currentStreak').textContent = currentUser.currentStreak || 0;
+    document.getElementById('bestStreak').textContent = currentUser.bestStreak || 0;
   }
   
   async function loadLeaderboard() {
