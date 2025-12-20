@@ -1109,12 +1109,12 @@
       <div id="leaderboardSection" class="leaderboard-section collapsed">
         <button class="leaderboard-toggle" onclick="toggleLeaderboard()">
           <span>🏆</span>
-          <span>Top 10 Leaderboard anzeigen</span>
+          <span id="leaderboardButtonText">Top 10 Leaderboard anzeigen</span>
           <span class="leaderboard-toggle-icon">▼</span>
         </button>
         <div class="leaderboard-content">
           <div class="leaderboard-header">
-            <h3>🏆 Top 10 Leaderboard <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
+            <h3 id="leaderboardTitle">🏆 Top 10 Leaderboard <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
           </div>
           <ol id="leaderboardList" class="leaderboard-list">
             <!-- Wird dynamisch befüllt -->
@@ -2502,7 +2502,11 @@
       // Monatsname für Anzeige
       const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
                          'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-      document.getElementById('leaderboardMonth').textContent = monthNames[currentMonth - 1] + ' ' + currentYear;
+      
+      // Update Texte mit Klassenname
+      const userClass = currentUser.class || '?';
+      document.getElementById('leaderboardButtonText').textContent = `Top 10 Leaderboard ${userClass} anzeigen`;
+      document.getElementById('leaderboardTitle').innerHTML = `🏆 Top 10 Leaderboard ${userClass} <span class="leaderboard-month">${monthNames[currentMonth - 1]}</span>`;
       
       // Lade alle User der gleichen Klasse
       const usersSnap = await db.ref('users').get();
@@ -2514,7 +2518,7 @@
       const allUsers = usersSnap.val();
       const classUsers = [];
       
-      // Filtere User nach Klasse und zähle Vokabeln für diesen Monat
+      // Filtere User nach Klasse und berechne Score für diesen Monat
       for (let userKey in allUsers) {
         const user = allUsers[userKey];
         
@@ -2528,8 +2532,11 @@
           continue;
         }
         
-        // Zähle Vokabeln die in diesem Monat geübt wurden
+        // Berechne Score: Vokabeln * Accuracy
         let monthVocabs = 0;
+        let totalPercent = 0;
+        let perfCount = 0;
+        
         if (user.performance) {
           for (let perfKey in user.performance) {
             const perf = user.performance[perfKey];
@@ -2541,20 +2548,30 @@
               
               if (perfMonth === currentMonth && perfYear === currentYear) {
                 monthVocabs += (perf.total || 0);
+                totalPercent += (perf.percent || 0);
+                perfCount++;
               }
             }
           }
         }
         
+        // Berechne durchschnittliche Accuracy
+        const avgAccuracy = perfCount > 0 ? (totalPercent / perfCount) : 0;
+        
+        // Score = Vokabeln * (Accuracy / 100)
+        const score = Math.round(monthVocabs * (avgAccuracy / 100));
+        
         classUsers.push({
           userKey: userKey,
           name: user.name,
-          vocabs: monthVocabs
+          vocabs: monthVocabs,
+          accuracy: Math.round(avgAccuracy),
+          score: score
         });
       }
       
-      // Sortiere nach Vokabeln (absteigend)
-      classUsers.sort((a, b) => b.vocabs - a.vocabs);
+      // Sortiere nach Score (absteigend)
+      classUsers.sort((a, b) => b.score - a.score);
       
       // Zeige nur Top 10
       const top10 = classUsers.slice(0, 10);
@@ -2585,7 +2602,7 @@
         li.innerHTML = `
           <span class="leaderboard-rank">${rankEmoji || (index + 1)}</span>
           <span class="leaderboard-name">${user.name}</span>
-          <span class="leaderboard-score">📚 ${user.vocabs}</span>
+          <span class="leaderboard-score">📚 ${user.score}</span>
         `;
         
         list.appendChild(li);
