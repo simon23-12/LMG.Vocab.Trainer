@@ -654,6 +654,35 @@
       background-clip: text;
       line-height: 1;
     }
+    
+    /* Info Icon für Streak */
+    .info-icon {
+      display: inline-block;
+      font-size: 14px;
+      color: #667eea;
+      cursor: help;
+      margin-left: 5px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .info-icon:hover {
+      transform: scale(1.2);
+      color: #764ba2;
+    }
+    
+    /* Streak Record unterhalb des Wertes */
+    .streak-record {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    .streak-record span {
+      color: #667eea;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
     .interval-section {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       border-radius: 16px;
@@ -1048,13 +1077,13 @@
           <div class="stat-label">🎯 Accuracy</div>
           <div class="stat-value" id="averageAccuracy">0%</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">🔥 Tage am Stück</div>
+        <div class="stat-card streak-card">
+          <div class="stat-label">
+            🔥 Tage am Stück geübt
+            <span class="info-icon" title="Hinweis: Es zählen nur Wochentage. Am Wochenende kannst du pausieren :)">ⓘ</span>
+          </div>
           <div class="stat-value" id="currentStreak">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">🏆 Rekord</div>
-          <div class="stat-value" id="bestStreak">0</div>
+          <div class="streak-record">🏆 Rekord: <span id="bestStreak">0</span></div>
         </div>
       </div>
       
