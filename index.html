@@ -1286,6 +1286,45 @@
     console.log('Loading:', msg);
   }
   
+  // SESSION PERSISTENCE: Prüfe ob gespeicherte Session existiert
+  async function checkSavedSession() {
+    try {
+      const savedUser = localStorage.getItem('lmg_currentUser');
+      const savedPerformance = localStorage.getItem('lmg_userPerformance');
+      const savedSessionPerformance = localStorage.getItem('lmg_sessionPerformance');
+      
+      if (savedUser) {
+        console.log('✓ Gespeicherte Session gefunden, stelle wieder her...');
+        
+        // Lade User-Daten
+        currentUser = JSON.parse(savedUser);
+        userPerformance = savedPerformance ? JSON.parse(savedPerformance) : {};
+        sessionPerformance = savedSessionPerformance ? JSON.parse(savedSessionPerformance) : {}; // Session-Tracking erhalten!
+        
+        // Lade Vokabeln und zeige Hauptseite
+        updateLoadingStatus('Stelle Session wieder her...');
+        await loadVocabs();
+        showPageSelection();
+        
+        console.log('✓ Session wiederhergestellt für:', currentUser.name);
+        console.log('✓ Session Performance:', Object.keys(sessionPerformance).length, 'Einträge');
+      } else {
+        // Keine Session gespeichert → zeige Login
+        document.getElementById('loadingScreen').style.display = 'none';
+        const loginScreen = document.getElementById('loginScreen');
+        loginScreen.style.display = 'block';
+        console.log('Keine gespeicherte Session, zeige Login');
+      }
+    } catch (error) {
+      console.error('Fehler beim Wiederherstellen der Session:', error);
+      // Bei Fehler: lösche fehlerhafte Daten und zeige Login
+      localStorage.removeItem('lmg_currentUser');
+      localStorage.removeItem('lmg_userPerformance');
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'block';
+    }
+  }
+  
   function initFirebase() {
     let attempts = 0;
     const maxAttempts = 20;
@@ -1320,11 +1359,9 @@
         firebaseReady = true;
         updateLoadingStatus('✓ Firebase bereit!');
         
-        // Zeige Login-Screen explizit an
-        document.getElementById('loadingScreen').style.display = 'none';
-        const loginScreen = document.getElementById('loginScreen');
-        loginScreen.style.display = 'block';
-        console.log('Login Screen angezeigt');
+        // SESSION PERSISTENCE: Auto-Login wenn Session gespeichert
+        checkSavedSession();
+        
       } catch (e) {
         document.getElementById('loadingScreen').innerHTML = 
           '<p style="color: #e74c3c;">❌ Firebase Fehler: ' + e.message + '</p>';
@@ -1552,6 +1589,15 @@
       };
       userPerformance = data.performance || {};
       sessionPerformance = {}; // Reset Session-Tracking beim Login
+      
+      // SESSION PERSISTENCE: Speichere User-Daten (OHNE Passwort!)
+      try {
+        localStorage.setItem('lmg_currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('lmg_userPerformance', JSON.stringify(userPerformance));
+        console.log('✓ Session in localStorage gespeichert');
+      } catch (e) {
+        console.warn('localStorage Fehler:', e);
+      }
       
       console.log("Rufe loadVocabs auf...");
       await loadVocabs();
@@ -2353,6 +2399,14 @@
         showStatus('Performance gespeichert! 💾', 'success');
       }
       
+      // SESSION PERSISTENCE: Speichere Performance-Updates
+      try {
+        localStorage.setItem('lmg_userPerformance', JSON.stringify(userPerformance));
+        localStorage.setItem('lmg_sessionPerformance', JSON.stringify(sessionPerformance));
+      } catch (e) {
+        console.warn('localStorage Fehler:', e);
+      }
+      
       // UPDATE STREAK nach erfolgreichem Üben
       await updateStreak();
       
@@ -2708,6 +2762,17 @@
     allVocabs = [];
     leaderboardCache = null; // Cache zurücksetzen
     leaderboardCacheTime = null;
+    
+    // SESSION PERSISTENCE: Lösche gespeicherte Daten
+    try {
+      localStorage.removeItem('lmg_currentUser');
+      localStorage.removeItem('lmg_userPerformance');
+      localStorage.removeItem('lmg_sessionPerformance');
+      console.log('✓ Session aus localStorage gelöscht');
+    } catch (e) {
+      console.warn('localStorage Fehler:', e);
+    }
+    
     document.getElementById('adminClassSelect').value = '';
     document.getElementById('studentList').innerHTML = '';
     document.getElementById('studentPerformance').innerHTML = '';
