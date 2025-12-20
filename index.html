@@ -1661,6 +1661,7 @@
       try {
         localStorage.setItem('lmg_currentUser', JSON.stringify(currentUser));
         localStorage.setItem('lmg_userPerformance', JSON.stringify(userPerformance));
+        localStorage.setItem('lmg_sessionPerformance', JSON.stringify(sessionPerformance));
         console.log('✓ Session in localStorage gespeichert');
       } catch (e) {
         console.warn('localStorage Fehler:', e);
