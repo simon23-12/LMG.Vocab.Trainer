@@ -2497,27 +2497,39 @@
     // USAGE TRACKING: Logge Session-Daten vor dem Logout
     if (currentUser) {
       try {
-        // Berechne Gesamtanzahl geübter Vokabeln dieser Session
-        let totalVocabs = 0;
+        // Berechne nur die Vokabeln die in DIESER SESSION geübt wurden
+        let sessionVocabs = 0;
+        let totalCorrect = 0;
+        let totalQuestions = 0;
+        
         if (userPerformance && Object.keys(userPerformance).length > 0) {
           for (let key in userPerformance) {
-            totalVocabs += (userPerformance[key].total || 0);
+            const perf = userPerformance[key];
+            sessionVocabs += (perf.total || 0);
+            totalCorrect += (perf.score || 0);
+            totalQuestions += (perf.total || 0);
           }
         }
+        
+        // Berechne durchschnittliche Accuracy der Session
+        const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
         
         // Erstelle Timestamp und unique Log-ID
         const timestamp = new Date().toISOString();
         const logId = Date.now() + '_' + currentUser.userKey;
         
-        // Schreibe Usage-Log in Firebase
-        await db.ref('usage_logs/' + logId).set({
-          timestamp: timestamp,
-          user: "Ein Schüler",
-          class: currentUser.class || "unbekannt",
-          vocabularyCount: totalVocabs
-        });
-        
-        console.log('✓ Usage-Log gespeichert:', totalVocabs, 'Vokabeln');
+        // Schreibe Usage-Log in Firebase (nur wenn Vokabeln geübt wurden)
+        if (sessionVocabs > 0) {
+          await db.ref('usage_logs/' + logId).set({
+            timestamp: timestamp,
+            user: "Ein Schüler",
+            class: currentUser.class || "unbekannt",
+            vocabularyCount: sessionVocabs,
+            accuracy: sessionAccuracy
+          });
+          
+          console.log('✓ Usage-Log gespeichert:', sessionVocabs, 'Vokabeln,', sessionAccuracy + '% Accuracy');
+        }
       } catch (error) {
         console.error('Usage-Log Fehler:', error);
         // Fahre trotzdem mit Logout fort
