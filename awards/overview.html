@@ -525,10 +525,6 @@
                 <div class="stat-label">Freigeschaltet</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value" id="totalCorrect">0</div>
-                <div class="stat-label">Richtige Antworten</div>
-            </div>
-            <div class="stat-item">
                 <div class="stat-value" id="progressPercent">0%</div>
                 <div class="stat-label">Gesamtfortschritt</div>
             </div>
@@ -551,12 +547,11 @@
                 <div class="badge-container">
                     <div class="rotating-ring"></div>
                     <div class="star-burst" id="starBurst"></div>
-                    <img src="images/first10.png" alt="First Step Star" class="award-image">
+                    <img src="" alt="Award" class="award-image" id="animationBadge">
                 </div>
                 
-                <div class="achievement-name">First Step Star</div>
-                <div class="achievement-description">
-                    Du hast deine ersten 10 Vokabeln richtig beantwortet!<br>
+                <div class="achievement-name" id="animationTitle">Award Unlocked!</div>
+                <div class="achievement-description" id="animationDescription">
                     Großartige Arbeit! 🌟
                 </div>
                 
@@ -583,15 +578,33 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Award Definition
-        const AWARD_FIRST_STEP = {
-            id: 'first-step-star',
-            title: 'First Step Star',
-            description: 'Beantworte deine ersten 10 Vokabeln richtig!',
-            image: 'images/first10.png',
-            requirement: 10,
-            type: 'correct_answers'
-        };
+        // Award Definitionen - Alle 3 Awards
+        const AWARDS = [
+            {
+                id: 'first-step-star',
+                title: 'First Step Star',
+                description: 'Beantworte deine ersten 10 Vokabeln richtig!',
+                image: 'images/first10.png',
+                requirement: 10,
+                type: 'correct_answers'
+            },
+            {
+                id: 'vocabulary-champion',
+                title: 'Vocabulary Champion',
+                description: 'Beantworte 50 Vokabeln richtig!',
+                image: 'images/first50.png',
+                requirement: 50,
+                type: 'correct_answers'
+            },
+            {
+                id: 'master-linguist',
+                title: 'Master Linguist',
+                description: 'Beantworte 100 Vokabeln richtig! Du bist ein Profi!',
+                image: 'images/first100.png',
+                requirement: 100,
+                type: 'correct_answers'
+            }
+        ];
 
         // Hole User aus localStorage
         const currentUser = JSON.parse(localStorage.getItem('lmg_currentUser') || 'null');
@@ -627,14 +640,14 @@
         }
 
         // Check ob Award unlocked werden soll
-        async function checkAndUnlockAward(correctAnswers) {
-            if (correctAnswers < AWARD_FIRST_STEP.requirement) {
+        async function checkAndUnlockAward(award, correctAnswers) {
+            if (correctAnswers < award.requirement) {
                 return false; // Noch nicht freigeschaltet
             }
 
             try {
                 // Check ob Award bereits freigeschaltet ist
-                const awardRef = ref(db, 'users/' + currentUser.userKey + '/awards/' + AWARD_FIRST_STEP.id);
+                const awardRef = ref(db, 'users/' + currentUser.userKey + '/awards/' + award.id);
                 const snapshot = await get(awardRef);
                 
                 if (snapshot.exists()) {
@@ -644,14 +657,14 @@
                 // NEU FREIGESCHALTET! Speichere Award
                 await set(awardRef, {
                     unlockedAt: new Date().toISOString(),
-                    requirement: AWARD_FIRST_STEP.requirement
+                    requirement: award.requirement
                 });
 
-                console.log('🎉 Award freigeschaltet!');
+                console.log('🎉 Award freigeschaltet:', award.title);
                 
                 // Zeige Animation als Overlay (kein Popup!)
                 setTimeout(() => {
-                    showAnimation();
+                    showAnimation(award);
                 }, 500);
                 
                 return true; // Gerade eben freigeschaltet
@@ -662,9 +675,9 @@
         }
 
         // Check ob Award bereits freigeschaltet ist
-        async function isAwardUnlocked() {
+        async function isAwardUnlocked(awardId) {
             try {
-                const awardRef = ref(db, 'users/' + currentUser.userKey + '/awards/' + AWARD_FIRST_STEP.id);
+                const awardRef = ref(db, 'users/' + currentUser.userKey + '/awards/' + awardId);
                 const snapshot = await get(awardRef);
                 return snapshot.exists();
             } catch (error) {
@@ -673,58 +686,71 @@
             }
         }
 
-        // Render Award Card
-        async function renderAward() {
+        // Render alle Awards
+        async function renderAwards() {
             const correctAnswers = await calculateCorrectAnswers();
-            const unlocked = await isAwardUnlocked();
+            const grid = document.getElementById('awardsGrid');
+            grid.innerHTML = ''; // Clear grid
             
-            // Check ob gerade freigeschaltet wurde
-            if (!unlocked) {
-                await checkAndUnlockAward(correctAnswers);
+            let unlockedCount = 0;
+
+            // Check und render jeden Award
+            for (const award of AWARDS) {
+                const unlocked = await isAwardUnlocked(award.id);
+                
+                // Check ob gerade freigeschaltet wurde
+                if (!unlocked) {
+                    await checkAndUnlockAward(award, correctAnswers);
+                }
+
+                // Reload status nach potential unlock
+                const isUnlocked = await isAwardUnlocked(award.id);
+                if (isUnlocked) unlockedCount++;
+
+                const progress = Math.min(100, Math.round((correctAnswers / award.requirement) * 100));
+
+                const card = document.createElement('div');
+                card.className = `award-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+                
+                card.innerHTML = `
+                    <div class="award-badge">
+                        <img src="${award.image}" alt="${award.title}">
+                        ${!isUnlocked ? '<div class="lock-overlay">🔒</div>' : ''}
+                    </div>
+                    <div class="award-title">${award.title}</div>
+                    <div class="award-description">${award.description}</div>
+                    
+                    ${!isUnlocked ? `
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="progress-text">${correctAnswers} / ${award.requirement} richtige Antworten</div>
+                    ` : `
+                        <div class="unlock-status">
+                            ✅ Freigeschaltet!
+                        </div>
+                    `}
+                `;
+
+                grid.appendChild(card);
             }
 
-            // Reload status nach potential unlock
-            const isUnlocked = await isAwardUnlocked();
-            const progress = Math.min(100, Math.round((correctAnswers / AWARD_FIRST_STEP.requirement) * 100));
-
-            const grid = document.getElementById('awardsGrid');
-            
-            const card = document.createElement('div');
-            card.className = `award-card ${isUnlocked ? 'unlocked' : 'locked'}`;
-            
-            card.innerHTML = `
-                <div class="award-badge">
-                    <img src="${AWARD_FIRST_STEP.image}" alt="${AWARD_FIRST_STEP.title}">
-                    ${!isUnlocked ? '<div class="lock-overlay">🔒</div>' : ''}
-                </div>
-                <div class="award-title">${AWARD_FIRST_STEP.title}</div>
-                <div class="award-description">${AWARD_FIRST_STEP.description}</div>
-                
-                ${!isUnlocked ? `
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: ${progress}%"></div>
-                    </div>
-                    <div class="progress-text">${correctAnswers} / ${AWARD_FIRST_STEP.requirement} richtige Antworten</div>
-                ` : `
-                    <div class="unlock-status">
-                        ✅ Freigeschaltet!
-                    </div>
-                `}
-            `;
-
-            grid.appendChild(card);
-
             // Update Summary Stats
-            document.getElementById('unlockedCount').textContent = isUnlocked ? '1' : '0';
-            document.getElementById('totalCorrect').textContent = correctAnswers;
-            document.getElementById('progressPercent').textContent = isUnlocked ? '100%' : progress + '%';
+            document.getElementById('unlockedCount').textContent = unlockedCount;
+            document.getElementById('progressPercent').textContent = 
+                Math.round((unlockedCount / AWARDS.length) * 100) + '%';
         }
 
         // Initialize
-        renderAward();
+        renderAwards();
 
         // Animation Functions
-        function showAnimation() {
+        function showAnimation(award) {
+            // Update animation content
+            document.getElementById('animationBadge').src = award.image;
+            document.getElementById('animationTitle').textContent = award.title;
+            document.getElementById('animationDescription').textContent = award.description;
+            
             const overlay = document.getElementById('animationOverlay');
             overlay.classList.add('active');
             
