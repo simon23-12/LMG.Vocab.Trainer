@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -2492,7 +2493,38 @@
     showPageSelection();
   }
   
-  function logout() {
+  async function logout() {
+    // USAGE TRACKING: Logge Session-Daten vor dem Logout
+    if (currentUser) {
+      try {
+        // Berechne Gesamtanzahl geübter Vokabeln dieser Session
+        let totalVocabs = 0;
+        if (userPerformance && Object.keys(userPerformance).length > 0) {
+          for (let key in userPerformance) {
+            totalVocabs += (userPerformance[key].total || 0);
+          }
+        }
+        
+        // Erstelle Timestamp und unique Log-ID
+        const timestamp = new Date().toISOString();
+        const logId = Date.now() + '_' + currentUser.userKey;
+        
+        // Schreibe Usage-Log in Firebase
+        await db.ref('usage_logs/' + logId).set({
+          timestamp: timestamp,
+          user: "Ein Schüler",
+          class: currentUser.class || "unbekannt",
+          vocabularyCount: totalVocabs
+        });
+        
+        console.log('✓ Usage-Log gespeichert:', totalVocabs, 'Vokabeln');
+      } catch (error) {
+        console.error('Usage-Log Fehler:', error);
+        // Fahre trotzdem mit Logout fort
+      }
+    }
+    
+    // Standard Logout
     currentUser = null;
     userPerformance = {};
     allVocabs = [];
