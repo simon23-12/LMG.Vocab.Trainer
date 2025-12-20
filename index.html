@@ -1183,6 +1183,7 @@
   
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
   
   <script>
   const firebaseConfig = {
@@ -1307,6 +1308,15 @@
       try {
         app = firebase.initializeApp(firebaseConfig);
         db = firebase.database();
+        
+        // Firebase App Check aktivieren (reCAPTCHA v3 - unsichtbar!)
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+          '6LcyqzEsAAAAADdyoXYe8Nz0RNXg0JF--msTJuSY', // reCAPTCHA Site Key
+          true // Auto-refresh Token
+        );
+        console.log('✓ App Check aktiviert (reCAPTCHA v3)');
+        
         firebaseReady = true;
         updateLoadingStatus('✓ Firebase bereit!');
         
