@@ -591,9 +591,17 @@
     
     /* Modern Dashboard Styles */
     .dashboard-header {
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 40px;
       animation: fadeInDown 0.6s ease;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .dashboard-header-left {
+      flex: 1;
+      text-align: center;
     }
     .dashboard-header h2 {
       font-size: 2.2em;
@@ -610,6 +618,27 @@
       font-size: 16px;
       word-wrap: break-word;
       overflow-wrap: break-word;
+    }
+    .awards-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .awards-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
     }
     .stats-grid {
       display: grid;
@@ -951,7 +980,7 @@
       
       <!-- Nutzungsstatistiken -->
       <div style="margin-bottom: 40px;">
-        <h3 style="color: #667eea; margin-bottom: 20px;">📊 Nutzungsstatistik kompette Sek I</h3>
+        <h3 style="color: #667eea; margin-bottom: 20px;">📊 Nutzungsstatistik</h3>
         <div class="summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
           <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
             <div style="font-size: 0.9em; opacity: 0.9;">Gesamt Sessions</div>
@@ -1091,8 +1120,14 @@
     
     <div id="pageSelectionScreen" class="screen">
       <div class="dashboard-header">
-        <h2>Willkommen, <span id="userName"></span>! 👋</h2>
-        <p>Klasse: <span id="userClass"></span></p>
+        <div class="dashboard-header-left">
+          <h2>Willkommen, <span id="userName"></span>! 👋</h2>
+          <p>Klasse: <span id="userClass"></span></p>
+        </div>
+        <a href="awards/overview.html" class="awards-button">
+          <span>🏆</span>
+          <span>Awards</span>
+        </a>
       </div>
       
       <!-- Dashboard Stats -->
