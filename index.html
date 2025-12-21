@@ -2897,6 +2897,38 @@
       image: 'awards/images/2000total.png',
       requirement: 2000,
       type: 'total_practiced'
+    },
+    {
+      id: '5daystreak',
+      title: 'Strong Streak',
+      description: 'Übe 5 Tage hintereinander!',
+      image: 'awards/images/5daystreak.png',
+      requirement: 5,
+      type: 'streak'
+    },
+    {
+      id: 'dart',
+      title: 'Bullseye!',
+      description: 'Erreiche 100% auf einer Seite!',
+      image: 'awards/images/dart.png',
+      requirement: 100,
+      type: 'perfect_page'
+    },
+    {
+      id: 'podiummontlyrace',
+      title: 'Masters of the Month',
+      description: 'Erreiche Platz 2 oder 3 im monatlichen Leaderboard!',
+      image: 'awards/images/podiummontlyrace.png',
+      requirement: 2,
+      type: 'leaderboard_podium'
+    },
+    {
+      id: 'winmonthlyrace',
+      title: 'Champion of the Month!',
+      description: 'Erreiche Platz 1 im monatlichen Leaderboard!',
+      image: 'awards/images/winmonthlyrace.png',
+      requirement: 1,
+      type: 'leaderboard_winner'
     }
   ];
 
@@ -2930,9 +2962,32 @@
     }
   }
 
-  async function checkAndUnlockAward(award, correctAnswers, totalPracticed) {
-    const currentValue = award.type === 'total_practiced' ? totalPracticed : correctAnswers;
-    if (currentValue < award.requirement) return false;
+  async function checkAndUnlockAward(award, data) {
+    // data enthält: correctAnswers, totalPracticed, currentStreak, hasPerfectPage
+    let meetsRequirement = false;
+    
+    switch(award.type) {
+      case 'correct_answers':
+        meetsRequirement = data.correctAnswers >= award.requirement;
+        break;
+      case 'total_practiced':
+        meetsRequirement = data.totalPracticed >= award.requirement;
+        break;
+      case 'streak':
+        meetsRequirement = data.currentStreak >= award.requirement;
+        break;
+      case 'perfect_page':
+        meetsRequirement = data.hasPerfectPage;
+        break;
+      case 'leaderboard_podium':
+      case 'leaderboard_winner':
+        // Leaderboard-Awards werden separat am Monatsende vergeben
+        return false;
+      default:
+        return false;
+    }
+    
+    if (!meetsRequirement) return false;
 
     try {
       const awardRef = db.ref('users/' + currentUser.userKey + '/awards/' + award.id);
@@ -2957,12 +3012,25 @@
 
   async function checkForNewAwards() {
     if (!currentUser) return;
+    
     const correctAnswers = calculateCorrectAnswers();
     const totalPracticed = calculateTotalPracticed();
-    console.log('Checking awards:', correctAnswers, 'correct,', totalPracticed, 'total');
+    const currentStreak = currentUser.currentStreak || 0;
+    
+    // Check if user has a perfect page (100%)
+    const hasPerfectPage = Object.values(userPerformance || {}).some(perf => perf.percent === 100);
+    
+    const data = {
+      correctAnswers,
+      totalPracticed,
+      currentStreak,
+      hasPerfectPage
+    };
+    
+    console.log('Checking awards:', data);
     
     for (const award of AWARDS) {
-      const wasUnlocked = await checkAndUnlockAward(award, correctAnswers, totalPracticed);
+      const wasUnlocked = await checkAndUnlockAward(award, data);
       if (wasUnlocked) break;
     }
   }
