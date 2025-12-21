@@ -5,6 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Awards - LMG Vokabeltrainer</title>
     <style>
+        :root {
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --container-bg: white;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --border-color: #ddd;
+            --card-bg: #f8f9fa;
+            --card-gradient-end: #e9ecef;
+            --button-primary: #667eea;
+            --button-hover: #5568d3;
+            --shadow-color: rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #1a1a2e;
+            --bg-gradient-end: #16213e;
+            --container-bg: #0f3460;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-tertiary: #808080;
+            --border-color: #2a2a3e;
+            --card-bg: #1a1a2e;
+            --card-gradient-end: #16213e;
+            --button-primary: #667eea;
+            --button-hover: #5568d3;
+            --shadow-color: rgba(0,0,0,0.5);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,18 +43,78 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
             padding: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.3);
+            transition: 0.3s;
+            border-radius: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "☀️";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+            content: "🌙";
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            background: white;
+            background: var(--container-bg);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px var(--shadow-color);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
 
         .header {
@@ -37,7 +127,7 @@
         }
 
         h1 {
-            color: #667eea;
+            color: var(--button-primary);
             font-size: 2.5em;
             display: flex;
             align-items: center;
@@ -46,7 +136,7 @@
 
         .back-button {
             padding: 12px 24px;
-            background: #667eea;
+            background: var(--button-primary);
             color: white;
             border: none;
             border-radius: 8px;
@@ -58,12 +148,12 @@
         }
 
         .back-button:hover {
-            background: #5568d3;
+            background: var(--button-hover);
             transform: translateY(-2px);
         }
 
         .stats-summary {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--card-gradient-end) 100%);
             border-radius: 16px;
             padding: 25px;
             margin-bottom: 40px;
@@ -71,6 +161,7 @@
             justify-content: space-around;
             flex-wrap: wrap;
             gap: 20px;
+            transition: background 0.3s ease;
         }
 
         .stat-item {
@@ -87,7 +178,7 @@
 
         .stat-label {
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
             margin-top: 5px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -101,12 +192,12 @@
         }
 
         .award-card {
-            background: white;
+            background: var(--container-bg);
             border-radius: 16px;
             padding: 30px;
             text-align: center;
             transition: all 0.3s;
-            border: 3px solid #e0e0e0;
+            border: 3px solid var(--border-color);
             position: relative;
             overflow: hidden;
         }
@@ -156,24 +247,25 @@
         .award-title {
             font-size: 24px;
             font-weight: 700;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 10px;
         }
 
         .award-description {
             font-size: 16px;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 20px;
             line-height: 1.5;
         }
 
         .progress-container {
-            background: #e0e0e0;
+            background: var(--border-color);
             border-radius: 20px;
             height: 30px;
             overflow: hidden;
             margin-top: 20px;
             position: relative;
+            transition: background 0.3s ease;
         }
 
         .progress-bar {
@@ -202,7 +294,7 @@
 
         .progress-text {
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
             margin-top: 10px;
             font-weight: 600;
         }
@@ -513,6 +605,14 @@
     </style>
 </head>
 <body>
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle">
+        <label class="toggle-switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    
     <div class="container">
         <div class="header">
             <h1>🏆 Deine Awards</h1>
@@ -1008,6 +1108,33 @@
         function playUnlockSound() {
             console.log('🎵 Achievement unlocked sound!');
         }
+        
+        // Dark Mode Funktionalität
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            
+            // Lade gespeicherte Präferenz
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+                darkModeToggle.checked = true;
+            }
+            
+            // Toggle Event
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'false');
+                }
+            });
+        }
+        
+        // Dark Mode beim Laden initialisieren
+        document.addEventListener('DOMContentLoaded', initDarkMode);
     </script>
 </body>
 </html>
