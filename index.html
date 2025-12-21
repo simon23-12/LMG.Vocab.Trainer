@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -958,6 +959,215 @@
     
       margin: 8px 0;
       line-height: 1.5;
+    }
+
+    /* Award Animation Overlay */
+    .animation-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    }
+    .animation-overlay.active {
+        display: flex;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .animation-container {
+        position: relative;
+        width: 450px;
+        max-width: 90vw;
+        height: 600px;
+        max-height: 90vh;
+    }
+    .particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 215, 0, 0.8);
+        border-radius: 50%;
+        animation: particleFloat 3s ease-in-out infinite;
+    }
+    @keyframes particleFloat {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            opacity: 0;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-200px) scale(0.5);
+            opacity: 0;
+        }
+    }
+    .award-animation-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        position: relative;
+        animation: cardSlideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    @keyframes cardSlideIn {
+        0% {
+            transform: translateY(100px) scale(0.8);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+    .unlock-header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #FFD700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        animation: textGlow 2s ease-in-out infinite;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    @keyframes textGlow {
+        0%, 100% {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        50% {
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                         0 0 30px rgba(255, 215, 0, 0.6);
+        }
+    }
+    .badge-container {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        margin: 20px auto;
+    }
+    .rotating-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 220px;
+        height: 220px;
+        border: 3px dashed rgba(255, 215, 0, 0.3);
+        border-radius: 50%;
+        animation: rotate 8s linear infinite;
+    }
+    @keyframes rotate {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .award-image {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        animation: badgePop 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s backwards,
+                   badgeFloat 3s ease-in-out 1.3s infinite;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    @keyframes badgePop {
+        0% {
+            transform: scale(0) rotate(-180deg);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+    }
+    @keyframes badgeFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    .star-burst {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+    .star-ray {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 2px;
+        height: 60px;
+        background: linear-gradient(to bottom, #FFD700, transparent);
+        animation: rayPulse 2s ease-in-out infinite;
+    }
+    @keyframes rayPulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+    }
+    .achievement-name {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin: 20px 0 10px;
+    }
+    .achievement-description {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .continue-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 25px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    .continue-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+    }
+    #confetti-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        animation: confettiFall 3s linear forwards;
+    }
+    @keyframes confettiFall {
+        to {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
     }
   </style>
 </head>
@@ -2478,6 +2688,9 @@
       // UPDATE STREAK nach erfolgreichem Üben
       await updateStreak();
       
+      // CHECK FOR NEW AWARDS
+      await checkForNewAwards();
+      
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
       showStatus('Fehler beim Speichern: ' + error.message, 'error');
@@ -2617,6 +2830,198 @@
     // Zeige Streak-Statistiken
     document.getElementById('currentStreak').textContent = currentUser.currentStreak || 0;
     document.getElementById('bestStreak').textContent = currentUser.bestStreak || 0;
+  }
+  
+  // AWARD SYSTEM
+  const AWARDS = [
+    {
+      id: 'getstarted',
+      title: 'Let\'s get this started!',
+      description: 'Übe zum ersten Mal Vokabeln!',
+      image: 'awards/images/getstarted.png',
+      requirement: 1,
+      type: 'total_practiced'
+    },
+    {
+      id: 'first-steps',
+      title: 'First steps',
+      description: 'Beantworte deine ersten 10 Vokabeln richtig!',
+      image: 'awards/images/first10.png',
+      requirement: 10,
+      type: 'correct_answers'
+    },
+    {
+      id: 'good-job',
+      title: 'Good job!',
+      description: 'Beantworte 50 Vokabeln richtig!',
+      image: 'awards/images/first50.png',
+      requirement: 50,
+      type: 'correct_answers'
+    },
+    {
+      id: 'vocab-guide',
+      title: 'Vocab Guide',
+      description: 'Beantworte 100 Vokabeln richtig!',
+      image: 'awards/images/first100.png',
+      requirement: 100,
+      type: 'correct_answers'
+    },
+    {
+      id: 'vocab-expert',
+      title: 'Vocab Expert',
+      description: 'Beantworte 200 Vokabeln richtig! Du bist ein Profi!',
+      image: 'awards/images/first200.png',
+      requirement: 200,
+      type: 'correct_answers'
+    },
+    {
+      id: 'nice-volume',
+      title: 'Nice Volume',
+      description: 'Übe insgesamt 500 Vokabeln!',
+      image: 'awards/images/500total.png',
+      requirement: 500,
+      type: 'total_practiced'
+    },
+    {
+      id: 'really-nice-volume',
+      title: 'Really nice volume!',
+      description: 'Übe insgesamt 1000 Vokabeln!',
+      image: 'awards/images/1000total.png',
+      requirement: 1000,
+      type: 'total_practiced'
+    },
+    {
+      id: 'absolute-cinema',
+      title: 'Absolute Cinema!',
+      description: 'Übe insgesamt 2000 Vokabeln! Legendär!',
+      image: 'awards/images/2000total.png',
+      requirement: 2000,
+      type: 'total_practiced'
+    }
+  ];
+
+  function calculateCorrectAnswers() {
+    const performance = userPerformance || {};
+    let totalCorrect = 0;
+    Object.values(performance).forEach(perf => {
+      totalCorrect += (perf.score || 0);
+    });
+    return totalCorrect;
+  }
+
+  function calculateTotalPracticed() {
+    const performance = userPerformance || {};
+    let totalPracticed = 0;
+    Object.values(performance).forEach(perf => {
+      totalPracticed += (perf.total || 0);
+    });
+    return totalPracticed;
+  }
+
+  async function isAwardUnlocked(awardId) {
+    if (!currentUser) return false;
+    try {
+      const awardRef = db.ref('users/' + currentUser.userKey + '/awards/' + awardId);
+      const snapshot = await awardRef.get();
+      return snapshot.exists();
+    } catch (error) {
+      console.error('Award check error:', error);
+      return false;
+    }
+  }
+
+  async function checkAndUnlockAward(award, correctAnswers, totalPracticed) {
+    const currentValue = award.type === 'total_practiced' ? totalPracticed : correctAnswers;
+    if (currentValue < award.requirement) return false;
+
+    try {
+      const awardRef = db.ref('users/' + currentUser.userKey + '/awards/' + award.id);
+      const snapshot = await awardRef.get();
+      if (snapshot.exists()) return false;
+
+      await awardRef.set({
+        unlockedAt: new Date().toISOString(),
+        requirement: award.requirement
+      });
+
+      console.log('🎉 Award freigeschaltet:', award.title);
+      setTimeout(() => {
+        showAwardAnimation(award);
+      }, 500);
+      return true;
+    } catch (error) {
+      console.error('Award unlock error:', error);
+      return false;
+    }
+  }
+
+  async function checkForNewAwards() {
+    if (!currentUser) return;
+    const correctAnswers = calculateCorrectAnswers();
+    const totalPracticed = calculateTotalPracticed();
+    console.log('Checking awards:', correctAnswers, 'correct,', totalPracticed, 'total');
+    
+    for (const award of AWARDS) {
+      const wasUnlocked = await checkAndUnlockAward(award, correctAnswers, totalPracticed);
+      if (wasUnlocked) break;
+    }
+  }
+
+  function showAwardAnimation(award) {
+    document.getElementById('animationBadge').src = award.image;
+    document.getElementById('animationTitle').textContent = award.title;
+    document.getElementById('animationDescription').textContent = award.description;
+    
+    const overlay = document.getElementById('animationOverlay');
+    overlay.classList.add('active');
+    
+    createParticles();
+    createStarBurst();
+    createConfetti();
+  }
+
+  function closeAwardAnimation() {
+    const overlay = document.getElementById('animationOverlay');
+    overlay.classList.remove('active');
+  }
+
+  function createParticles() {
+    const container = document.getElementById('particles');
+    container.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 3 + 's';
+      particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+      container.appendChild(particle);
+    }
+  }
+
+  function createStarBurst() {
+    const burst = document.getElementById('starBurst');
+    burst.innerHTML = '';
+    for (let i = 0; i < 12; i++) {
+      const ray = document.createElement('div');
+      ray.className = 'star-ray';
+      ray.style.transform = `translate(-50%, -100%) rotate(${i * 30}deg)`;
+      burst.appendChild(ray);
+    }
+  }
+
+  function createConfetti() {
+    const container = document.getElementById('confetti-container');
+    container.innerHTML = '';
+    const colors = ['#FFD700', '#FF69B4', '#00CED1', '#FF6347', '#9370DB', '#32CD32'];
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      confetti.style.animationDuration = (2 + Math.random()) + 's';
+      container.appendChild(confetti);
+    }
   }
   
   async function loadLeaderboard() {
@@ -3116,5 +3521,31 @@
     }
   }
   </script>
+
+  <!-- Award Animation Overlay -->
+  <div class="animation-overlay" id="animationOverlay">
+    <div class="animation-container">
+      <div class="particles" id="particles"></div>
+      <div id="confetti-container"></div>
+
+      <div class="award-animation-card">
+        <div class="unlock-header">🎉 Achievement Unlocked! 🎉</div>
+        
+        <div class="badge-container">
+          <div class="rotating-ring"></div>
+          <div class="star-burst" id="starBurst"></div>
+          <img src="" alt="Award" class="award-image" id="animationBadge">
+        </div>
+        
+        <div class="achievement-name" id="animationTitle">Award Unlocked!</div>
+        <div class="achievement-description" id="animationDescription">
+          Großartige Arbeit! 🌟
+        </div>
+        
+        <button class="continue-btn" onclick="closeAwardAnimation()">Awesome! 🚀</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
