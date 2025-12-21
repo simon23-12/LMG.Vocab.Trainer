@@ -578,31 +578,71 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Award Definitionen - Alle 3 Awards
+        // Award Definitionen - Alle Awards
         const AWARDS = [
             {
-                id: 'first-step-star',
-                title: 'First Step Star',
+                id: 'getstarted',
+                title: 'Let\'s get this started!',
+                description: 'Übe zum ersten Mal Vokabeln!',
+                image: 'images/getstarted.png',
+                requirement: 1,
+                type: 'total_practiced'
+            },
+            {
+                id: 'first-steps',
+                title: 'First steps',
                 description: 'Beantworte deine ersten 10 Vokabeln richtig!',
                 image: 'images/first10.png',
                 requirement: 10,
                 type: 'correct_answers'
             },
             {
-                id: 'vocabulary-champion',
-                title: 'Vocabulary Champion',
+                id: 'good-job',
+                title: 'Good job!',
                 description: 'Beantworte 50 Vokabeln richtig!',
                 image: 'images/first50.png',
                 requirement: 50,
                 type: 'correct_answers'
             },
             {
-                id: 'master-linguist',
-                title: 'Master Linguist',
-                description: 'Beantworte 100 Vokabeln richtig! Du bist ein Profi!',
+                id: 'vocab-guide',
+                title: 'Vocab Guide',
+                description: 'Beantworte 100 Vokabeln richtig!',
                 image: 'images/first100.png',
                 requirement: 100,
                 type: 'correct_answers'
+            },
+            {
+                id: 'vocab-expert',
+                title: 'Vocab Expert',
+                description: 'Beantworte 200 Vokabeln richtig! Du bist ein Profi!',
+                image: 'images/first200.png',
+                requirement: 200,
+                type: 'correct_answers'
+            },
+            {
+                id: 'nice-volume',
+                title: 'Nice Volume',
+                description: 'Übe insgesamt 500 Vokabeln!',
+                image: 'images/500total.png',
+                requirement: 500,
+                type: 'total_practiced'
+            },
+            {
+                id: 'really-nice-volume',
+                title: 'Really nice volume!',
+                description: 'Übe insgesamt 1000 Vokabeln!',
+                image: 'images/1000total.png',
+                requirement: 1000,
+                type: 'total_practiced'
+            },
+            {
+                id: 'absolute-cinema',
+                title: 'Absolute Cinema!',
+                description: 'Übe insgesamt 2000 Vokabeln! Legendär!',
+                image: 'images/2000total.png',
+                requirement: 2000,
+                type: 'total_practiced'
             }
         ];
 
@@ -639,9 +679,37 @@
             }
         }
 
+        // Berechne insgesamt geübte Vokabeln (egal ob richtig oder falsch)
+        async function calculateTotalPracticed() {
+            try {
+                const userRef = ref(db, 'users/' + currentUser.userKey);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val();
+
+                if (!userData) return 0;
+
+                const performance = userData.performance || {};
+                let totalPracticed = 0;
+
+                // Summiere alle 'total' Werte (alle geübten Vokabeln)
+                Object.values(performance).forEach(perf => {
+                    totalPracticed += (perf.total || 0);
+                });
+
+                console.log('Total practiced vocabularies:', totalPracticed);
+                return totalPracticed;
+            } catch (error) {
+                console.error('Fehler beim Berechnen:', error);
+                return 0;
+            }
+        }
+
         // Check ob Award unlocked werden soll
-        async function checkAndUnlockAward(award, correctAnswers) {
-            if (correctAnswers < award.requirement) {
+        async function checkAndUnlockAward(award, correctAnswers, totalPracticed) {
+            // Prüfe Requirement basierend auf Award-Typ
+            const currentValue = award.type === 'total_practiced' ? totalPracticed : correctAnswers;
+            
+            if (currentValue < award.requirement) {
                 return false; // Noch nicht freigeschaltet
             }
 
@@ -689,6 +757,7 @@
         // Render alle Awards
         async function renderAwards() {
             const correctAnswers = await calculateCorrectAnswers();
+            const totalPracticed = await calculateTotalPracticed();
             const grid = document.getElementById('awardsGrid');
             grid.innerHTML = ''; // Clear grid
             
@@ -700,14 +769,20 @@
                 
                 // Check ob gerade freigeschaltet wurde
                 if (!unlocked) {
-                    await checkAndUnlockAward(award, correctAnswers);
+                    await checkAndUnlockAward(award, correctAnswers, totalPracticed);
                 }
 
                 // Reload status nach potential unlock
                 const isUnlocked = await isAwardUnlocked(award.id);
                 if (isUnlocked) unlockedCount++;
 
-                const progress = Math.min(100, Math.round((correctAnswers / award.requirement) * 100));
+                // Berechne Progress basierend auf Award-Typ
+                const currentValue = award.type === 'total_practiced' ? totalPracticed : correctAnswers;
+                const progress = Math.min(100, Math.round((currentValue / award.requirement) * 100));
+                
+                // Progress-Text basierend auf Award-Typ
+                const progressLabel = award.type === 'total_practiced' ? 
+                    'geübte Vokabeln' : 'richtige Antworten';
 
                 const card = document.createElement('div');
                 card.className = `award-card ${isUnlocked ? 'unlocked' : 'locked'}`;
@@ -724,7 +799,7 @@
                         <div class="progress-container">
                             <div class="progress-bar" style="width: ${progress}%"></div>
                         </div>
-                        <div class="progress-text">${correctAnswers} / ${award.requirement} richtige Antworten</div>
+                        <div class="progress-text">${currentValue} / ${award.requirement} ${progressLabel}</div>
                     ` : `
                         <div class="unlock-status">
                             ✅ Freigeschaltet!
