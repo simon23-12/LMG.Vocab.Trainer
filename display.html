@@ -1553,7 +1553,7 @@
         // Lade Vokabeln und zeige Hauptseite
         updateLoadingStatus('Stelle Session wieder her...');
         await loadVocabs();
-        await showPageSelection();
+        showPageSelection();
         
         console.log('✓ Session wiederhergestellt für:', currentUser.name);
         console.log('✓ Session Performance:', Object.keys(sessionPerformance).length, 'Einträge');
@@ -1732,18 +1732,9 @@
     }
   }
   
-  async function showPageSelection() {
+  function showPageSelection() {
     document.getElementById('userName').textContent = currentUser.name;
     document.getElementById('userClass').textContent = currentUser.class;
-    
-    // UPDATE STREAK beim Pageload (nur wenn noch nicht heute)
-    try {
-      await updateStreak();
-    } catch (error) {
-      console.error('❌ Fehler beim Streak-Update:', error);
-      console.error('Stack:', error.stack);
-      // Fahre trotzdem fort
-    }
     
     // Berechne Dashboard-Statistiken
     calculateDashboardStats();
@@ -2546,14 +2537,20 @@
     const lastSchoolday = getLastSchoolday(today);
     const lastSchooldayString = getDateString(lastSchoolday);
     
+    console.log('📆 Letzter Schultag:', lastSchooldayString);
+    console.log('📆 Vergleich:', lastActivityDate, '===', lastSchooldayString, '?', lastActivityDate === lastSchooldayString);
+    
     if (lastActivityDate === lastSchooldayString) {
       // Streak geht weiter!
       currentStreak += 1;
-      console.log('✓ Streak geht weiter:', currentStreak);
+      console.log('✅ Streak geht weiter! Neu:', currentStreak);
     } else if (!lastActivityDate || new Date(lastActivityDate) < lastSchoolday) {
       // Streak unterbrochen - Reset!
       currentStreak = 1;
-      console.log('✗ Streak unterbrochen, Reset zu 1');
+      console.log('❌ Streak unterbrochen, Reset zu 1');
+      console.log('   Grund: lastActivity', lastActivityDate, '<', lastSchooldayString);
+    } else {
+      console.log('⚠️ Unerwarteter Fall! lastActivity:', lastActivityDate, 'lastSchoolday:', lastSchooldayString);
     }
     
     // Update Best Streak
@@ -3051,9 +3048,9 @@
     }
   }
   
-  async function backToSelection() {
+  function backToSelection() {
     // Lade Performance neu, damit die Farben aktualisiert werden
-    await showPageSelection();
+    showPageSelection();
   }
   
   async function logout() {
