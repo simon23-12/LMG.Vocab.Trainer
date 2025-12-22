@@ -783,6 +783,30 @@
                 image: 'images/weekendwarrior.png',
                 requirement: 1,
                 type: 'weekend_practice'
+            },
+            {
+                id: 'megabrain',
+                title: 'Mega Brain',
+                description: 'Erreiche 100% auf 10 verschiedenen Seiten!',
+                image: 'images/megabrain.png',
+                requirement: 10,
+                type: 'perfect_pages_count'
+            },
+            {
+                id: 'gigabrain',
+                title: 'Giga Brain',
+                description: 'Erreiche 100% auf 20 verschiedenen Seiten!',
+                image: 'images/gigabrain.png',
+                requirement: 20,
+                type: 'perfect_pages_count'
+            },
+            {
+                id: 'endurance',
+                title: 'Ausdauerprofi',
+                description: 'Übe insgesamt 25 Wochen lang!',
+                image: 'images/endurance.png',
+                requirement: 25,
+                type: 'total_weeks'
             }
         ];
 
@@ -906,6 +930,71 @@
             }
         }
 
+        // Zähle perfekte Seiten (100%)
+        async function countPerfectPages() {
+            try {
+                const userRef = ref(db, 'users/' + currentUser.userKey);
+                const snapshot = await get(userRef);
+                const userData = snapshot.val();
+                
+                const performance = userData?.performance || {};
+                let perfectCount = 0;
+                
+                // Zähle nur "page_" Einträge mit 100%, nicht Intervalle
+                for (let key in performance) {
+                    if (key.startsWith('page_') && performance[key].percent === 100) {
+                        perfectCount++;
+                    }
+                }
+                
+                console.log('Perfect Pages Count:', perfectCount);
+                return perfectCount;
+            } catch (error) {
+                console.error('Fehler beim Perfect-Pages-Count:', error);
+                return 0;
+            }
+        }
+
+        // Berechne wie viele Wochen insgesamt geübt wurde
+        async function calculateTotalWeeks() {
+            try {
+                const logsRef = ref(db, 'usage_logs');
+                const snapshot = await get(logsRef);
+                
+                if (!snapshot.exists()) return 0;
+                
+                const logs = snapshot.val();
+                const weeks = new Set();
+                
+                // Durchsuche alle Logs nach diesem User
+                for (let logId in logs) {
+                    const log = logs[logId];
+                    
+                    // Check ob dieser Log vom aktuellen User ist
+                    if (log.userName === currentUser.name && log.userClass === currentUser.class) {
+                        // Berechne die Wochennummer (ISO 8601)
+                        const date = new Date(log.timestamp);
+                        const year = date.getFullYear();
+                        
+                        // ISO Woche berechnen
+                        const oneJan = new Date(year, 0, 1);
+                        const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
+                        const weekNumber = Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
+                        
+                        // Speichere Jahr + Woche als eindeutigen String
+                        const weekKey = `${year}-W${weekNumber}`;
+                        weeks.add(weekKey);
+                    }
+                }
+                
+                console.log('Total Weeks:', weeks.size);
+                return weeks.size;
+            } catch (error) {
+                console.error('Fehler beim Wochen-Berechnen:', error);
+                return 0;
+            }
+        }
+
 
         // Check ob Award unlocked werden soll
         async function checkAndUnlockAward(award, data) {
@@ -927,6 +1016,12 @@
                     break;
                 case 'weekend_practice':
                     meetsRequirement = data.hasWeekend;
+                    break;
+                case 'perfect_pages_count':
+                    meetsRequirement = data.perfectPagesCount >= award.requirement;
+                    break;
+                case 'total_weeks':
+                    meetsRequirement = data.totalWeeks >= award.requirement;
                     break;
                 case 'leaderboard_podium':
                 case 'leaderboard_winner':
@@ -988,13 +1083,17 @@
             const currentStreak = await calculateStreak();
             const hasPerfect = await hasPerfectPage();
             const hasWeekend = await hasWeekendPractice();
+            const perfectPagesCount = await countPerfectPages();
+            const totalWeeks = await calculateTotalWeeks();
             
             const data = {
                 correctAnswers,
                 totalPracticed,
                 currentStreak,
                 hasPerfect,
-                hasWeekend
+                hasWeekend,
+                perfectPagesCount,
+                totalWeeks
             };
             
             const grid = document.getElementById('awardsGrid');
@@ -1038,6 +1137,21 @@
                         currentValue = hasPerfect ? '✓' : '✗';
                         progress = hasPerfect ? 100 : 0;
                         progressLabel = 'Perfekte Seite';
+                        break;
+                    case 'perfect_pages_count':
+                        currentValue = perfectPagesCount;
+                        progress = Math.min(100, Math.round((currentValue / award.requirement) * 100));
+                        progressLabel = 'Perfekte Seiten';
+                        break;
+                    case 'total_weeks':
+                        currentValue = totalWeeks;
+                        progress = Math.min(100, Math.round((currentValue / award.requirement) * 100));
+                        progressLabel = 'Wochen geübt';
+                        break;
+                    case 'weekend_practice':
+                        currentValue = hasWeekend ? '✓' : '✗';
+                        progress = hasWeekend ? 100 : 0;
+                        progressLabel = 'Am Wochenende';
                         break;
                     case 'leaderboard_podium':
                     case 'leaderboard_winner':
