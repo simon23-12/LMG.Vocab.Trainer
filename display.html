@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -3016,6 +3014,13 @@
   }
   
   async function logout() {
+    // Zeige Lade-Feedback
+    const logoutButtons = document.querySelectorAll('button[onclick*="logout"]');
+    logoutButtons.forEach(btn => {
+      btn.disabled = true;
+      btn.textContent = btn.textContent.includes('Logout') ? '🔄 Logout...' : btn.textContent;
+    });
+    
     // USAGE TRACKING: Logge Session-Daten vor dem Logout
     if (currentUser) {
       try {
@@ -3077,12 +3082,10 @@
       console.warn('localStorage Fehler:', e);
     }
     
-    document.getElementById('adminClassSelect').value = '';
-    document.getElementById('studentList').innerHTML = '';
-    document.getElementById('studentPerformance').innerHTML = '';
+    console.log('✓ Logout abgeschlossen, leite zu index.html weiter...');
+    
     // Leite zu index.html weiter
     window.location.href = "index.html";
-    showStatus("Erfolgreich ausgeloggt!", 'info');
   }
   
   // AUTO-LOGOUT bei Seite schließen/refresh
