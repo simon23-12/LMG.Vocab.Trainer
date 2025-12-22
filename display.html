@@ -2490,8 +2490,10 @@
   
   function getDateString(date) {
     const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d.toISOString().split('T')[0]; // YYYY-MM-DD
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // YYYY-MM-DD in lokaler Zeit
   }
   
   async function updateStreak() {
@@ -2504,6 +2506,9 @@
     console.log('✓ currentUser:', currentUser.name, currentUser.userKey);
     
     const today = new Date();
+    console.log('📅 Raw Date:', today);
+    console.log('📅 UTC String:', today.toISOString());
+    
     today.setHours(0, 0, 0, 0);
     const todayString = getDateString(today);
     
