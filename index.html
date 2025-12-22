@@ -383,7 +383,7 @@
   <div class="container">
     <!-- Header mit Logo -->
     <h1>
-      <img src="https://www.lmg-annaberg.de/wp-content/uploads/2022/06/logo_new_small.png" alt="LMG Logo" class="logo">
+      <img src="images/schoollogo.png" alt="LMG Logo" class="logo">
       Vokabeltrainer
     </h1>
 
@@ -630,7 +630,7 @@
     // LEHRER-LOGIN CHECK
     if (username === 'teacher' || username === 'admin@lmg-vokabel.internal' || username === 'admin') {
       const inputHash = btoa(password);
-      const correctHash = 'TE1HYWRtaW4='; // Base64 von "LMGadmin"
+      const correctHash = 'TE1HYWRtaW4=';
       
       if (inputHash === correctHash) {
         // Speichere Lehrer-Session
