@@ -630,7 +630,7 @@
     // LEHRER-LOGIN CHECK
     if (username === 'teacher' || username === 'admin@lmg-vokabel.internal' || username === 'admin') {
       const inputHash = btoa(password);
-      const correctHash = 'TE1HYWRtaW4='; // Base64 von "LMGadmin"
+      const correctHash = 'TE1HYWRtaW4='; // PW Hash
       
       if (inputHash === correctHash) {
         // Speichere Lehrer-Session
