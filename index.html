@@ -630,7 +630,7 @@
     // LEHRER-LOGIN CHECK
     if (username === 'teacher' || username === 'admin@lmg-vokabel.internal' || username === 'admin') {
       const inputHash = btoa(password);
-      const correctHash = 'TE1HYWRtaW4='; // PW Hash
+      const correctHash = 'TE1HYWRtaW4='; // Base64 von "LMGadmin"
       
       if (inputHash === correctHash) {
         // Speichere Lehrer-Session
@@ -686,9 +686,33 @@
       currentUser = data;
       currentUser.key = userKey;
       
-      // Speichere Klasse und weiterleiten
+      // Extrahiere Jahrgang aus Klasse
+      let jahrgang;
+      if (data.class.startsWith('10')) {
+        jahrgang = '10';
+      } else {
+        jahrgang = data.class.charAt(0);
+      }
+      
+      // Erstelle vollständiges User-Objekt für display.html
+      const userObject = {
+        name: data.name,
+        userKey: userKey,
+        class: data.class,
+        jahrgang: jahrgang,
+        currentStreak: data.currentStreak || 0,
+        bestStreak: data.bestStreak || 0,
+        lastActivityDate: data.lastActivityDate || null
+      };
+      
+      // Speichere Session-Daten für display.html
+      localStorage.setItem('lmg_currentUser', JSON.stringify(userObject));
+      localStorage.setItem('lmg_userPerformance', JSON.stringify(data.performance || {}));
+      localStorage.setItem('lmg_sessionPerformance', JSON.stringify({}));
       localStorage.setItem('selectedClass', data.class);
       localStorage.setItem('currentUserKey', userKey);
+      
+      console.log('✓ Session-Daten gespeichert für display.html');
       
       showStatus('✓ Erfolgreich angemeldet!', 'success');
       setTimeout(() => {
