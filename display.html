@@ -2530,6 +2530,10 @@
     // Prüfe ob heute schon geübt wurde
     if (lastActivityDate === todayString) {
       console.log('ℹ️ Heute schon geübt, Streak bleibt:', currentStreak);
+      
+      // Update UI trotzdem (für den Fall dass currentUser im Memory veraltet ist)
+      calculateDashboardStats();
+      
       return; // Streak bleibt gleich
     }
     
@@ -2581,6 +2585,10 @@
   }
   
   function calculateDashboardStats() {
+    console.log('📊 calculateDashboardStats() aufgerufen');
+    console.log('   currentUser.currentStreak:', currentUser.currentStreak);
+    console.log('   currentUser.bestStreak:', currentUser.bestStreak);
+    
     const perf = userPerformance;
     const perfEntries = Object.values(perf);
     
