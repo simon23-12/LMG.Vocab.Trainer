@@ -186,15 +186,15 @@
 
         .awards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
             margin-top: 30px;
         }
 
         .award-card {
             background: var(--container-bg);
             border-radius: 16px;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
             transition: all 0.3s;
             border: 3px solid var(--border-color);
@@ -218,9 +218,9 @@
         }
 
         .award-badge {
-            width: 180px;
-            height: 180px;
-            margin: 0 auto 20px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
             position: relative;
         }
 
@@ -239,31 +239,31 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
+            font-size: 48px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 50%;
         }
 
         .award-title {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 10px;
         }
 
         .award-description {
-            font-size: 16px;
+            font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.5;
+            margin-bottom: 15px;
+            line-height: 1.4;
         }
 
         .progress-container {
             background: var(--border-color);
-            border-radius: 20px;
-            height: 30px;
+            border-radius: 15px;
+            height: 20px;
             overflow: hidden;
-            margin-top: 20px;
+            margin-top: 15px;
             position: relative;
             transition: background 0.3s ease;
         }
@@ -271,7 +271,7 @@
         .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            border-radius: 20px;
+            border-radius: 15px;
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
@@ -293,17 +293,17 @@
         }
 
         .progress-text {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
-            margin-top: 10px;
+            margin-top: 8px;
             font-weight: 600;
         }
 
         .unlock-status {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             color: #4CAF50;
-            margin-top: 15px;
+            margin-top: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -616,7 +616,7 @@
     <div class="container">
         <div class="header">
             <h1>🏆 Deine Awards</h1>
-            <a href="../index.html" class="back-button">← Zurück zum Training</a>
+            <a href="../display.html" class="back-button">← Zurück zum Training</a>
         </div>
 
         <div class="stats-summary">
@@ -775,6 +775,14 @@
                 image: 'images/winmonthlyrace.png',
                 requirement: 1,
                 type: 'leaderboard_winner'
+            },
+            {
+                id: 'weekendwarrior',
+                title: 'Weekend Warrior',
+                description: 'Übe an einem Samstag oder Sonntag!',
+                image: 'images/weekendwarrior.png',
+                requirement: 1,
+                type: 'weekend_practice'
             }
         ];
 
@@ -783,7 +791,7 @@
         
         if (!currentUser) {
             alert('Bitte logge dich zuerst ein!');
-            window.location.href = '../index.html';
+            window.location.href = '../display.html';
         }
 
         // Berechne richtige Antworten aus Performance
@@ -865,6 +873,40 @@
             }
         }
 
+        // Prüfe ob User am Wochenende (Sa/So) geübt hat
+        async function hasWeekendPractice() {
+            try {
+                const logsRef = ref(db, 'usage_logs');
+                const snapshot = await get(logsRef);
+                
+                if (!snapshot.exists()) return false;
+                
+                const logs = snapshot.val();
+                
+                // Durchsuche alle Logs nach diesem User
+                for (let logId in logs) {
+                    const log = logs[logId];
+                    
+                    // Check ob dieser Log vom aktuellen User ist
+                    if (log.userName === currentUser.name && log.userClass === currentUser.class) {
+                        // Parse das Datum und prüfe ob Wochenende
+                        const logDate = new Date(log.timestamp);
+                        const dayOfWeek = logDate.getDay(); // 0 = Sonntag, 6 = Samstag
+                        
+                        if (dayOfWeek === 0 || dayOfWeek === 6) {
+                            return true; // Am Wochenende geübt!
+                        }
+                    }
+                }
+                
+                return false;
+            } catch (error) {
+                console.error('Fehler beim Weekend-Check:', error);
+                return false;
+            }
+        }
+
+
         // Check ob Award unlocked werden soll
         async function checkAndUnlockAward(award, data) {
             // data enthält: correctAnswers, totalPracticed, currentStreak, hasPerfect
@@ -882,6 +924,9 @@
                     break;
                 case 'perfect_page':
                     meetsRequirement = data.hasPerfect;
+                    break;
+                case 'weekend_practice':
+                    meetsRequirement = data.hasWeekend;
                     break;
                 case 'leaderboard_podium':
                 case 'leaderboard_winner':
@@ -942,12 +987,14 @@
             const totalPracticed = await calculateTotalPracticed();
             const currentStreak = await calculateStreak();
             const hasPerfect = await hasPerfectPage();
+            const hasWeekend = await hasWeekendPractice();
             
             const data = {
                 correctAnswers,
                 totalPracticed,
                 currentStreak,
-                hasPerfect
+                hasPerfect,
+                hasWeekend
             };
             
             const grid = document.getElementById('awardsGrid');
