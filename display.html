@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1551,7 +1553,7 @@
         // Lade Vokabeln und zeige Hauptseite
         updateLoadingStatus('Stelle Session wieder her...');
         await loadVocabs();
-        showPageSelection();
+        await showPageSelection();
         
         console.log('✓ Session wiederhergestellt für:', currentUser.name);
         console.log('✓ Session Performance:', Object.keys(sessionPerformance).length, 'Einträge');
@@ -1730,9 +1732,13 @@
     }
   }
   
-  function showPageSelection() {
+  async function showPageSelection() {
     document.getElementById('userName').textContent = currentUser.name;
     document.getElementById('userClass').textContent = currentUser.class;
+    
+    // UPDATE STREAK beim Pageload (nur wenn noch nicht heute)
+    await updateStreak();
+    
     // Berechne Dashboard-Statistiken
     calculateDashboardStats();
     
@@ -3008,9 +3014,9 @@
     }
   }
   
-  function backToSelection() {
+  async function backToSelection() {
     // Lade Performance neu, damit die Farben aktualisiert werden
-    showPageSelection();
+    await showPageSelection();
   }
   
   async function logout() {
@@ -3050,8 +3056,8 @@
         if (sessionVocabs > 0) {
           await db.ref('usage_logs/' + logId).set({
             timestamp: timestamp,
-            user: "Ein Schüler",
-            class: currentUser.class || "unbekannt",
+            userName: currentUser.name,
+            userClass: currentUser.class || "unbekannt",
             vocabularyCount: sessionVocabs,
             accuracy: sessionAccuracy
           });
@@ -3111,8 +3117,8 @@
         // Verwende navigator.sendBeacon für zuverlässiges Logging beim Schließen
         const logData = {
           timestamp: new Date().toISOString(),
-          user: "Ein Schüler",
-          class: currentUser.class || "unbekannt",
+          userName: currentUser.name,
+          userClass: currentUser.class || "unbekannt",
           vocabularyCount: sessionVocabs,
           accuracy: sessionAccuracy
         };
