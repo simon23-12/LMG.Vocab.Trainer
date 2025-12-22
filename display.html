@@ -1737,7 +1737,13 @@
     document.getElementById('userClass').textContent = currentUser.class;
     
     // UPDATE STREAK beim Pageload (nur wenn noch nicht heute)
-    await updateStreak();
+    try {
+      await updateStreak();
+    } catch (error) {
+      console.error('❌ Fehler beim Streak-Update:', error);
+      console.error('Stack:', error.stack);
+      // Fahre trotzdem fort
+    }
     
     // Berechne Dashboard-Statistiken
     calculateDashboardStats();
@@ -2489,24 +2495,45 @@
   }
   
   async function updateStreak() {
-    if (!currentUser) return;
+    console.log('=== updateStreak START ===');
+    if (!currentUser) {
+      console.log('❌ Kein currentUser, Skip Streak Update');
+      return;
+    }
+    
+    console.log('✓ currentUser:', currentUser.name, currentUser.userKey);
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayString = getDateString(today);
     
+    console.log('✓ Heute:', todayString);
+    
     // Hole User-Daten
     const userRef = db.ref('users/' + currentUser.userKey);
+    console.log('✓ Hole Daten von:', 'users/' + currentUser.userKey);
+    
     const snapshot = await userRef.get();
+    console.log('✓ Snapshot erhalten, exists:', snapshot.exists());
+    
+    if (!snapshot.exists()) {
+      console.error('❌ User nicht in Firebase gefunden!');
+      return;
+    }
+    
     const userData = snapshot.val();
+    console.log('✓ User-Daten:', userData);
     
     let currentStreak = userData.currentStreak || 0;
     let bestStreak = userData.bestStreak || 0;
     let lastActivityDate = userData.lastActivityDate || null;
     
+    console.log('✓ Aktueller Streak:', currentStreak);
+    console.log('✓ Last Activity:', lastActivityDate);
+    
     // Prüfe ob heute schon geübt wurde
     if (lastActivityDate === todayString) {
-      console.log('Heute schon geübt, Streak bleibt:', currentStreak);
+      console.log('ℹ️ Heute schon geübt, Streak bleibt:', currentStreak);
       return; // Streak bleibt gleich
     }
     
@@ -2531,11 +2558,14 @@
     }
     
     // Speichere in Firebase
+    console.log('💾 Speichere Update in Firebase...');
     await userRef.update({
       currentStreak: currentStreak,
       bestStreak: bestStreak,
       lastActivityDate: todayString
     });
+    
+    console.log('✅ Firebase Update erfolgreich!');
     
     // Update lokale Kopie
     currentUser.currentStreak = currentStreak;
@@ -2544,6 +2574,8 @@
     
     // Update UI
     calculateDashboardStats();
+    
+    console.log('=== updateStreak ENDE ===');
   }
   
   function calculateDashboardStats() {
