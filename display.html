@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -2003,6 +2001,76 @@
     
     userNorm = removePunctuation(userNorm);
     correctNorm = removePunctuation(correctNorm);
+    
+    // KONTRAKTION-NORMALISIERUNG: Erlaube Langformen für Kurzformen
+    // Wandle Kontraktionen in Langformen um, damit beide Versionen akzeptiert werden
+    const normalizeContractions = (text) => {
+      return text
+        // Negative Kontraktionen
+        .replace(/\bisn't\b/gi, 'is not')
+        .replace(/\baren't\b/gi, 'are not')
+        .replace(/\bwasn't\b/gi, 'was not')
+        .replace(/\bweren't\b/gi, 'were not')
+        .replace(/\bhasn't\b/gi, 'has not')
+        .replace(/\bhaven't\b/gi, 'have not')
+        .replace(/\bhadn't\b/gi, 'had not')
+        .replace(/\bwon't\b/gi, 'will not')
+        .replace(/\bwouldn't\b/gi, 'would not')
+        .replace(/\bshan't\b/gi, 'shall not')
+        .replace(/\bshouldn't\b/gi, 'should not')
+        .replace(/\bcan't\b/gi, 'can not')
+        .replace(/\bcannot\b/gi, 'can not')
+        .replace(/\bcouldn't\b/gi, 'could not')
+        .replace(/\bmightn't\b/gi, 'might not')
+        .replace(/\bmustn't\b/gi, 'must not')
+        .replace(/\bneedn't\b/gi, 'need not')
+        .replace(/\bdon't\b/gi, 'do not')
+        .replace(/\bdoesn't\b/gi, 'does not')
+        .replace(/\bdidn't\b/gi, 'did not')
+        // Positive Kontraktionen
+        .replace(/\bi'm\b/gi, 'i am')
+        .replace(/\byou're\b/gi, 'you are')
+        .replace(/\bhe's\b/gi, 'he is')  // Ambig: "he is" oder "he has" - wir nehmen "is"
+        .replace(/\bshe's\b/gi, 'she is')
+        .replace(/\bit's\b/gi, 'it is')
+        .replace(/\bwe're\b/gi, 'we are')
+        .replace(/\bthey're\b/gi, 'they are')
+        .replace(/\bthat's\b/gi, 'that is')
+        .replace(/\bwho's\b/gi, 'who is')
+        .replace(/\bwhat's\b/gi, 'what is')
+        .replace(/\bwhere's\b/gi, 'where is')
+        .replace(/\bwhen's\b/gi, 'when is')
+        .replace(/\bwhy's\b/gi, 'why is')
+        .replace(/\bhow's\b/gi, 'how is')
+        .replace(/\bthere's\b/gi, 'there is')
+        .replace(/\bhere's\b/gi, 'here is')
+        // "have" Kontraktionen
+        .replace(/\bi've\b/gi, 'i have')
+        .replace(/\byou've\b/gi, 'you have')
+        .replace(/\bwe've\b/gi, 'we have')
+        .replace(/\bthey've\b/gi, 'they have')
+        // "would/had" Kontraktionen
+        .replace(/\bi'd\b/gi, 'i would')  // Auch "i had" möglich
+        .replace(/\byou'd\b/gi, 'you would')
+        .replace(/\bhe'd\b/gi, 'he would')
+        .replace(/\bshe'd\b/gi, 'she would')
+        .replace(/\bwe'd\b/gi, 'we would')
+        .replace(/\bthey'd\b/gi, 'they would')
+        // "will" Kontraktionen
+        .replace(/\bi'll\b/gi, 'i will')
+        .replace(/\byou'll\b/gi, 'you will')
+        .replace(/\bhe'll\b/gi, 'he will')
+        .replace(/\bshe'll\b/gi, 'she will')
+        .replace(/\bit'll\b/gi, 'it will')
+        .replace(/\bwe'll\b/gi, 'we will')
+        .replace(/\bthey'll\b/gi, 'they will')
+        .replace(/\bthat'll\b/gi, 'that will')
+        .trim();
+    };
+    
+    // Normalisiere BEIDE Antworten (User UND korrekte Antwort)
+    userNorm = normalizeContractions(userNorm);
+    correctNorm = normalizeContractions(correctNorm);
     
     // Ersetze Abkürzungen mit vollen Wörtern für flexibleren Vergleich
     const expandAbbreviations = (text) => {
