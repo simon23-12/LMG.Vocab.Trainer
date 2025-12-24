@@ -1924,6 +1924,9 @@
       return;
     }
     
+    // Setze Processing-Lock zurück für neue Frage
+    isProcessingAnswer = false;
+    
     const vocab = quizVocabs[currentQuestionIndex];
     
     document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
@@ -1959,7 +1962,16 @@
     }, 1000);
   }
   
+  // Lock-Variable um mehrfaches Absenden zu verhindern
+  let isProcessingAnswer = false;
+  
   function submitAnswer(timeout = false) {
+    // Verhindere mehrfaches Absenden (Enter-Spam-Schutz)
+    if (isProcessingAnswer) {
+      return;
+    }
+    isProcessingAnswer = true;
+    
     clearInterval(timer);
     
     const vocab = quizVocabs[currentQuestionIndex];
