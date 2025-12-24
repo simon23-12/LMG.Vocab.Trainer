@@ -3315,25 +3315,24 @@
   }
   
   // AUTO-LOGOUT bei Seite schließen/refresh
+  // Verwende sendBeacon mit korrektem Content-Type
   
-  // Globale Flag-Variable um Duplikate zu verhindern
-  let sessionLogSent = false;
+  let windowCloseLogSent = false;
   
-  function saveSessionLogBeforeLeaving() {
+  function sendSessionLogViaBeacon() {
     // Verhindere doppelte Logs
-    if (sessionLogSent) {
-      console.log('⏭ Session-Log bereits gesendet, überspringe...');
+    if (windowCloseLogSent) {
+      console.log('⏭ Window-Close-Log bereits gesendet');
       return;
     }
     
     // Nur loggen wenn User eingeloggt ist UND Session-Daten existieren
     if (!currentUser || !sessionPerformance || Object.keys(sessionPerformance).length === 0) {
-      console.log('⏭ Kein User oder keine Session-Daten, überspringe Log');
+      console.log('⏭ Kein User oder keine Session-Daten für Window-Close-Log');
       return;
     }
     
-    // Setze Flag sofort um Race Conditions zu vermeiden
-    sessionLogSent = true;
+    windowCloseLogSent = true;
     
     // Berechne Session-Stats
     let sessionVocabs = 0;
@@ -3361,56 +3360,55 @@
         accuracy: sessionAccuracy
       };
       
-      console.log('📊 Sende Session-Log:', logData);
+      console.log('📊 Sende Window-Close-Log via Beacon:', sessionVocabs, 'Vokabeln');
       
-      // SYNCHRON: Verwende sendBeacon (funktioniert auch beim Schließen)
+      // Firebase REST API URL - WICHTIG: Mit .json am Ende!
       const url = `https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app/usage_logs/${logId}.json`;
       
-      // sendBeacon ist die zuverlässigste Methode für beforeunload
+      // sendBeacon mit Blob für korrekten Content-Type
+      const blob = new Blob([JSON.stringify(logData)], { type: 'application/json' });
+      
       if (navigator.sendBeacon) {
-        const beaconSent = navigator.sendBeacon(url, JSON.stringify(logData));
-        console.log('✓ sendBeacon gesendet:', beaconSent ? 'erfolgreich' : 'fehlgeschlagen');
+        const success = navigator.sendBeacon(url, blob);
+        console.log('✓ sendBeacon Status:', success ? 'gesendet' : 'fehlgeschlagen');
       } else {
-        // Fallback für alte Browser: fetch mit keepalive
-        fetch(url, {
-          method: 'PUT',
-          body: JSON.stringify(logData),
-          headers: {'Content-Type': 'application/json'},
-          keepalive: true  // WICHTIG: Request läuft auch nach Seite schließen weiter
-        }).then(() => {
-          console.log('✓ Fetch keepalive gesendet');
-        }).catch(err => {
-          console.warn('Fetch keepalive Fehler:', err);
-        });
+        // Fallback: synchroner XMLHttpRequest (veraltet aber funktioniert in beforeunload)
+        try {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', url, false); // false = synchron
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify(logData));
+          console.log('✓ Synchroner XHR gesendet');
+        } catch (e) {
+          console.error('XHR Fehler:', e);
+        }
       }
     } else {
-      console.log('⏭ Keine Vokabeln geübt, kein Log nötig');
+      console.log('⏭ Keine Vokabeln geübt, kein Window-Close-Log');
     }
   }
   
-  // Event 1: visibilitychange (triggert wenn Tab versteckt wird)
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'hidden') {
-      if (!sessionLogSent && currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
-        console.log('📊 visibilitychange: Tab versteckt, sende Session-Log...');
-        saveSessionLogBeforeLeaving();
-      }
-    }
-  });
-  
-  // Event 2: beforeunload (triggert beim Fenster schließen/refresh)
+  // Event 1: beforeunload (primär - funktioniert auf Desktop)
   window.addEventListener('beforeunload', function(e) {
-    if (!sessionLogSent && currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
-      console.log('📊 beforeunload: Fenster wird geschlossen, sende Session-Log...');
-      saveSessionLogBeforeLeaving();
+    if (!windowCloseLogSent) {
+      console.log('📊 beforeunload triggered');
+      sendSessionLogViaBeacon();
     }
   });
   
-  // Event 3: pagehide (zusätzlicher Fallback für iOS/Safari)
+  // Event 2: visibilitychange (funktioniert auch auf Mobile)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden' && !windowCloseLogSent) {
+      console.log('📊 visibilitychange triggered');
+      sendSessionLogViaBeacon();
+    }
+  });
+  
+  // Event 3: pagehide (iOS/Safari)
   window.addEventListener('pagehide', function(e) {
-    if (!sessionLogSent && currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
-      console.log('📊 pagehide: Seite wird versteckt, sende Session-Log...');
-      saveSessionLogBeforeLeaving();
+    if (!windowCloseLogSent) {
+      console.log('📊 pagehide triggered');
+      sendSessionLogViaBeacon();
     }
   });
   
