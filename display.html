@@ -3317,11 +3317,23 @@
   // AUTO-LOGOUT bei Seite schließen/refresh
   // WICHTIG: beforeunload ist nicht 100% zuverlässig, daher nutzen wir mehrere Events
   
+  // Globale Flag-Variable um Duplikate zu verhindern
+  let sessionLogSent = false;
+  
   async function saveSessionLogBeforeLeaving() {
+    // Verhindere doppelte Logs
+    if (sessionLogSent) {
+      console.log('⏭ Session-Log bereits gesendet, überspringe...');
+      return;
+    }
+    
     // Nur loggen wenn User eingeloggt ist UND Session-Daten existieren
     if (!currentUser || !sessionPerformance || Object.keys(sessionPerformance).length === 0) {
       return;
     }
+    
+    // Setze Flag sofort um Race Conditions zu vermeiden
+    sessionLogSent = true;
     
     // Berechne Session-Stats
     let sessionVocabs = 0;
@@ -3353,9 +3365,6 @@
         // Verwende Firebase SDK mit await
         await db.ref('usage_logs/' + logId).set(logData);
         console.log('✓ Auto-Logout Log via Firebase SDK gesendet:', sessionVocabs, 'Vokabeln');
-        
-        // Markiere dass Log erfolgreich war
-        sessionStorage.setItem('log_sent', 'true');
       } catch (err) {
         console.warn('Firebase SDK Fehler bei Auto-Logout:', err);
         
@@ -3367,25 +3376,23 @@
     }
   }
   
-  // Event 1: beforeunload (wenn Seite geschlossen/refreshed wird)
-  window.addEventListener('beforeunload', function(e) {
-    if (currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
-      const logSent = sessionStorage.getItem('log_sent');
-      if (logSent !== 'true') {
-        // Synchroner Aufruf (keine Zeit für await)
+  // Event 1: visibilitychange (zuverlässiger in modernen Browsern) - PRIMÄR
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      // Tab wird versteckt/geschlossen
+      if (!sessionLogSent && currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+        console.log('📊 visibilitychange: Sende Session-Log...');
         saveSessionLogBeforeLeaving();
       }
     }
   });
   
-  // Event 2: visibilitychange (zuverlässiger in modernen Browsern)
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'hidden') {
-      // Tab wird versteckt/geschlossen
-      const logSent = sessionStorage.getItem('log_sent');
-      if (logSent !== 'true' && currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
-        saveSessionLogBeforeLeaving();
-      }
+  // Event 2: beforeunload (Fallback für ältere Browser)
+  window.addEventListener('beforeunload', function(e) {
+    if (!sessionLogSent && currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+      console.log('📊 beforeunload: Sende Session-Log...');
+      // Synchroner Aufruf (keine Zeit für await)
+      saveSessionLogBeforeLeaving();
     }
   });
   
