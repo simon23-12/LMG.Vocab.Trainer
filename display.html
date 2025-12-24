@@ -3315,41 +3315,76 @@
   }
   
   // AUTO-LOGOUT bei Seite schließen/refresh
-  window.addEventListener('beforeunload', function(e) {
+  // WICHTIG: beforeunload ist nicht 100% zuverlässig, daher nutzen wir mehrere Events
+  
+  async function saveSessionLogBeforeLeaving() {
     // Nur loggen wenn User eingeloggt ist UND Session-Daten existieren
-    if (currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+    if (!currentUser || !sessionPerformance || Object.keys(sessionPerformance).length === 0) {
+      return;
+    }
+    
+    // Berechne Session-Stats
+    let sessionVocabs = 0;
+    let totalCorrect = 0;
+    let totalQuestions = 0;
+    
+    for (let key in sessionPerformance) {
+      const perf = sessionPerformance[key];
+      sessionVocabs += (perf.total || 0);
+      totalCorrect += (perf.score || 0);
+      totalQuestions += (perf.total || 0);
+    }
+    
+    const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+    
+    if (sessionVocabs > 0) {
+      const timestamp = new Date().toISOString();
+      const logId = Date.now() + '_' + currentUser.userKey;
       
-      // Berechne Session-Stats
-      let sessionVocabs = 0;
-      let totalCorrect = 0;
-      let totalQuestions = 0;
+      const logData = {
+        timestamp: timestamp,
+        userName: currentUser.name,
+        userClass: currentUser.class || "unbekannt",
+        vocabularyCount: sessionVocabs,
+        accuracy: sessionAccuracy
+      };
       
-      for (let key in sessionPerformance) {
-        const perf = sessionPerformance[key];
-        sessionVocabs += (perf.total || 0);
-        totalCorrect += (perf.score || 0);
-        totalQuestions += (perf.total || 0);
-      }
-      
-      const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
-      
-      if (sessionVocabs > 0) {
-        // Verwende navigator.sendBeacon für zuverlässiges Logging beim Schließen
-        const logData = {
-          timestamp: new Date().toISOString(),
-          userName: currentUser.name,
-          userClass: currentUser.class || "unbekannt",
-          vocabularyCount: sessionVocabs,
-          accuracy: sessionAccuracy
-        };
+      try {
+        // Verwende Firebase SDK mit await
+        await db.ref('usage_logs/' + logId).set(logData);
+        console.log('✓ Auto-Logout Log via Firebase SDK gesendet:', sessionVocabs, 'Vokabeln');
         
-        const logId = Date.now() + '_' + currentUser.userKey;
+        // Markiere dass Log erfolgreich war
+        sessionStorage.setItem('log_sent', 'true');
+      } catch (err) {
+        console.warn('Firebase SDK Fehler bei Auto-Logout:', err);
         
-        // sendBeacon ist asynchron und funktioniert auch wenn Seite schließt
+        // FALLBACK: Verwende sendBeacon
         const url = `https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app/usage_logs/${logId}.json`;
-        navigator.sendBeacon(url, JSON.stringify(logData));
-        
-        console.log('✓ Auto-Logout Log gesendet:', sessionVocabs, 'Vokabeln');
+        const beaconSent = navigator.sendBeacon(url, JSON.stringify(logData));
+        console.log('✓ Fallback sendBeacon gesendet:', beaconSent);
+      }
+    }
+  }
+  
+  // Event 1: beforeunload (wenn Seite geschlossen/refreshed wird)
+  window.addEventListener('beforeunload', function(e) {
+    if (currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+      const logSent = sessionStorage.getItem('log_sent');
+      if (logSent !== 'true') {
+        // Synchroner Aufruf (keine Zeit für await)
+        saveSessionLogBeforeLeaving();
+      }
+    }
+  });
+  
+  // Event 2: visibilitychange (zuverlässiger in modernen Browsern)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      // Tab wird versteckt/geschlossen
+      const logSent = sessionStorage.getItem('log_sent');
+      if (logSent !== 'true' && currentUser && sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+        saveSessionLogBeforeLeaving();
       }
     }
   });
