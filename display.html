@@ -1542,6 +1542,12 @@
       const savedPerformance = localStorage.getItem('lmg_userPerformance');
       const savedSessionPerformance = localStorage.getItem('lmg_sessionPerformance');
       
+      console.log('🔍 localStorage beim Restore:');
+      console.log('   savedUser:', !!savedUser);
+      console.log('   savedPerformance:', !!savedPerformance);
+      console.log('   savedSessionPerformance:', savedSessionPerformance);
+      console.log('   savedSessionPerformance parsed:', savedSessionPerformance ? JSON.parse(savedSessionPerformance) : 'null');
+      
       if (savedUser) {
         console.log('✓ Gespeicherte Session gefunden, stelle wieder her...');
         
@@ -1549,6 +1555,10 @@
         currentUser = JSON.parse(savedUser);
         userPerformance = savedPerformance ? JSON.parse(savedPerformance) : {};
         sessionPerformance = savedSessionPerformance ? JSON.parse(savedSessionPerformance) : {}; // Session-Tracking erhalten!
+        
+        console.log('🔍 Nach Restore:');
+        console.log('   sessionPerformance:', sessionPerformance);
+        console.log('   sessionPerformance keys:', Object.keys(sessionPerformance));
         
         // Lade Vokabeln und zeige Hauptseite
         updateLoadingStatus('Stelle Session wieder her...');
