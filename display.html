@@ -1705,17 +1705,23 @@
       
       console.log("Cache miss, veraltet oder neue Version - lade von GitHub...");
       
-      // Lade von GitHub mit Cache-Busting
+      // Lade von GitHub mit Cache-Busting und explizitem UTF-8 Encoding
       const vocabURL = `${GITHUB_BASE_URL}${vocabFileName}?v=${VOCAB_VERSION}`;
       console.log("GitHub URL:", vocabURL);
       
-      const response = await fetch(vocabURL);
+      const response = await fetch(vocabURL, {
+        headers: {
+          'Accept': 'application/json; charset=UTF-8'
+        }
+      });
       
       if (!response.ok) {
         throw new Error(`GitHub HTTP ${response.status}: ${response.statusText}`);
       }
       
-      const data = await response.json();
+      // Hole Text mit UTF-8 und parse dann zu JSON
+      const text = await response.text();
+      const data = JSON.parse(text);
       console.log("JSON von GitHub geladen, Typ:", typeof data);
       
       // Konvertiere Object zu Array (wie bei Firebase)
