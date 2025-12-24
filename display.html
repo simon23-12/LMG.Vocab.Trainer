@@ -2535,18 +2535,39 @@
       }
       
       // Speichere auch den Gesamt-Intervall-Score (wie bisher)
+      
+      // WICHTIG: sessionPerformance immer aktualisieren für Time-Logging!
+      // (auch wenn Score schlechter ist als der Rekord)
+      sessionPerformance[window.currentPerformanceKey] = perfData;
+      console.log('✓ sessionPerformance aktualisiert:', window.currentPerformanceKey, perfData);
+      
+      // UPDATE STREAK nach erfolgreichem Üben (IMMER, auch bei schlechterem Score!)
+      await updateStreak();
+      
+      // CHECK FOR NEW AWARDS (IMMER ausführen)
+      await checkForNewAwards();
+      
       const existingPerf = userPerformance[window.currentPerformanceKey];
       if (existingPerf && existingPerf.percent > percent) {
         console.log("Bestehender Score ist besser:", existingPerf.percent, "% vs", percent, "%");
+        console.log("→ Firebase/userPerformance wird NICHT überschrieben, aber sessionPerformance wurde aktualisiert!");
         if (!isIntervalTest) {
           showStatus('Gut gemacht! Aber dein bisheriger Rekord war besser: ' + existingPerf.percent + '%', 'info');
         }
-        return;
+        
+        // SESSION PERSISTENCE: Speichere sessionPerformance trotzdem!
+        try {
+          localStorage.setItem('lmg_sessionPerformance', JSON.stringify(sessionPerformance));
+          console.log('✓ sessionPerformance in localStorage gespeichert (trotz schlechterem Score)');
+        } catch (e) {
+          console.warn('localStorage Fehler:', e);
+        }
+        
+        return; // Aber Firebase/userPerformance nicht überschreiben
       }
       
-      // OPTIMISTISCHES UPDATE: Aktualisiere lokal sofort (kein Reload nötig!)
+      // Score ist besser oder gleich → Aktualisiere auch userPerformance und Firebase
       userPerformance[window.currentPerformanceKey] = perfData;
-      sessionPerformance[window.currentPerformanceKey] = perfData; // Track für Session
       
       await db.ref('users/' + userPath + '/performance/' + window.currentPerformanceKey).set(perfData);
       
@@ -2562,12 +2583,6 @@
       } catch (e) {
         console.warn('localStorage Fehler:', e);
       }
-      
-      // UPDATE STREAK nach erfolgreichem Üben
-      await updateStreak();
-      
-      // CHECK FOR NEW AWARDS
-      await checkForNewAwards();
       
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
