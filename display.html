@@ -3240,6 +3240,11 @@
   }
   
   async function logout() {
+    console.log('🔍 logout() aufgerufen');
+    console.log('🔍 currentUser:', currentUser);
+    console.log('🔍 sessionPerformance:', sessionPerformance);
+    console.log('🔍 sessionPerformance keys:', Object.keys(sessionPerformance || {}));
+    
     // Zeige Lade-Feedback
     const logoutButtons = document.querySelectorAll('button[onclick*="logout"]');
     logoutButtons.forEach(btn => {
@@ -3259,11 +3264,17 @@
         if (sessionPerformance && Object.keys(sessionPerformance).length > 0) {
           for (let key in sessionPerformance) {
             const perf = sessionPerformance[key];
+            console.log('🔍 Logout - Processing key:', key, perf);
             sessionVocabs += (perf.total || 0);
             totalCorrect += (perf.score || 0);
             totalQuestions += (perf.total || 0);
           }
         }
+        
+        console.log('🔍 Logout - Berechnete Werte:');
+        console.log('   sessionVocabs:', sessionVocabs);
+        console.log('   totalCorrect:', totalCorrect);
+        console.log('   totalQuestions:', totalQuestions);
         
         // Berechne durchschnittliche Accuracy der Session
         const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
@@ -3272,17 +3283,25 @@
         const timestamp = new Date().toISOString();
         const logId = Date.now() + '_' + currentUser.userKey;
         
+        console.log('🔍 Logout - sessionVocabs:', sessionVocabs);
+        
         // Schreibe Usage-Log in Firebase (nur wenn Vokabeln geübt wurden)
         if (sessionVocabs > 0) {
-          await db.ref('usage_logs/' + logId).set({
+          const logData = {
             timestamp: timestamp,
             userName: currentUser.name,
             userClass: currentUser.class || "unbekannt",
             vocabularyCount: sessionVocabs,
             accuracy: sessionAccuracy
-          });
+          };
+          
+          console.log('📊 Logout - Schreibe Log:', logData);
+          
+          await db.ref('usage_logs/' + logId).set(logData);
           
           console.log('✓ Usage-Log gespeichert:', sessionVocabs, 'Vokabeln,', sessionAccuracy + '% Accuracy');
+        } else {
+          console.log('⏭ Logout - Keine Vokabeln geübt, kein Log');
         }
       } catch (error) {
         console.error('Usage-Log Fehler:', error);
@@ -3320,6 +3339,12 @@
   let windowCloseLogSent = false;
   
   function sendSessionLogViaBeacon() {
+    console.log('🔍 sendSessionLogViaBeacon() aufgerufen');
+    console.log('🔍 windowCloseLogSent:', windowCloseLogSent);
+    console.log('🔍 currentUser:', currentUser);
+    console.log('🔍 sessionPerformance:', sessionPerformance);
+    console.log('🔍 sessionPerformance keys:', Object.keys(sessionPerformance || {}));
+    
     // Verhindere doppelte Logs
     if (windowCloseLogSent) {
       console.log('⏭ Window-Close-Log bereits gesendet');
@@ -3329,6 +3354,9 @@
     // Nur loggen wenn User eingeloggt ist UND Session-Daten existieren
     if (!currentUser || !sessionPerformance || Object.keys(sessionPerformance).length === 0) {
       console.log('⏭ Kein User oder keine Session-Daten für Window-Close-Log');
+      console.log('   currentUser:', !!currentUser);
+      console.log('   sessionPerformance:', !!sessionPerformance);
+      console.log('   keys length:', Object.keys(sessionPerformance || {}).length);
       return;
     }
     
@@ -3341,10 +3369,16 @@
     
     for (let key in sessionPerformance) {
       const perf = sessionPerformance[key];
+      console.log('🔍 Processing key:', key, perf);
       sessionVocabs += (perf.total || 0);
       totalCorrect += (perf.score || 0);
       totalQuestions += (perf.total || 0);
     }
+    
+    console.log('🔍 Berechnete Werte:');
+    console.log('   sessionVocabs:', sessionVocabs);
+    console.log('   totalCorrect:', totalCorrect);
+    console.log('   totalQuestions:', totalQuestions);
     
     const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
     
@@ -3361,6 +3395,7 @@
       };
       
       console.log('📊 Sende Window-Close-Log via Beacon:', sessionVocabs, 'Vokabeln');
+      console.log('📊 Log-Daten:', logData);
       
       // Firebase REST API URL - WICHTIG: Mit .json am Ende!
       const url = `https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app/usage_logs/${logId}.json`;
