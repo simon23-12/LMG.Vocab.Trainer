@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -2110,7 +2112,19 @@
       return;
     }
     
-    // 1b. RADIKALE VEREINFACHUNG: Wenn die User-Antwort (min. 4 Buchstaben) 
+    // 1b. KOMMA-TOLERANZ: Prüfe ob die Antwort nur wegen fehlender Kommas falsch ist
+    // "Yes that is right" vs "Yes, that is right" → halber Fehler
+    const userNoCommas = userNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+    const correctNoCommas = correctNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+    
+    if (userNoCommas === correctNoCommas && userNoBrackets !== correctNoBrackets) {
+      // Nur wenn die Kommas unterschiedlich sind (aber sonst identisch)
+      console.log("⚠️ Komma(s) vergessen:", userAnswer, "→ Richtig:", correctAnswer);
+      handleAnswerResult('half', userAnswer, vocab, correctAnswer, -1, 'comma');
+      return;
+    }
+    
+    // 1c. RADIKALE VEREINFACHUNG: Wenn die User-Antwort (min. 4 Buchstaben) 
     // IRGENDWO in der korrekten Antwort vorkommt, ist es richtig.
     // Das vermeidet Grenzfälle und ist großzügig bei Variationen.
     
@@ -2313,26 +2327,32 @@
     return matrix[b.length][a.length];
   }
   
-  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer, transpositionPos) {
+  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer, transpositionPos, errorType) {
     let scoreIncrement = 0;
     
     if (isCorrect === 'half') {
-      // HALBRICHTIG: Buchstabendreher
+      // HALBRICHTIG: Buchstabendreher ODER Komma vergessen
       scoreIncrement = 0.5;
       score += 0.5;
       
-      // Markiere den Dreher rot
-      let markedAnswer = userAnswer;
-      if (transpositionPos >= 0 && transpositionPos < userAnswer.length - 1) {
-        const before = userAnswer.substring(0, transpositionPos);
-        const char1 = userAnswer[transpositionPos];
-        const char2 = userAnswer[transpositionPos + 1];
-        const after = userAnswer.substring(transpositionPos + 2);
-        markedAnswer = before + '<span style="color:#e74c3c; font-weight:700;">' + char1 + char2 + '</span>' + after;
+      if (errorType === 'comma') {
+        // Komma-Fehler
+        document.getElementById('feedback').innerHTML = "⚠️ Fast! Komma(s) vergessen: " + userAnswer + " → Richtig: " + correctAnswer;
+        document.getElementById('feedback').className = 'feedback half';
+      } else {
+        // Buchstabendreher
+        let markedAnswer = userAnswer;
+        if (transpositionPos >= 0 && transpositionPos < userAnswer.length - 1) {
+          const before = userAnswer.substring(0, transpositionPos);
+          const char1 = userAnswer[transpositionPos];
+          const char2 = userAnswer[transpositionPos + 1];
+          const after = userAnswer.substring(transpositionPos + 2);
+          markedAnswer = before + '<span style="color:#e74c3c; font-weight:700;">' + char1 + char2 + '</span>' + after;
+        }
+        
+        document.getElementById('feedback').innerHTML = "⚠️ Fast! Buchstabendreher: " + markedAnswer + " → Richtig: " + correctAnswer;
+        document.getElementById('feedback').className = 'feedback half';
       }
-      
-      document.getElementById('feedback').innerHTML = "⚠️ Fast! Buchstabendreher: " + markedAnswer + " → Richtig: " + correctAnswer;
-      document.getElementById('feedback').className = 'feedback half';
       
     } else if (isCorrect) {
       // RICHTIG
