@@ -1672,21 +1672,29 @@
       console.log("=== loadVocabs START ===");
       showStatus("Lade Vokabeln...", 'info');
       
-      // Lade Vokabeln basierend auf Jahrgang
-      const vocabPath = 'vocabulary' + currentUser.jahrgang;
-      console.log("Lade Vokabeln von:", vocabPath);
+      // GitHub Configuration
+      const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/';
+      const VOCAB_VERSION = '1.0.0'; // Bei Änderungen an Vokabeln hochzählen um Cache zu invalidieren
+      
+      // Map Jahrgang zu Dateinamen (alle lowercase: voc5_4.json, voc6_4.json etc.)
+      const vocabFileName = `voc${currentUser.jahrgang}_4.json`;
+      
+      console.log("Lade Vokabeln für Jahrgang:", currentUser.jahrgang, "Datei:", vocabFileName);
       
       // CACHE-CHECK: Prüfe ob Vokabeln im localStorage sind
       const cacheKey = 'vocabs_' + currentUser.jahrgang;
+      const cacheVersionKey = 'vocabs_version_' + currentUser.jahrgang;
       const cacheTimeKey = 'vocabs_time_' + currentUser.jahrgang;
       const cached = localStorage.getItem(cacheKey);
+      const cachedVersion = localStorage.getItem(cacheVersionKey);
       const cacheTime = localStorage.getItem(cacheTimeKey);
       
-      // Cache ist 7 Tage gültig
+      // Cache ist 7 Tage gültig UND Version muss übereinstimmen
       const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 Tage in ms
       const now = Date.now();
       
-      if (cached && cacheTime && (now - parseInt(cacheTime)) < CACHE_DURATION) {
+      if (cached && cacheTime && cachedVersion === VOCAB_VERSION && 
+          (now - parseInt(cacheTime)) < CACHE_DURATION) {
         console.log("✓ Vokabeln aus Cache geladen (gespart: ~200 KB Download)");
         allVocabs = JSON.parse(cached);
         showStatus("Vokabeln geladen! ✓", 'success');
@@ -1695,32 +1703,38 @@
         return;
       }
       
-      console.log("Cache miss oder veraltet, lade von Firebase...");
-      console.log("Rufe db.ref().get() auf...");
-      const snap = await db.ref(vocabPath).get();
-      console.log("Snapshot erhalten!");
-      console.log("Snapshot exists?", snap.exists());
+      console.log("Cache miss, veraltet oder neue Version - lade von GitHub...");
       
-      if (!snap.exists()) {
-        console.log("Snapshot existiert NICHT");
-        showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " gefunden!", 'error');
-        allVocabs = [];
-        return;
+      // Lade von GitHub mit Cache-Busting
+      const vocabURL = `${GITHUB_BASE_URL}${vocabFileName}?v=${VOCAB_VERSION}`;
+      console.log("GitHub URL:", vocabURL);
+      
+      const response = await fetch(vocabURL);
+      
+      if (!response.ok) {
+        throw new Error(`GitHub HTTP ${response.status}: ${response.statusText}`);
       }
       
-      console.log("Snapshot existiert, hole Daten...");
-      const data = snap.val();
-      console.log("Raw data erhalten, Typ:", typeof data);
-      console.log("Data keys:", data ? Object.keys(data).length : 'null');
+      const data = await response.json();
+      console.log("JSON von GitHub geladen, Typ:", typeof data);
       
-      allVocabs = Object.values(data);
+      // Konvertiere Object zu Array (wie bei Firebase)
+      if (typeof data === 'object' && !Array.isArray(data)) {
+        allVocabs = Object.values(data);
+      } else if (Array.isArray(data)) {
+        allVocabs = data;
+      } else {
+        throw new Error("Unerwartetes Datenformat von GitHub");
+      }
+      
       console.log("Vokabeln geladen:", allVocabs.length, "für Jahrgang", currentUser.jahrgang);
       
-      // CACHE: Speichere im localStorage
+      // CACHE: Speichere im localStorage mit Version
       try {
         localStorage.setItem(cacheKey, JSON.stringify(allVocabs));
+        localStorage.setItem(cacheVersionKey, VOCAB_VERSION);
         localStorage.setItem(cacheTimeKey, now.toString());
-        console.log("✓ Vokabeln im Cache gespeichert");
+        console.log("✓ Vokabeln im Cache gespeichert (Version:", VOCAB_VERSION, ")");
       } catch (e) {
         console.warn("localStorage voll, ignoriere Cache:", e);
       }
@@ -1740,9 +1754,16 @@
       console.log("=== loadVocabs ENDE ===");
     } catch (error) {
       console.error("=== loadVocabs ERROR ===");
-      showStatus("Fehler beim Laden: " + error.message, 'error');
+      showStatus("Fehler beim Laden von GitHub: " + error.message, 'error');
       console.error("LoadVocabs Error:", error);
       console.error("Error stack:", error.stack);
+      
+      // Fallback-Info für Nutzer
+      if (error.message.includes('404')) {
+        showStatus("Vokabel-Datei nicht auf GitHub gefunden! Überprüfe URL.", 'error');
+      } else if (error.message.includes('Failed to fetch')) {
+        showStatus("Netzwerkfehler - bitte Internetverbindung prüfen", 'error');
+      }
     }
   }
   
