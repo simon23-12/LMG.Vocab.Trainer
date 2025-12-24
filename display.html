@@ -1553,6 +1553,10 @@
         // Lade Vokabeln und zeige Hauptseite
         updateLoadingStatus('Stelle Session wieder her...');
         await loadVocabs();
+        
+        // WICHTIG: Prüfe Streak beim Login!
+        await checkStreakOnLogin();
+        
         showPageSelection();
         
         console.log('✓ Session wiederhergestellt für:', currentUser.name);
@@ -2487,6 +2491,80 @@
     return `${year}-${month}-${day}`; // YYYY-MM-DD in lokaler Zeit
   }
   
+  async function checkStreakOnLogin() {
+    console.log('=== checkStreakOnLogin START ===');
+    if (!currentUser) {
+      console.log('❌ Kein currentUser, Skip Streak Check');
+      return;
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayString = getDateString(today);
+    
+    console.log('📅 Login Check - Heute:', todayString);
+    
+    // Hole User-Daten aus Firebase
+    const userRef = db.ref('users/' + currentUser.userKey);
+    const snapshot = await userRef.get();
+    
+    if (!snapshot.exists()) {
+      console.error('❌ User nicht in Firebase gefunden!');
+      return;
+    }
+    
+    const userData = snapshot.val();
+    let currentStreak = userData.currentStreak || 0;
+    let lastActivityDate = userData.lastActivityDate || null;
+    
+    console.log('✓ Aktueller Streak beim Login:', currentStreak);
+    console.log('✓ Last Activity:', lastActivityDate);
+    
+    // Wenn heute schon geübt wurde, ist alles ok
+    if (lastActivityDate === todayString) {
+      console.log('✅ Heute schon geübt, Streak gültig:', currentStreak);
+      currentUser.currentStreak = currentStreak;
+      currentUser.bestStreak = userData.bestStreak || 0;
+      currentUser.lastActivityDate = lastActivityDate;
+      return;
+    }
+    
+    // Prüfe ob wir am letzten Schultag geübt haben
+    const lastSchoolday = getLastSchoolday(today);
+    const lastSchooldayString = getDateString(lastSchoolday);
+    
+    console.log('📆 Letzter Schultag war:', lastSchooldayString);
+    console.log('📆 Letzte Aktivität war:', lastActivityDate);
+    
+    // Wenn lastActivity VOR dem letzten Schultag liegt → Streak ist verloren
+    if (!lastActivityDate || new Date(lastActivityDate) < lastSchoolday) {
+      console.log('❌ Streak beim Login verloren! Reset zu 0');
+      console.log('   Grund: Nicht am letzten Schultag (' + lastSchooldayString + ') geübt');
+      
+      currentStreak = 0;
+      
+      // Speichere Reset in Firebase
+      await userRef.update({
+        currentStreak: 0
+      });
+      
+      // Update lokale Kopie
+      currentUser.currentStreak = 0;
+      currentUser.bestStreak = userData.bestStreak || 0;
+      currentUser.lastActivityDate = lastActivityDate;
+      
+      console.log('💾 Streak auf 0 zurückgesetzt (in Firebase & lokal)');
+    } else if (lastActivityDate === lastSchooldayString) {
+      // Streak ist noch gültig
+      console.log('✅ Am letzten Schultag geübt, Streak bleibt:', currentStreak);
+      currentUser.currentStreak = currentStreak;
+      currentUser.bestStreak = userData.bestStreak || 0;
+      currentUser.lastActivityDate = lastActivityDate;
+    }
+    
+    console.log('=== checkStreakOnLogin ENDE ===');
+  }
+
   async function updateStreak() {
     console.log('=== updateStreak START ===');
     if (!currentUser) {
