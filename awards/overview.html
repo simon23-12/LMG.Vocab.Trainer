@@ -852,15 +852,10 @@
 
                 if (!userData) return 0;
 
-                const performance = userData.performance || {};
-                let totalPracticed = 0;
+                // Verwende lifetimeTotalVocabs statt der Summe aus performance
+                const totalPracticed = userData.lifetimeTotalVocabs || 0;
 
-                // Summiere alle 'total' Werte (alle geübten Vokabeln)
-                Object.values(performance).forEach(perf => {
-                    totalPracticed += (perf.total || 0);
-                });
-
-                console.log('Total practiced vocabularies:', totalPracticed);
+                console.log('Total practiced vocabularies (lifetime):', totalPracticed);
                 return totalPracticed;
             } catch (error) {
                 console.error('Fehler beim Berechnen:', error);
