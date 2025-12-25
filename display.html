@@ -2222,7 +2222,7 @@
     const correctSynonyms = synonyms[correctNorm] || [];
     if (correctSynonyms.includes(userNorm)) {
       console.log("✓ Synonym akzeptiert (Dictionary):", userAnswer, "für", correctAnswer);
-      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer, undefined, undefined, true);
       return;
     }
     
@@ -2233,7 +2233,7 @@
       // Prüfe direkt
       if (vocabSynonyms.includes(userNorm)) {
         console.log("✓ Synonym akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
-        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer, undefined, undefined, true);
         return;
       }
       
@@ -2241,7 +2241,7 @@
       const vocabSynonymsClean = vocabSynonyms.map(s => cleanVerb(s));
       if (vocabSynonymsClean.includes(userVerbClean)) {
         console.log("✓ Synonym-Verb akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
-        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer, undefined, undefined, true);
         return;
       }
     }
@@ -2251,7 +2251,7 @@
       // Prüfe direkt
       if (synonyms[key].includes(correctNorm) && synonyms[key].includes(userNorm)) {
         console.log("✓ Beide sind Synonyme (Dictionary):", userAnswer, "=", correctAnswer);
-        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer, undefined, undefined, true);
         return;
       }
       
@@ -2263,7 +2263,7 @@
       if ((keyClean === correctClean || synonymsClean.includes(correctClean)) && 
           (keyClean === userVerbClean || synonymsClean.includes(userVerbClean))) {
         console.log("✓ Beide sind Synonyme-Verben (Dictionary):", userAnswer, "=", correctAnswer);
-        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer, undefined, undefined, true);
         return;
       }
     }
@@ -2376,7 +2376,7 @@
     return matrix[b.length][a.length];
   }
   
-  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer, transpositionPos, errorType) {
+  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer, transpositionPos, errorType, isSynonym) {
     let scoreIncrement = 0;
     
     if (isCorrect === 'half') {
@@ -2407,7 +2407,13 @@
       // RICHTIG
       scoreIncrement = 1;
       score++;
-      document.getElementById('feedback').textContent = "✓ Richtig!";
+      
+      // Unterscheide zwischen exakter Übereinstimmung und Synonym
+      if (isSynonym) {
+        document.getElementById('feedback').textContent = "✓ Auch richtig! Übersetzung im Buch: " + correctAnswer;
+      } else {
+        document.getElementById('feedback').textContent = "✓ Richtig!";
+      }
       document.getElementById('feedback').className = 'feedback correct';
       
     } else {
