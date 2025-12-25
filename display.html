@@ -2568,6 +2568,3578 @@
       sessionPerformance[window.currentPerformanceKey] = perfData;
       console.log('✓ sessionPerformance aktualisiert:', window.currentPerformanceKey, perfData);
       
+      // UPDATE LIFETIME TOTAL VOCABS - wird IMMER erhöht, auch bei wiederholten Seiten
+      const vocabsJustPracticed = quizVocabs.length;
+      const currentLifetimeTotal = currentUser.lifetimeTotalVocabs || 0;
+      const newLifetimeTotal = currentLifetimeTotal + vocabsJustPracticed;
+      
+      currentUser.lifetimeTotalVocabs = newLifetimeTotal;
+      
+      const userPath = currentUser.userKey.replace(/\./g, '_');
+      await db.ref('users/' + userPath + '/lifetimeTotalVocabs').set(newLifetimeTotal);
+      
+      console.log(`✓ lifetimeTotalVocabs aktualisiert: ${currentLifetimeTotal} + ${vocabsJustPracticed} = ${newLifetimeTotal}`);
+      
+      // UPDATE STREAK nach erfolgreichem Üben (IMMER, auch bei schlechterem Score!)
+      await updateStreak();
+      
+      // CHECK FOR NEW AWARDS (IMMER ausführen)
+      await checkForNewAwards();
+      
+      const existingPerf = userPerformance[window.currentPerformanceKey];
+      if (existingPerf && existingPerf.percent > percent) {
+        console.log("Bestehender Score ist besser:", existingPerf.percent, "% vs", percent, "%");
+        console.log("→ Firebase/userPerformance wird NICHT überschrieben, aber sessionPerformance wurde aktualisiert!");
+        if (!isIntervalTest) {
+          showStatus('Gut gemacht! Aber dein bisheriger Rekord war besser: ' + existingPerf.percent + '%', 'info');
+        }
+        
+        // SESSION PERSISTENCE: Speichere sessionPerformance und currentUser trotzdem!
+        try {
+          localStorage.setItem('lmg_sessionPerformance', JSON.stringify(sessionPerformance));
+          localStorage.setItem('lmg_currentUser', JSON.stringify(currentUser));
+          console.log('✓ sessionPerformance & currentUser in localStorage gespeichert (trotz schlechterem Score)');
+        } catch (e) {
+          console.warn('localStorage Fehler:', e);
+        }
+        
+        return; // Aber Firebase/userPerformance nicht überschreiben
+      }
+      
+      // Score ist besser oder gleich → Aktualisiere auch userPerformance und Firebase
+      userPerformance[window.currentPerformanceKey] = perfData;
+      
+      await db.ref('users/' + userPath + '/performance/' + window.currentPerformanceKey).set(perfData);
+      
+      console.log('✓ Performance gespeichert in Firebase (Delta Update)');
+      if (!isIntervalTest) {
+        showStatus('Performance gespeichert! 💾', 'success');
+      }
+      
+      // SESSION PERSISTENCE: Speichere Performance-Updates und currentUser (für lifetimeTotalVocabs)
+      try {
+        localStorage.setItem('lmg_userPerformance', JSON.stringify(userPerformance));
+        localStorage.setItem('lmg_sessionPerformance', JSON.stringify(sessionPerformance));
+        localStorage.setItem('lmg_currentUser', JSON.stringify(currentUser));
+      } catch (e) {
+        console.warn('localStorage Fehler:', e);
+      }
+      
+    } catch (error) {
+      console.error('Fehler beim Speichern:', error);
+      showStatus('Fehler beim Speichern: ' + error.message, 'error');
+    }
+  }
+  
+  // STREAK HELPER FUNCTIONS
+  function isWeekday(date) {
+    const day = date.getDay();
+    return day >= 1 && day <= 5; // Mo-Fr
+  }
+  
+  function getLastSchoolday(fromDate) {
+    const date = new Date(fromDate);
+    date.setHours(0, 0, 0, 0);
+    
+    // Gehe zurück bis zum letzten Schultag
+    do {
+      date.setDate(date.getDate() - 1);
+    } while (!isWeekday(date));
+    
+    return date;
+  }
+  
+  function getDateString(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // YYYY-MM-DD in lokaler Zeit
+  }
+  
+  async function checkStreakOnLogin() {
+    console.log('=== checkStreakOnLogin START ===');
+    if (!currentUser) {
+      console.log('❌ Kein currentUser, Skip Streak Check');
+      return;
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayString = getDateString(today);
+    
+    console.log('📅 Login Check - Heute:', todayString);
+    
+    // Hole User-Daten aus Firebase
+    const userRef = db.ref('users/' + currentUser.userKey);
+    const snapshot = await userRef.get();
+    
+    if (!snapshot.exists()) {
+      console.error('❌ User nicht in Firebase gefunden!');
+      return;
+    }
+    
+    const userData = snapshot.val();
+    let currentStreak = userData.currentStreak || 0;
+    let lastActivityDate = userData.lastActivityDate || null;
+    
+    // Lade auch lifetimeTotalVocabs
+    currentUser.lifetimeTotalVocabs = userData.lifetimeTotalVocabs || 0;
+    
+    console.log('✓ Aktueller Streak beim Login:', currentStreak);
+    console.log('✓ Last Activity:', lastActivityDate);
+    console.log('✓ Lifetime Total Vocabs:', currentUser.lifetimeTotalVocabs);
+    
+    // Wenn heute schon geübt wurde, ist alles ok
+    if (lastActivityDate === todayString) {
+      console.log('✅ Heute schon geübt, Streak gültig:', currentStreak);
+      currentUser.currentStreak = currentStreak;
+      currentUser.bestStreak = userData.bestStreak || 0;
+      currentUser.lastActivityDate = lastActivityDate;
+      return;
+    }
+    
+    // Prüfe ob wir am letzten Schultag geübt haben
+    const lastSchoolday = getLastSchoolday(today);
+    const lastSchooldayString = getDateString(lastSchoolday);
+    
+    console.log('📆 Letzter Schultag war:', lastSchooldayString);
+    console.log('📆 Letzte Aktivität war:', lastActivityDate);
+    
+    // Wenn lastActivity VOR dem letzten Schultag liegt → Streak ist verloren
+    if (!lastActivityDate || new Date(lastActivityDate) < lastSchoolday) {
+      console.log('❌ Streak beim Login verloren! Reset zu 0');
+      console.log('   Grund: Nicht am letzten Schultag (' + lastSchooldayString + ') geübt');
+      
+      currentStreak = 0;
+      
+      // Speichere Reset in Firebase
+      await userRef.update({
+        currentStreak: 0
+      });
+      
+      // Update lokale Kopie
+      currentUser.currentStreak = 0;
+      currentUser.bestStreak = userData.bestStreak || 0;
+      currentUser.lastActivityDate = lastActivityDate;
+      
+      console.log('💾 Streak auf 0 zurückgesetzt (in Firebase & lokal)');
+    } else if (lastActivityDate === lastSchooldayString) {
+      // Streak ist noch gültig
+      console.log('✅ Am letzten Schultag geübt, Streak bleibt:', currentStreak);
+      currentUser.currentStreak = currentStreak;
+      currentUser.bestStreak = userData.bestStreak || 0;
+      currentUser.lastActivityDate = lastActivityDate;
+    }
+    
+    console.log('=== checkStreakOnLogin ENDE ===');
+  }
+
+  async function updateStreak() {
+    console.log('=== updateStreak START ===');
+    if (!currentUser) {
+      console.log('❌ Kein currentUser, Skip Streak Update');
+      return;
+    }
+    
+    console.log('✓ currentUser:', currentUser.name, currentUser.userKey);
+    
+    const today = new Date();
+    console.log('📅 Raw Date:', today);
+    console.log('📅 UTC String:', today.toISOString());
+    
+    today.setHours(0, 0, 0, 0);
+    const todayString = getDateString(today);
+    
+    console.log('✓ Heute:', todayString);
+    
+    // Hole User-Daten
+    const userRef = db.ref('users/' + currentUser.userKey);
+    console.log('✓ Hole Daten von:', 'users/' + currentUser.userKey);
+    
+    const snapshot = await userRef.get();
+    console.log('✓ Snapshot erhalten, exists:', snapshot.exists());
+    
+    if (!snapshot.exists()) {
+      console.error('❌ User nicht in Firebase gefunden!');
+      return;
+    }
+    
+    const userData = snapshot.val();
+    console.log('✓ User-Daten:', userData);
+    
+    let currentStreak = userData.currentStreak || 0;
+    let bestStreak = userData.bestStreak || 0;
+    let lastActivityDate = userData.lastActivityDate || null;
+    
+    console.log('✓ Aktueller Streak:', currentStreak);
+    console.log('✓ Last Activity:', lastActivityDate);
+    
+    // Prüfe ob heute schon geübt wurde
+    if (lastActivityDate === todayString) {
+      console.log('ℹ️ Heute schon geübt, Streak bleibt:', currentStreak);
+      
+      // Update UI trotzdem (für den Fall dass currentUser im Memory veraltet ist)
+      calculateDashboardStats();
+      
+      return; // Streak bleibt gleich
+    }
+    
+    // Prüfe ob wir am letzten Schultag geübt haben
+    const lastSchoolday = getLastSchoolday(today);
+    const lastSchooldayString = getDateString(lastSchoolday);
+    
+    console.log('📆 Letzter Schultag:', lastSchooldayString);
+    console.log('📆 Vergleich:', lastActivityDate, '===', lastSchooldayString, '?', lastActivityDate === lastSchooldayString);
+    
+    if (lastActivityDate === lastSchooldayString) {
+      // Streak geht weiter!
+      currentStreak += 1;
+      console.log('✅ Streak geht weiter! Neu:', currentStreak);
+    } else if (!lastActivityDate || new Date(lastActivityDate) < lastSchoolday) {
+      // Streak unterbrochen - Reset!
+      currentStreak = 1;
+      console.log('❌ Streak unterbrochen, Reset zu 1');
+      console.log('   Grund: lastActivity', lastActivityDate, '<', lastSchooldayString);
+    } else {
+      console.log('⚠️ Unerwarteter Fall! lastActivity:', lastActivityDate, 'lastSchoolday:', lastSchooldayString);
+    }
+    
+    // Update Best Streak
+    if (currentStreak > bestStreak) {
+      bestStreak = currentStreak;
+      console.log('🏆 Neuer Rekord:', bestStreak);
+    }
+    
+    // Speichere in Firebase
+    console.log('💾 Speichere Update in Firebase...');
+    await userRef.update({
+      currentStreak: currentStreak,
+      bestStreak: bestStreak,
+      lastActivityDate: todayString
+    });
+    
+    console.log('✅ Firebase Update erfolgreich!');
+    
+    // Update lokale Kopie
+    currentUser.currentStreak = currentStreak;
+    currentUser.bestStreak = bestStreak;
+    currentUser.lastActivityDate = todayString;
+    
+    // Update UI
+    calculateDashboardStats();
+    
+    console.log('=== updateStreak ENDE ===');
+  }
+  
+  function calculateDashboardStats() {
+    console.log('📊 calculateDashboardStats() aufgerufen');
+    console.log('   currentUser.currentStreak:', currentUser.currentStreak);
+    console.log('   currentUser.bestStreak:', currentUser.bestStreak);
+    console.log('   currentUser.lifetimeTotalVocabs:', currentUser.lifetimeTotalVocabs);
+    
+    const perf = userPerformance;
+    const perfEntries = Object.values(perf);
+    
+    // Verwende lifetimeTotalVocabs für die Gesamtzahl aller jemals geübten Vokabeln
+    const totalVocabs = currentUser.lifetimeTotalVocabs || 0;
+    
+    if (perfEntries.length === 0) {
+      document.getElementById('totalVocabsPracticed').textContent = totalVocabs; // Zeige trotzdem den Lifetime-Counter
+      document.getElementById('averageAccuracy').textContent = '0%';
+      return;
+    }
+    
+    // Berechne Average Accuracy aus allen Seiten (wie bisher)
+    let totalPercent = 0;
+    
+    perfEntries.forEach(entry => {
+      totalPercent += entry.percent || 0;
+    });
+    
+    const avgAccuracy = Math.round(totalPercent / perfEntries.length);
+    
+    document.getElementById('totalVocabsPracticed').textContent = totalVocabs;
+    
+    const accuracyElement = document.getElementById('averageAccuracy');
+    accuracyElement.textContent = avgAccuracy + '%';
+    
+    // Färbe den Accuracy-Text basierend auf dem Durchschnitt
+    if (avgAccuracy === 100) {
+      accuracyElement.style.background = 'linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
+    } else if (avgAccuracy >= 80) {
+      accuracyElement.style.background = 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
+    } else if (avgAccuracy >= 50) {
+      accuracyElement.style.background = 'linear-gradient(135deg, #f09819 0%, #edde5d 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
+    } else {
+      accuracyElement.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+      accuracyElement.style.webkitBackgroundClip = 'text';
+      accuracyElement.style.webkitTextFillColor = 'transparent';
+      accuracyElement.style.backgroundClip = 'text';
+    }
+    
+    // Zeige Streak-Statistiken
+    document.getElementById('currentStreak').textContent = currentUser.currentStreak || 0;
+    document.getElementById('bestStreak').textContent = currentUser.bestStreak || 0;
+  }
+  
+  // AWARD SYSTEM
+  const AWARDS = [
+    {
+      id: 'getstarted',
+      title: 'Let\'s get this started!',
+      description: 'Übe zum ersten Mal Vokabeln!',
+      image: 'awards/images/getstarted.png',
+      requirement: 1,
+      type: 'total_practiced'
+    },
+    {
+      id: 'first-steps',
+      title: 'First steps',
+      description: 'Beantworte deine ersten 10 Vokabeln richtig!',
+      image: 'awards/images/first10.png',
+      requirement: 10,
+      type: 'correct_answers'
+    },
+    {
+      id: 'good-job',
+      title: 'Good job!',
+      description: 'Beantworte 50 Vokabeln richtig!',
+      image: 'awards/images/first50.png',
+      requirement: 50,
+      type: 'correct_answers'
+    },
+    {
+      id: 'vocab-guide',
+      title: 'Vocab Guide',
+      description: 'Beantworte 100 Vokabeln richtig!',
+      image: 'awards/images/first100.png',
+      requirement: 100,
+      type: 'correct_answers'
+    },
+    {
+      id: 'vocab-expert',
+      title: 'Vocab Expert',
+      description: 'Beantworte 200 Vokabeln richtig! Du bist ein Profi!',
+      image: 'awards/images/first200.png',
+      requirement: 200,
+      type: 'correct_answers'
+    },
+    {
+      id: 'nice-volume',
+      title: 'Nice Volume',
+      description: 'Übe insgesamt 500 Vokabeln!',
+      image: 'awards/images/500total.png',
+      requirement: 500,
+      type: 'total_practiced'
+    },
+    {
+      id: 'really-nice-volume',
+      title: 'Really nice volume!',
+      description: 'Übe insgesamt 1000 Vokabeln!',
+      image: 'awards/images/1000total.png',
+      requirement: 1000,
+      type: 'total_practiced'
+    },
+    {
+      id: 'absolute-cinema',
+      title: 'Absolute Cinema!',
+      description: 'Übe insgesamt 2000 Vokabeln! Legendär!',
+      image: 'awards/images/2000total.png',
+      requirement: 2000,
+      type: 'total_practiced'
+    },
+    {
+      id: '5daystreak',
+      title: 'Strong Streak',
+      description: 'Übe 5 Tage hintereinander!',
+      image: 'awards/images/5daystreak.png',
+      requirement: 5,
+      type: 'streak'
+    },
+    {
+      id: 'dart',
+      title: 'Bullseye!',
+      description: 'Erreiche 100% auf einer Seite!',
+      image: 'awards/images/dart.png',
+      requirement: 100,
+      type: 'perfect_page'
+    },
+    {
+      id: 'podiummontlyrace',
+      title: 'Masters of the Month',
+      description: 'Erreiche Platz 2 oder 3 im monatlichen Leaderboard!',
+      image: 'awards/images/podiummontlyrace.png',
+      requirement: 2,
+      type: 'leaderboard_podium'
+    },
+    {
+      id: 'winmonthlyrace',
+      title: 'Champion of the Month!',
+      description: 'Erreiche Platz 1 im monatlichen Leaderboard!',
+      image: 'awards/images/winmonthlyrace.png',
+      requirement: 1,
+      type: 'leaderboard_winner'
+    }
+  ];
+
+  function calculateCorrectAnswers() {
+    const performance = userPerformance || {};
+    let totalCorrect = 0;
+    Object.values(performance).forEach(perf => {
+      totalCorrect += (perf.score || 0);
+    });
+    return totalCorrect;
+  }
+
+  function calculateTotalPracticed() {
+    // Verwende den Lifetime Counter statt der Summe aus userPerformance
+    return currentUser.lifetimeTotalVocabs || 0;
+  }
+
+  async function isAwardUnlocked(awardId) {
+    if (!currentUser) return false;
+    try {
+      const awardRef = db.ref('users/' + currentUser.userKey + '/awards/' + awardId);
+      const snapshot = await awardRef.get();
+      return snapshot.exists();
+    } catch (error) {
+      console.error('Award check error:', error);
+      return false;
+    }
+  }
+
+  async function checkAndUnlockAward(award, data) {
+    // data enthält: correctAnswers, totalPracticed, currentStreak, hasPerfectPage
+    let meetsRequirement = false;
+    
+    switch(award.type) {
+      case 'correct_answers':
+        meetsRequirement = data.correctAnswers >= award.requirement;
+        break;
+      case 'total_practiced':
+        meetsRequirement = data.totalPracticed >= award.requirement;
+        break;
+      case 'streak':
+        meetsRequirement = data.currentStreak >= award.requirement;
+        break;
+      case 'perfect_page':
+        meetsRequirement = data.hasPerfectPage;
+        break;
+      case 'leaderboard_podium':
+      case 'leaderboard_winner':
+        // Leaderboard-Awards werden separat am Monatsende vergeben
+        return false;
+      default:
+        return false;
+    }
+    
+    if (!meetsRequirement) return false;
+
+    try {
+      const awardRef = db.ref('users/' + currentUser.userKey + '/awards/' + award.id);
+      const snapshot = await awardRef.get();
+      if (snapshot.exists()) return false;
+
+      await awardRef.set({
+        unlockedAt: new Date().toISOString(),
+        requirement: award.requirement
+      });
+
+      console.log('🎉 Award freigeschaltet:', award.title);
+      setTimeout(() => {
+        showAwardAnimation(award);
+      }, 500);
+      return true;
+    } catch (error) {
+      console.error('Award unlock error:', error);
+      return false;
+    }
+  }
+
+  async function checkForNewAwards() {
+    if (!currentUser) return;
+    
+    const correctAnswers = calculateCorrectAnswers();
+    const totalPracticed = calculateTotalPracticed();
+    const currentStreak = currentUser.currentStreak || 0;
+    
+    // Check if user has a perfect page (100%)
+    const hasPerfectPage = Object.values(userPerformance || {}).some(perf => perf.percent === 100);
+    
+    const data = {
+      correctAnswers,
+      totalPracticed,
+      currentStreak,
+      hasPerfectPage
+    };
+    
+    console.log('Checking awards:', data);
+    
+    for (const award of AWARDS) {
+      const wasUnlocked = await checkAndUnlockAward(award, data);
+      if (wasUnlocked) break;
+    }
+  }
+
+  function showAwardAnimation(award) {
+    document.getElementById('animationBadge').src = award.image;
+    document.getElementById('animationTitle').textContent = award.title;
+    document.getElementById('animationDescription').textContent = award.description;
+    
+    const overlay = document.getElementById('animationOverlay');
+    overlay.classList.add('active');
+    
+    createParticles();
+    createStarBurst();
+    createConfetti();
+  }
+
+  function closeAwardAnimation() {
+    const overlay = document.getElementById('animationOverlay');
+    overlay.classList.remove('active');
+  }
+
+  function createParticles() {
+    const container = document.getElementById('particles');
+    container.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 3 + 's';
+      particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+      container.appendChild(particle);
+    }
+  }
+
+  function createStarBurst() {
+    const burst = document.getElementById('starBurst');
+    burst.innerHTML = '';
+    for (let i = 0; i < 12; i++) {
+      const ray = document.createElement('div');
+      ray.className = 'star-ray';
+      ray.style.transform = `translate(-50%, -100%) rotate(${i * 30}deg)`;
+      burst.appendChild(ray);
+    }
+  }
+
+  function createConfetti() {
+    const container = document.getElementById('confetti-container');
+    container.innerHTML = '';
+    const colors = ['#FFD700', '#FF69B4', '#00CED1', '#FF6347', '#9370DB', '#32CD32'];
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      confetti.style.animationDuration = (2 + Math.random()) + 's';
+      container.appendChild(confetti);
+    }
+  }
+  
+  async function loadLeaderboard() {
+    try {
+      // Zeige Loading
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '<li class="leaderboard-loading">Lade Leaderboard... ⏳</li>';
+      
+      // Hole aktuellen Monat und Jahr
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1; // 1-12
+      const currentYear = now.getFullYear();
+      const monthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`; // "2025-12"
+      
+      // Monatsname für Anzeige
+      const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                         'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+      
+      // Update Texte mit Klassenname
+      const userClass = currentUser.class || '?';
+      document.getElementById('leaderboardButtonText').textContent = `Top 10 Leaderboard ${userClass} anzeigen`;
+      document.getElementById('leaderboardTitle').innerHTML = `🏆 Top 10 Leaderboard ${userClass} <span class="leaderboard-month">${monthNames[currentMonth - 1]}</span>`;
+      
+      // Lade alle User der gleichen Klasse
+      const usersSnap = await db.ref('users').get();
+      if (!usersSnap.exists()) {
+        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Daten verfügbar</li>';
+        return;
+      }
+      
+      const allUsers = usersSnap.val();
+      const classUsers = [];
+      
+      // Filtere User nach Klasse und berechne Score für diesen Monat
+      for (let userKey in allUsers) {
+        const user = allUsers[userKey];
+        
+        // Nur User der gleichen Klasse
+        if (user.class !== currentUser.class) continue;
+        
+        // Exkludiere Test-Accounts
+        const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
+        if (testAccounts.includes(user.name.toLowerCase())) {
+          console.log('Überspringe Test-Account:', user.name);
+          continue;
+        }
+        
+        // Berechne Score: Vokabeln * Accuracy
+        let monthVocabs = 0;
+        let totalPercent = 0;
+        let perfCount = 0;
+        
+        if (user.performance) {
+          for (let perfKey in user.performance) {
+            const perf = user.performance[perfKey];
+            // Prüfe ob Timestamp in diesem Monat liegt
+            if (perf.timestamp) {
+              const perfDate = new Date(perf.timestamp);
+              const perfMonth = perfDate.getMonth() + 1;
+              const perfYear = perfDate.getFullYear();
+              
+              if (perfMonth === currentMonth && perfYear === currentYear) {
+                monthVocabs += (perf.total || 0);
+                totalPercent += (perf.percent || 0);
+                perfCount++;
+              }
+            }
+          }
+        }
+        
+        // Berechne durchschnittliche Accuracy
+        const avgAccuracy = perfCount > 0 ? (totalPercent / perfCount) : 0;
+        
+        // Score = Vokabeln * (Accuracy / 100)
+        const score = Math.round(monthVocabs * (avgAccuracy / 100));
+        
+        classUsers.push({
+          userKey: userKey,
+          name: user.name,
+          vocabs: monthVocabs,
+          accuracy: Math.round(avgAccuracy),
+          score: score
+        });
+      }
+      
+      // Sortiere nach Score (absteigend)
+      classUsers.sort((a, b) => b.score - a.score);
+      
+      // Zeige nur Top 10
+      const top10 = classUsers.slice(0, 10);
+      
+      // Rendere Leaderboard
+      list.innerHTML = '';
+      
+      if (top10.length === 0) {
+        list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Aktivität in diesem Monat</li>';
+        return;
+      }
+      
+      top10.forEach((user, index) => {
+        const li = document.createElement('li');
+        li.className = 'leaderboard-item';
+        
+        // Highlight current user
+        if (user.userKey === currentUser.userKey) {
+          li.classList.add('current-user');
+        }
+        
+        // Rang-Emojis
+        let rankEmoji = '';
+        if (index === 0) rankEmoji = '🥇';
+        else if (index === 1) rankEmoji = '🥈';
+        else if (index === 2) rankEmoji = '🥉';
+        
+        li.innerHTML = `
+          <span class="leaderboard-rank">${rankEmoji || (index + 1)}</span>
+          <span class="leaderboard-name">${user.name}</span>
+          <span class="leaderboard-score">📚 ${user.score}</span>
+        `;
+        
+        list.appendChild(li);
+      });
+      
+    } catch (error) {
+      console.error('Leaderboard Fehler:', error);
+      document.getElementById('leaderboardList').innerHTML = '<li style="text-align:center; padding:20px; color:#e74c3c;">Fehler beim Laden</li>';
+    }
+  }
+  
+  // Cache für Leaderboard
+  let leaderboardCache = null;
+  let leaderboardCacheTime = null;
+  
+  async function toggleLeaderboard() {
+    const section = document.getElementById('leaderboardSection');
+    const isCollapsed = section.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+      // Öffnen
+      section.classList.remove('collapsed');
+      
+      // Lade Daten (mit 5-Minuten Cache)
+      const now = Date.now();
+      if (!leaderboardCache || (now - leaderboardCacheTime) > 5*60*1000) {
+        console.log('Lade Leaderboard (nicht gecached oder veraltet)');
+        await loadLeaderboard();
+        leaderboardCache = true;
+        leaderboardCacheTime = now;
+      } else {
+        console.log('Zeige gecachtes Leaderboard');
+      }
+    } else {
+      // Schließen
+      section.classList.add('collapsed');
+    }
+  }
+  
+  function backToSelection() {
+    // Lade Performance neu, damit die Farben aktualisiert werden
+    showPageSelection();
+  }
+  
+  async function logout() {
+    console.log('🔍 logout() aufgerufen');
+    console.log('🔍 currentUser:', currentUser);
+    console.log('🔍 sessionPerformance:', sessionPerformance);
+    console.log('🔍 sessionPerformance keys:', Object.keys(sessionPerformance || {}));
+    
+    // Zeige Lade-Feedback
+    const logoutButtons = document.querySelectorAll('button[onclick*="logout"]');
+    logoutButtons.forEach(btn => {
+      btn.disabled = true;
+      btn.textContent = btn.textContent.includes('Logout') ? '🔄 Logout...' : btn.textContent;
+    });
+    
+    // USAGE TRACKING: Logge Session-Daten vor dem Logout
+    if (currentUser) {
+      try {
+        // Berechne nur die Vokabeln die in DIESER SESSION geübt wurden
+        let sessionVocabs = 0;
+        let totalCorrect = 0;
+        let totalQuestions = 0;
+        
+        // Verwende sessionPerformance statt userPerformance!
+        if (sessionPerformance && Object.keys(sessionPerformance).length > 0) {
+          for (let key in sessionPerformance) {
+            const perf = sessionPerformance[key];
+            console.log('🔍 Logout - Processing key:', key, perf);
+            sessionVocabs += (perf.total || 0);
+            totalCorrect += (perf.score || 0);
+            totalQuestions += (perf.total || 0);
+          }
+        }
+        
+        console.log('🔍 Logout - Berechnete Werte:');
+        console.log('   sessionVocabs:', sessionVocabs);
+        console.log('   totalCorrect:', totalCorrect);
+        console.log('   totalQuestions:', totalQuestions);
+        
+        // Berechne durchschnittliche Accuracy der Session
+        const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+        
+        // Erstelle Timestamp und unique Log-ID
+        const timestamp = new Date().toISOString();
+        const logId = Date.now() + '_' + currentUser.userKey;
+        
+        console.log('🔍 Logout - sessionVocabs:', sessionVocabs);
+        
+        // Schreibe Usage-Log in Firebase (nur wenn Vokabeln geübt wurden)
+        if (sessionVocabs > 0) {
+          const logData = {
+            timestamp: timestamp,
+            userName: currentUser.name,
+            userClass: currentUser.class || "unbekannt",
+            vocabularyCount: sessionVocabs,
+            accuracy: sessionAccuracy
+          };
+          
+          console.log('📊 Logout - Schreibe Log:', logData);
+          
+          await db.ref('usage_logs/' + logId).set(logData);
+          
+          console.log('✓ Usage-Log gespeichert:', sessionVocabs, 'Vokabeln,', sessionAccuracy + '% Accuracy');
+        } else {
+          console.log('⏭ Logout - Keine Vokabeln geübt, kein Log');
+        }
+      } catch (error) {
+        console.error('Usage-Log Fehler:', error);
+        // Fahre trotzdem mit Logout fort
+      }
+    }
+    
+    // Standard Logout
+    currentUser = null;
+    userPerformance = {};
+    sessionPerformance = {}; // Reset auch Session-Tracking
+    allVocabs = [];
+    leaderboardCache = null; // Cache zurücksetzen
+    leaderboardCacheTime = null;
+    
+    // SESSION PERSISTENCE: Lösche gespeicherte Daten
+    try {
+      localStorage.removeItem('lmg_currentUser');
+      localStorage.removeItem('lmg_userPerformance');
+      localStorage.removeItem('lmg_sessionPerformance');
+      console.log('✓ Session aus localStorage gelöscht');
+    } catch (e) {
+      console.warn('localStorage Fehler:', e);
+    }
+    
+    console.log('✓ Logout abgeschlossen, leite zu index.html weiter...');
+    
+    // Leite zu index.html weiter
+    window.location.href = "index.html";
+  }
+  
+  // AUTO-LOGOUT bei Seite schließen/refresh
+  // Verwende sendBeacon mit korrektem Content-Type
+  
+  let windowCloseLogSent = false;
+  
+  function sendSessionLogViaBeacon() {
+    console.log('🔍 sendSessionLogViaBeacon() aufgerufen');
+    console.log('🔍 windowCloseLogSent:', windowCloseLogSent);
+    console.log('🔍 currentUser:', currentUser);
+    console.log('🔍 sessionPerformance:', sessionPerformance);
+    console.log('🔍 sessionPerformance keys:', Object.keys(sessionPerformance || {}));
+    
+    // Verhindere doppelte Logs
+    if (windowCloseLogSent) {
+      console.log('⏭ Window-Close-Log bereits gesendet');
+      return;
+    }
+    
+    // Nur loggen wenn User eingeloggt ist UND Session-Daten existieren
+    if (!currentUser || !sessionPerformance || Object.keys(sessionPerformance).length === 0) {
+      console.log('⏭ Kein User oder keine Session-Daten für Window-Close-Log');
+      console.log('   currentUser:', !!currentUser);
+      console.log('   sessionPerformance:', !!sessionPerformance);
+      console.log('   keys length:', Object.keys(sessionPerformance || {}).length);
+      return;
+    }
+    
+    windowCloseLogSent = true;
+    
+    // Berechne Session-Stats
+    let sessionVocabs = 0;
+    let totalCorrect = 0;
+    let totalQuestions = 0;
+    
+    for (let key in sessionPerformance) {
+      const perf = sessionPerformance[key];
+      console.log('🔍 Processing key:', key, perf);
+      sessionVocabs += (perf.total || 0);
+      totalCorrect += (perf.score || 0);
+      totalQuestions += (perf.total || 0);
+    }
+    
+    console.log('🔍 Berechnete Werte:');
+    console.log('   sessionVocabs:', sessionVocabs);
+    console.log('   totalCorrect:', totalCorrect);
+    console.log('   totalQuestions:', totalQuestions);
+    
+    const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+    
+    if (sessionVocabs > 0) {
+      const timestamp = new Date().toISOString();
+      const logId = Date.now() + '_' + currentUser.userKey;
+      
+      const logData = {
+        timestamp: timestamp,
+        userName: currentUser.name,
+        userClass: currentUser.class || "unbekannt",
+        vocabularyCount: sessionVocabs,
+        accuracy: sessionAccuracy
+      };
+      
+      console.log('📊 Sende Window-Close-Log via Beacon:', sessionVocabs, 'Vokabeln');
+      console.log('📊 Log-Daten:', logData);
+      
+      // Firebase REST API URL - WICHTIG: Mit .json am Ende!
+      const url = `https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app/usage_logs/${logId}.json`;
+      
+      // sendBeacon mit Blob für korrekten Content-Type
+      const blob = new Blob([JSON.stringify(logData)], { type: 'application/json' });
+      
+      if (navigator.sendBeacon) {
+        const success = navigator.sendBeacon(url, blob);
+        console.log('✓ sendBeacon Status:', success ? 'gesendet' : 'fehlgeschlagen');
+      } else {
+        // Fallback: synchroner XMLHttpRequest (veraltet aber funktioniert in beforeunload)
+        try {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', url, false); // false = synchron
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify(logData));
+          console.log('✓ Synchroner XHR gesendet');
+        } catch (e) {
+          console.error('XHR Fehler:', e);
+        }
+      }
+    } else {
+      console.log('⏭ Keine Vokabeln geübt, kein Window-Close-Log');
+    }
+  }
+  
+  // Event 1: beforeunload (primär - funktioniert auf Desktop)
+  window.addEventListener('beforeunload', function(e) {
+    if (!windowCloseLogSent) {
+      console.log('📊 beforeunload triggered');
+      sendSessionLogViaBeacon();
+    }
+  });
+  
+  // Event 2: visibilitychange (funktioniert auch auf Mobile)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden' && !windowCloseLogSent) {
+      console.log('📊 visibilitychange triggered');
+      sendSessionLogViaBeacon();
+    }
+  });
+  
+  // Event 3: pagehide (iOS/Safari)
+  window.addEventListener('pagehide', function(e) {
+    if (!windowCloseLogSent) {
+      console.log('📊 pagehide triggered');
+      sendSessionLogViaBeacon();
+    }
+  });
+  
+  // Dark Mode Funktionalität
+  function initDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    
+    // Lade gespeicherte Präferenz
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+      body.classList.add('dark-mode');
+      darkModeToggle.checked = true;
+    }
+    
+    // Toggle Event
+    darkModeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'true');
+      } else {
+        body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'false');
+      }
+    });
+  }
+  
+  // Dark Mode beim Laden initialisieren
+  document.addEventListener('DOMContentLoaded', initDarkMode);
+  </script>
+
+  <!-- Award Animation Overlay -->
+  <div class="animation-overlay" id="animationOverlay">
+    <div class="animation-container">
+      <div class="particles" id="particles"></div>
+      <div id="confetti-container"></div>
+
+      <div class="award-animation-card">
+        <div class="unlock-header">🎉 Achievement Unlocked! 🎉</div>
+        
+        <div class="badge-container">
+          <div class="rotating-ring"></div>
+          <div class="star-burst" id="starBurst"></div>
+          <img src="" alt="Award" class="award-image" id="animationBadge">
+        </div>
+        
+        <div class="achievement-name" id="animationTitle">Award Unlocked!</div>
+        <div class="achievement-description" id="animationDescription">
+          Großartige Arbeit! 🌟
+        </div>
+        
+        <button class="continue-btn" onclick="closeAwardAnimation()">Awesome! 🚀</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMG Englisch Vokabeltrainer</title>
+  <style>
+    :root {
+      --bg-gradient-start: #667eea;
+      --bg-gradient-end: #764ba2;
+      --container-bg: white;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --border-color: #ddd;
+      --input-bg: white;
+      --input-border: #ddd;
+      --button-primary: #667eea;
+      --button-hover: #5568d3;
+      --card-bg: white;
+      --shadow-color: rgba(0,0,0,0.1);
+      --overlay-bg: rgba(0,0,0,0.5);
+    }
+
+    body.dark-mode {
+      --bg-gradient-start: #1a1a2e;
+      --bg-gradient-end: #16213e;
+      --container-bg: #0f3460;
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --text-tertiary: #808080;
+      --border-color: #2a2a3e;
+      --input-bg: #1a1a2e;
+      --input-border: #2a2a3e;
+      --button-primary: #667eea;
+      --button-hover: #5568d3;
+      --card-bg: #16213e;
+      --shadow-color: rgba(0,0,0,0.5);
+      --overlay-bg: rgba(0,0,0,0.8);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+      min-height: 100vh;
+      padding: 20px;
+      transition: background 0.3s ease;
+    }
+    
+    .dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255,255,255,0.3);
+      transition: 0.3s;
+      border-radius: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "☀️";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #667eea;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(30px);
+      content: "🌙";
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--container-bg);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px var(--shadow-color);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    h1 { 
+      color: var(--button-primary); 
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      height: 60px;
+      width: auto;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+    h2 { 
+      color: var(--text-primary); 
+      margin: 30px 0 20px 0;
+      font-size: 1.8em;
+    }
+    .screen { display: none; }
+    .screen.active { display: block !important; }
+    
+    .form-group {
+      margin: 20px 0;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    input, select {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      border: 2px solid var(--input-border);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border 0.3s, background 0.3s;
+      background: var(--input-bg);
+      color: var(--text-primary);
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--button-primary);
+    }
+    button {
+      padding: 12px 30px;
+      background: var(--button-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 5px;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: var(--button-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+    button:disabled {
+      background: var(--text-tertiary);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .interval-selector {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 10px;
+      flex-wrap: wrap;
+      border: 1px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+    .interval-selector label {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .interval-selector select {
+      max-width: 100px;
+    }
+    .page-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .page-box {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #ccc;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .page-box.tested {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .page-box.perfect {
+      background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
+    }
+    .page-box.green {
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    }
+    .page-box.yellow {
+      background: linear-gradient(135deg, #f09819 0%, #edde5d 100%);
+    }
+    .page-box.red {
+      background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    }
+    .page-box:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    }
+    .page-box.disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .page-number {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .page-percent {
+      font-size: 14px;
+      margin-top: 5px;
+      opacity: 0.9;
+    }
+    
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 10px;
+      margin-bottom: 30px;
+      border: 1px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+    .progress {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--button-primary);
+    }
+    .timer {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--text-primary);
+      min-width: 60px;
+      text-align: center;
+    }
+    .timer.warning {
+      color: #e74c3c;
+      animation: pulse 0.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .question-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 40px;
+      border-radius: 20px;
+      text-align: center;
+      margin: 40px 0;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .question-word {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    .question-label {
+      font-size: 20px;
+      opacity: 0.9;
+    }
+    
+    /* Mobile Optimierungen */
+    @media (max-width: 768px) {
+      .question-card {
+        padding: 40px 20px;
+        margin: 20px 0;
+      }
+      .question-word {
+        font-size: 32px;
+      }
+      .question-label {
+        font-size: 16px;
+      }
+      .answer-input {
+        font-size: 18px;
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+      .logo {
+        height: 45px;
+      }
+      .stat-value {
+        font-size: 32px;
+      }
+      .page-box {
+        font-size: 20px;
+      }
+      .page-number {
+        font-size: 22px;
+      }
+    }
+    @media (max-width: 480px) {
+      .question-word {
+        font-size: 24px;
+      }
+      .question-label {
+        font-size: 14px;
+      }
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.4em;
+      }
+      .logo {
+        height: 35px;
+      }
+    }
+    .answer-input {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      font-size: 24px;
+      text-align: center;
+      border: 3px solid var(--button-primary);
+      border-radius: 12px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      transition: background 0.3s ease, border 0.3s ease;
+    }
+    .feedback {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .feedback.correct {
+      background: #d4edda;
+      color: #155724;
+    }
+    .feedback.wrong {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .feedback.half {
+      background: #fff3cd;
+      color: #856404;
+      border: 2px solid #ffc107;
+    }
+    
+    .score-display {
+      text-align: center;
+      margin: 40px 0;
+    }
+    .score-circle {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .score-text {
+      font-size: 24px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    .results-list {
+      margin: 30px 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .result-item {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+    .result-item.correct {
+      background: #d4edda;
+    }
+    .result-item.wrong {
+      background: #f8d7da;
+    }
+    .result-item.half {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+    }
+    .result-word {
+      font-weight: 600;
+      font-size: 18px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      flex: 1;
+    }
+    .result-answer {
+      font-size: 16px;
+      opacity: 0.8;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+      opacity: 0.8;
+    }
+    
+    .student-card {
+      padding: 15px;
+      margin: 10px 0;
+      background: var(--card-bg);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid var(--button-primary);
+    }
+    .student-card:hover {
+      background: var(--border-color);
+      transform: translateX(5px);
+    }
+    .student-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .perf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .student-perf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+    }
+    .perf-item {
+      padding: 10px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+    .perf-item.green { border-color: #56ab2f; background: #d4edda; }
+    .perf-item.yellow { border-color: #f09819; background: #fff3cd; }
+    .perf-item.red { border-color: #eb3349; background: #f8d7da; }
+    
+    #status {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+    }
+    .checking {
+      background: #d1ecf1;
+      color: #0c5460;
+      display: block;
+    }
+    .success { background: #d4edda; color: #155724; display: block; }
+    .error { background: #f8d7da; color: #721c24; display: block; }
+    .info { background: #d1ecf1; color: #0c5460; display: block; }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 20px;
+      color: var(--button-primary);
+    }
+    
+    /* Modern Landing Page Styles */
+    .landing-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.8s ease;
+    }
+    .welcome-section h2 {
+      font-size: 2em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .welcome-section p {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      background: var(--card-bg);
+      transition: background 0.3s ease;
+      padding: 8px;
+      border-radius: 12px;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.3s;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .tab:hover:not(.active) {
+      background: var(--border-color);
+    }
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .modern-input {
+      width: 100%;
+      padding: 14px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s;
+      background: var(--input-bg);
+      color: var(--text-primary);
+    }
+    .modern-input:focus {
+      outline: none;
+      border-color: var(--button-primary);
+      box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+      transform: translateY(-2px);
+    }
+    .modern-button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+      margin-top: 20px;
+    }
+    .modern-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    .modern-button:active {
+      transform: translateY(0);
+    }
+    .input-icon {
+      position: relative;
+    }
+    .input-icon input {
+      padding-left: 45px;
+    }
+    .input-icon::before {
+      content: attr(data-icon);
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .feature-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s;
+      border: 2px solid var(--border-color);
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--button-primary);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.2);
+    }
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .feature-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeInDown {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Modern Dashboard Styles */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.6s ease;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .dashboard-header-left {
+      flex: 1;
+      text-align: center;
+    }
+    .dashboard-header h2 {
+      font-size: 2.2em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .dashboard-header p {
+      color: var(--text-tertiary);
+      font-size: 16px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .awards-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .awards-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 50px;
+      animation: slideInUp 0.8s ease;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 20px var(--shadow-color);
+      border: 2px solid var(--border-color);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px var(--shadow-color);
+      border-color: var(--button-primary);
+    }
+    .stat-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .stat-value {
+      font-size: 42px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    
+    /* Info Icon für Streak */
+    .info-icon {
+      display: inline-block;
+      font-size: 14px;
+      color: #667eea;
+      cursor: help;
+      margin-left: 5px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .info-icon:hover {
+      transform: scale(1.2);
+      color: #764ba2;
+    }
+    
+    /* Streak Record unterhalb des Wertes */
+    .streak-record {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    .streak-record span {
+      color: #667eea;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    .interval-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 40px;
+      animation: slideInUp 1s ease;
+      border: 1px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+    .interval-section h3 {
+      margin: 0 0 20px 0;
+      font-size: 1.3em;
+      color: var(--text-primary);
+    }
+    .interval-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .interval-controls label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .interval-controls select {
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      min-width: 100px;
+    }
+    .interval-controls select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    .interval-controls button {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .interval-controls button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    .pages-section h3 {
+      margin: 0 0 25px 0;
+      font-size: 1.3em;
+      color: var(--text-primary);
+      animation: slideInUp 1.2s ease;
+    }
+    .modern-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--card-bg);
+      color: #e74c3c;
+      border: 2px solid #e74c3c;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 40px;
+    }
+    .modern-logout:hover {
+      background: #e74c3c;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(231,76,60,0.3);
+    }
+    
+    /* Info Box Styles */
+    .info-box {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-left: 4px solid #2196f3;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      animation: slideInUp 0.6s ease;
+    }
+    .info-box-title {
+      font-weight: 700;
+      color: #1565c0;
+      margin-bottom: 12px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-box-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #0d47a1;
+    }
+    .info-box-list li {
+    
+    /* Leaderboard Styles */
+    .leaderboard-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      margin: 30px 0;
+      box-shadow: 0 4px 20px var(--shadow-color);
+      animation: slideInUp 0.8s ease;
+      border: 1px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+    .leaderboard-section.collapsed .leaderboard-content {
+      display: none;
+    }
+    .leaderboard-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .leaderboard-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    .leaderboard-toggle-icon {
+      transition: transform 0.3s;
+    }
+    .leaderboard-section:not(.collapsed) .leaderboard-toggle-icon {
+      transform: rotate(180deg);
+    }
+    .leaderboard-content {
+      margin-top: 20px;
+      animation: slideInUp 0.5s ease;
+    }
+    .leaderboard-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .leaderboard-header h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.5em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .leaderboard-month {
+      color: #667eea;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+    .leaderboard-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      background: var(--input-bg);
+      border-radius: 12px;
+      transition: all 0.3s;
+      animation: slideInLeft 0.5s ease;
+      border: 1px solid var(--border-color);
+    }
+    .leaderboard-item:nth-child(1) { animation-delay: 0.1s; }
+    .leaderboard-item:nth-child(2) { animation-delay: 0.15s; }
+    .leaderboard-item:nth-child(3) { animation-delay: 0.2s; }
+    .leaderboard-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(102,126,234,0.15);
+    }
+    .leaderboard-rank {
+      font-size: 1.3em;
+      font-weight: 700;
+      min-width: 40px;
+      text-align: center;
+    }
+    .leaderboard-item:nth-child(1) .leaderboard-rank {
+      color: #FFD700;
+      font-size: 1.6em;
+    }
+    .leaderboard-item:nth-child(2) .leaderboard-rank {
+      color: #C0C0C0;
+      font-size: 1.5em;
+    }
+    .leaderboard-item:nth-child(3) .leaderboard-rank {
+      color: #CD7F32;
+      font-size: 1.4em;
+    }
+    .leaderboard-name {
+      flex: 1;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1.05em;
+    }
+    .leaderboard-item.current-user {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    .leaderboard-item.current-user .leaderboard-name,
+    .leaderboard-item.current-user .leaderboard-score {
+      color: white;
+    }
+    .leaderboard-score {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 1.1em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .leaderboard-item.current-user .leaderboard-score {
+      color: white;
+    }
+    .leaderboard-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-tertiary);
+      font-size: 1.1em;
+    }
+    
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+
+    /* Award Animation Overlay */
+    .animation-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--overlay-bg);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    }
+    .animation-overlay.active {
+        display: flex;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .animation-container {
+        position: relative;
+        width: 450px;
+        max-width: 90vw;
+        height: 600px;
+        max-height: 90vh;
+    }
+    .particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 215, 0, 0.8);
+        border-radius: 50%;
+        animation: particleFloat 3s ease-in-out infinite;
+    }
+    @keyframes particleFloat {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            opacity: 0;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-200px) scale(0.5);
+            opacity: 0;
+        }
+    }
+    .award-animation-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        position: relative;
+        animation: cardSlideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    @keyframes cardSlideIn {
+        0% {
+            transform: translateY(100px) scale(0.8);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+    .unlock-header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #FFD700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        animation: textGlow 2s ease-in-out infinite;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    @keyframes textGlow {
+        0%, 100% {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        50% {
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                         0 0 30px rgba(255, 215, 0, 0.6);
+        }
+    }
+    .badge-container {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        margin: 20px auto;
+    }
+    .rotating-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 220px;
+        height: 220px;
+        border: 3px dashed rgba(255, 215, 0, 0.3);
+        border-radius: 50%;
+        animation: rotate 8s linear infinite;
+    }
+    @keyframes rotate {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .award-image {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        animation: badgePop 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s backwards,
+                   badgeFloat 3s ease-in-out 1.3s infinite;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    @keyframes badgePop {
+        0% {
+            transform: scale(0) rotate(-180deg);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+    }
+    @keyframes badgeFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    .star-burst {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+    .star-ray {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 2px;
+        height: 60px;
+        background: linear-gradient(to bottom, #FFD700, transparent);
+        animation: rayPulse 2s ease-in-out infinite;
+    }
+    @keyframes rayPulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+    }
+    .achievement-name {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin: 20px 0 10px;
+    }
+    .achievement-description {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .continue-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 25px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    .continue-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+    }
+    #confetti-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        animation: confettiFall 3s linear forwards;
+    }
+    @keyframes confettiFall {
+        to {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark Mode Toggle -->
+  <div class="dark-mode-toggle">
+    <label class="toggle-switch">
+      <input type="checkbox" id="darkModeToggle">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+  
+  <div class="container">
+    <h1>
+      <img src="images/schoollogo.png" alt="LMG Logo" class="logo">
+      LMG Englisch Vokabeltrainer
+    </h1>
+    
+    <div id="loadingScreen" class="loading" style="display: none;">
+      <p>⏳ Lade Firebase...</p>
+      <p id="loadingStatus" style="font-size: 14px; margin-top: 10px;"></p>
+    </div>
+    
+    <div id="status"></div>
+     <div id="pageSelectionScreen" class="screen">
+      <div class="dashboard-header">
+        <div class="dashboard-header-left">
+          <h2>Willkommen, <span id="userName"></span>! 👋</h2>
+          <p>Klasse: <span id="userClass"></span></p>
+        </div>
+        <a href="awards/overview.html" class="awards-button">
+          <span>🏆</span>
+          <span>Awards</span>
+        </a>
+      </div>
+      
+      <!-- Dashboard Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">📚 Vokabeln geübt</div>
+          <div class="stat-value" id="totalVocabsPracticed">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🎯 Accuracy</div>
+          <div class="stat-value" id="averageAccuracy">0%</div>
+        </div>
+        <div class="stat-card streak-card">
+          <div class="stat-label">
+            🔥 Tage am Stück geübt
+            <span class="info-icon" title="Hinweis: Es zählen nur Wochentage. Am Wochenende kannst du pausieren :)">ⓘ</span>
+          </div>
+          <div class="stat-value" id="currentStreak">0</div>
+          <div class="streak-record">🏆 Rekord: <span id="bestStreak">0</span></div>
+        </div>
+      </div>
+      
+      <!-- Interval Section -->
+      <div class="interval-section">
+        <h3>📖 Intervall testen</h3>
+        <div class="interval-controls">
+          <label>Von Seite:</label>
+          <select id="pageFrom"></select>
+          <label>Bis Seite:</label>
+          <select id="pageTo"></select>
+          <button onclick="startIntervalQuiz()">Los geht's! 🚀</button>
+        </div>
+      </div>
+      
+      <!-- Pages Grid -->
+      <div class="pages-section">
+        <h3>📄 Oder wähle eine einzelne Seite:</h3>
+        <div id="pageGrid" class="page-grid"></div>
+      </div>
+      
+      <!-- Leaderboard Section -->
+      <div id="leaderboardSection" class="leaderboard-section collapsed">
+        <button class="leaderboard-toggle" onclick="toggleLeaderboard()">
+          <span>🏆</span>
+          <span id="leaderboardButtonText">Top 10 Leaderboard anzeigen</span>
+          <span class="leaderboard-toggle-icon">▼</span>
+        </button>
+        <div class="leaderboard-content">
+          <div class="leaderboard-header">
+            <h3 id="leaderboardTitle">🏆 Top 10 Leaderboard <span class="leaderboard-month" id="leaderboardMonth"></span></h3>
+          </div>
+          <ol id="leaderboardList" class="leaderboard-list">
+            <!-- Wird dynamisch befüllt -->
+          </ol>
+        </div>
+      </div>
+      
+      <div style="text-align: center;">
+        <button onclick="logout()" class="modern-logout">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </div>
+    
+    <div id="quizScreen" class="screen">
+      <div class="quiz-header">
+        <div class="progress">
+          Frage <span id="currentQuestion">1</span> von <span id="totalQuestions">10</span>
+        </div>
+        <div class="timer" id="timer">15</div>
+      </div>
+      
+      <div class="question-card">
+        <div class="question-label">Übersetze ins Englische:</div>
+        <div class="question-word" id="questionWord">Wort</div>
+      </div>
+      
+      <div style="text-align: center;">
+        <input 
+          type="text" 
+          id="answerInput" 
+          class="answer-input" 
+          placeholder="Deine Antwort..."
+          onkeypress="if(event.key==='Enter') submitAnswer()"
+          autocomplete="off"
+        />
+        <div id="feedback" class="feedback"></div>
+        <button onclick="submitAnswer()" id="submitBtn" style="margin-top: 20px; font-size: 18px;">
+          Antwort abgeben
+        </button>
+      </div>
+    </div>
+    
+    <div id="resultsScreen" class="screen">
+      <h2>🎉 Quiz beendet!</h2>
+      
+      <div class="score-display">
+        <div class="score-circle">
+          <span id="scorePercent">0%</span>
+        </div>
+        <div class="score-text">
+          <span id="scoreCount">0</span> von <span id="scoreTotalCount">10</span> richtig
+        </div>
+      </div>
+      
+      <h3>Deine Antworten:</h3>
+      <div id="resultsList" class="results-list"></div>
+      
+      <div style="text-align: center; margin-top: 40px;">
+        <button onclick="backToSelection()">Zurück zur Übersicht</button>
+        <button onclick="logout()" style="background: #e74c3c;">Logout</button>
+      </div>
+    </div>
+    <div class="footer">From Simon with love ❤️</div>
+  </div>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+  
+  <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
+    authDomain: "testdatabase-4daf4.firebaseapp.com",
+    databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "testdatabase-4daf4",
+    storageBucket: "testdatabase-4daf4.firebasestorage.app",
+    messagingSenderId: "743231387214",
+    appId: "1:743231387214:web:166169b25f72616280351f"
+  };
+  
+
+  // ============================================
+  // SHA-256 HASH FUNKTION (Einweg!)
+  // ============================================
+  async function hashPassword(password) {
+    const salt = 'LMG_VOKABEL_2024_SECURE_SALT';
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password + salt);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
+  
+  let app, db;
+  let currentUser = null;
+  let userPerformance = {};
+  let sessionPerformance = {}; // NEU: Trackt nur diese Session
+  let allVocabs = [];
+  let quizVocabs = [];
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let answers = [];
+  let timer = null;
+  let timeLeft = 15;
+  let firebaseReady = false;
+  
+  // Synonym-Dictionary für häufige Vokabeln
+  const synonyms = {
+    'house': ['home', 'dwelling', 'residence'],
+    'home': ['house', 'dwelling', 'residence'],
+    'religious': ['faithful', 'devout', 'pious', 'godly'],
+    'faithful': ['religious', 'devout', 'loyal', 'pious'],
+    'athletic': ['sporty', 'fit', 'active'],
+    'sporty': ['athletic', 'fit', 'active'],
+    'beautiful': ['pretty', 'lovely', 'gorgeous', 'attractive'],
+    'especially': ['particularly', 'specially'],
+    'particularly': ['especially', 'specially'],
+    'learn': ['to learn', 'study'],
+    'to learn': ['learn', 'study'],
+    'fast': ['quick', 'rapid', 'swift', 'speedy'],
+    'quick': ['fast', 'rapid', 'swift', 'speedy'],
+    'big': ['large', 'huge', 'enormous', 'giant'],
+    'small': ['little', 'tiny', 'mini'],
+    'happy': ['glad', 'joyful', 'cheerful', 'pleased'],
+    'sad': ['unhappy', 'sorrowful', 'depressed'],
+    'good': ['nice', 'fine', 'great', 'excellent'],
+    'bad': ['poor', 'terrible', 'awful'],
+    'start': ['begin', 'commence', 'to start', 'to begin'],
+    'end': ['finish', 'conclude', 'to end', 'to finish'],
+    'see': ['to see', 'look at', 'watch', 'view'],
+    'look': ['see', 'watch', 'gaze'],
+    'talk': ['speak', 'chat', 'converse', 'to talk', 'to speak'],
+    'walk': ['go', 'stroll', 'to walk'],
+    'run': ['jog', 'sprint', 'to run'],
+    'eat': ['to eat', 'consume', 'dine'],
+    'drink': ['to drink', 'sip'],
+    'give': ['to give', 'provide', 'offer'],
+    'take': ['to take', 'grab', 'get'],
+    'make': ['to make', 'create', 'produce', 'build'],
+    'do': ['to do', 'perform', 'execute'],
+    'say': ['to say', 'tell', 'state'],
+    'think': ['to think', 'believe', 'consider'],
+    'know': ['to know', 'understand'],
+    'want': ['to want', 'wish', 'desire'],
+    'need': ['to need', 'require'],
+    'help': ['to help', 'assist', 'aid', 'support'],
+    'work': ['to work', 'labor', 'job'],
+    'play': ['to play', 'game'],
+    'stop': ['to stop', 'halt', 'cease'],
+    'wait': ['to wait', 'hold on'],
+    'like': ['to like', 'enjoy', 'love'],
+    'love': ['to love', 'adore'],
+    'hate': ['to hate', 'dislike'],
+    'try': ['to try', 'attempt'],
+    'use': ['to use', 'utilize', 'employ'],
+    'find': ['to find', 'discover', 'locate'],
+    'get': ['to get', 'obtain', 'receive'],
+    'come': ['to come', 'arrive'],
+    'go': ['to go', 'travel', 'move'],
+    'buy': ['to buy', 'purchase'],
+    'sell': ['to sell', 'vend']
+  };
+  
+  function updateLoadingStatus(msg) {
+    const el = document.getElementById('loadingStatus');
+    if (el) el.textContent = msg;
+    console.log('Loading:', msg);
+  }
+  
+  // SESSION PERSISTENCE: Prüfe ob gespeicherte Session existiert
+  async function checkSavedSession() {
+    try {
+      const savedUser = localStorage.getItem('lmg_currentUser');
+      const savedPerformance = localStorage.getItem('lmg_userPerformance');
+      const savedSessionPerformance = localStorage.getItem('lmg_sessionPerformance');
+      
+      console.log('🔍 localStorage beim Restore:');
+      console.log('   savedUser:', !!savedUser);
+      console.log('   savedPerformance:', !!savedPerformance);
+      console.log('   savedSessionPerformance:', savedSessionPerformance);
+      console.log('   savedSessionPerformance parsed:', savedSessionPerformance ? JSON.parse(savedSessionPerformance) : 'null');
+      
+      if (savedUser) {
+        console.log('✓ Gespeicherte Session gefunden, stelle wieder her...');
+        
+        // Lade User-Daten
+        currentUser = JSON.parse(savedUser);
+        userPerformance = savedPerformance ? JSON.parse(savedPerformance) : {};
+        sessionPerformance = savedSessionPerformance ? JSON.parse(savedSessionPerformance) : {}; // Session-Tracking erhalten!
+        
+        console.log('🔍 Nach Restore:');
+        console.log('   sessionPerformance:', sessionPerformance);
+        console.log('   sessionPerformance keys:', Object.keys(sessionPerformance));
+        
+        // Lade Vokabeln und zeige Hauptseite
+        updateLoadingStatus('Stelle Session wieder her...');
+        await loadVocabs();
+        
+        // WICHTIG: Prüfe Streak beim Login!
+        await checkStreakOnLogin();
+        
+        showPageSelection();
+        
+        console.log('✓ Session wiederhergestellt für:', currentUser.name);
+        console.log('✓ Session Performance:', Object.keys(sessionPerformance).length, 'Einträge');
+      } else {
+        // Keine Session gespeichert → zurück zu index.html
+        console.log('Keine Session gefunden, leite zu index.html weiter');
+        window.location.href = 'index.html';
+      }
+    } catch (error) {
+      console.error('Fehler beim Wiederherstellen der Session:', error);
+      // Bei Fehler: zurück zum Login
+      localStorage.removeItem('lmg_currentUser');
+      localStorage.removeItem('lmg_userPerformance');
+      window.location.href = 'index.html';
+    }
+  }
+  
+  function initFirebase() {
+    let attempts = 0;
+    const maxAttempts = 20;
+    
+    function tryInit() {
+      attempts++;
+      updateLoadingStatus(`Versuch ${attempts}/${maxAttempts}...`);
+      
+      if (typeof firebase === 'undefined') {
+        if (attempts < maxAttempts) {
+          setTimeout(tryInit, 200);
+        } else {
+          document.getElementById('loadingScreen').innerHTML = 
+            '<p style="color: #e74c3c;">❌ Firebase konnte nicht geladen werden.</p>' +
+            '<p style="font-size: 14px;">Bitte Seite neu laden oder als HTML-Datei lokal öffnen.</p>';
+        }
+        return;
+      }
+      
+      try {
+        app = firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        
+        // Firebase App Check aktivieren (reCAPTCHA v3 - unsichtbar!)
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+          '6LcyqzEsAAAAADdyoXYe8Nz0RNXg0JF--msTJuSY', // reCAPTCHA Site Key
+          true // Auto-refresh Token
+        );
+        console.log('✓ App Check aktiviert (reCAPTCHA v3)');
+        
+        firebaseReady = true;
+        updateLoadingStatus('✓ Firebase bereit!');
+        
+        // SESSION PERSISTENCE: Auto-Login wenn Session gespeichert
+        checkSavedSession();
+        
+      } catch (e) {
+        document.getElementById('loadingScreen').innerHTML = 
+          '<p style="color: #e74c3c;">❌ Firebase Fehler: ' + e.message + '</p>';
+      }
+    }
+    
+    tryInit();
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initFirebase, 100));
+  } else {
+    setTimeout(initFirebase, 100);
+  }
+  
+  function showStatus(msg, type = 'info') {
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = type;
+    el.style.display = 'block';
+  }
+  
+  function showScreen(screenId) {
+    console.log("showScreen aufgerufen für:", screenId);
+    
+    // Verstecke alle Screens
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.style.display = 'none';
+      console.log("Verstecke:", s.id);
+    });
+    
+    // Zeige gewünschten Screen
+    const screen = document.getElementById(screenId);
+    if (screen) {
+      screen.classList.add('active');
+      screen.style.display = 'block';
+      console.log("✓ Zeige Screen:", screenId);
+    } else {
+      console.error("❌ Screen nicht gefunden:", screenId);
+    }
+  }
+  
+  // Login-Funktionen wurden entfernt - display.html nutzt Session von index.html
+  
+  async function loadVocabs() {
+    try {
+      console.log("=== loadVocabs START ===");
+      showStatus("Lade Vokabeln...", 'info');
+      
+      // GitHub Configuration
+      const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/';
+      const VOCAB_VERSION = '1.0.0'; // Bei Änderungen an Vokabeln hochzählen um Cache zu invalidieren
+      
+      // Map Jahrgang zu Dateinamen (alle lowercase: voc5_4.json, voc6_4.json etc.)
+      const vocabFileName = `voc${currentUser.jahrgang}_4.json`;
+      
+      console.log("Lade Vokabeln für Jahrgang:", currentUser.jahrgang, "Datei:", vocabFileName);
+      
+      // CACHE-CHECK: Prüfe ob Vokabeln im localStorage sind
+      const cacheKey = 'vocabs_' + currentUser.jahrgang;
+      const cacheVersionKey = 'vocabs_version_' + currentUser.jahrgang;
+      const cacheTimeKey = 'vocabs_time_' + currentUser.jahrgang;
+      const cached = localStorage.getItem(cacheKey);
+      const cachedVersion = localStorage.getItem(cacheVersionKey);
+      const cacheTime = localStorage.getItem(cacheTimeKey);
+      
+      // Cache ist 7 Tage gültig UND Version muss übereinstimmen
+      const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 Tage in ms
+      const now = Date.now();
+      
+      if (cached && cacheTime && cachedVersion === VOCAB_VERSION && 
+          (now - parseInt(cacheTime)) < CACHE_DURATION) {
+        console.log("✓ Vokabeln aus Cache geladen (gespart: ~200 KB Download)");
+        allVocabs = JSON.parse(cached);
+        showStatus("Vokabeln geladen! ✓", 'success');
+        console.log("Vokabeln aus Cache:", allVocabs.length);
+        console.log("=== loadVocabs ENDE (aus Cache) ===");
+        return;
+      }
+      
+      console.log("Cache miss, veraltet oder neue Version - lade von GitHub...");
+      
+      // Lade von GitHub mit Cache-Busting und explizitem UTF-8 Encoding
+      const vocabURL = `${GITHUB_BASE_URL}${vocabFileName}?v=${VOCAB_VERSION}`;
+      console.log("GitHub URL:", vocabURL);
+      
+      const response = await fetch(vocabURL, {
+        headers: {
+          'Accept': 'application/json; charset=UTF-8'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`GitHub HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      // Hole Text mit UTF-8 und parse dann zu JSON
+      const text = await response.text();
+      const data = JSON.parse(text);
+      console.log("JSON von GitHub geladen, Typ:", typeof data);
+      
+      // Konvertiere Object zu Array (wie bei Firebase)
+      if (typeof data === 'object' && !Array.isArray(data)) {
+        allVocabs = Object.values(data);
+      } else if (Array.isArray(data)) {
+        allVocabs = data;
+      } else {
+        throw new Error("Unerwartetes Datenformat von GitHub");
+      }
+      
+      console.log("Vokabeln geladen:", allVocabs.length, "für Jahrgang", currentUser.jahrgang);
+      
+      // CACHE: Speichere im localStorage mit Version
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(allVocabs));
+        localStorage.setItem(cacheVersionKey, VOCAB_VERSION);
+        localStorage.setItem(cacheTimeKey, now.toString());
+        console.log("✓ Vokabeln im Cache gespeichert (Version:", VOCAB_VERSION, ")");
+      } catch (e) {
+        console.warn("localStorage voll, ignoriere Cache:", e);
+      }
+      
+      if (allVocabs.length > 0) {
+        console.log("Erste Vokabel:", allVocabs[0]);
+      }
+      
+      console.log("Performance:", userPerformance);
+      
+      if (allVocabs.length === 0) {
+        showStatus("Vokabeln sind leer!", 'error');
+      } else {
+        showStatus("Vokabeln geladen! ✓", 'success');
+      }
+      
+      console.log("=== loadVocabs ENDE ===");
+    } catch (error) {
+      console.error("=== loadVocabs ERROR ===");
+      showStatus("Fehler beim Laden von GitHub: " + error.message, 'error');
+      console.error("LoadVocabs Error:", error);
+      console.error("Error stack:", error.stack);
+      
+      // Fallback-Info für Nutzer
+      if (error.message.includes('404')) {
+        showStatus("Vokabel-Datei nicht auf GitHub gefunden! Überprüfe URL.", 'error');
+      } else if (error.message.includes('Failed to fetch')) {
+        showStatus("Netzwerkfehler - bitte Internetverbindung prüfen", 'error');
+      }
+    }
+  }
+  
+  function showPageSelection() {
+    document.getElementById('userName').textContent = currentUser.name;
+    document.getElementById('userClass').textContent = currentUser.class;
+    
+    // Berechne Dashboard-Statistiken
+    calculateDashboardStats();
+    
+    // Leaderboard NICHT automatisch laden - nur bei Klick
+    // loadLeaderboard(); // ❌ Entfernt für Performance
+    
+    if (allVocabs.length === 0) {
+      showStatus("Keine Vokabeln für Jahrgang " + currentUser.jahrgang + " verfügbar!", 'error');
+      return;
+    }
+    
+    const pages = [...new Set(allVocabs.map(v => parseInt(v.Page)))].sort((a,b) => a-b);
+    
+    const fromSelect = document.getElementById('pageFrom');
+    const toSelect = document.getElementById('pageTo');
+    fromSelect.innerHTML = '';
+    toSelect.innerHTML = '';
+    
+    pages.forEach(page => {
+      fromSelect.innerHTML += `<option value="${page}">${page}</option>`;
+      toSelect.innerHTML += `<option value="${page}">${page}</option>`;
+    });
+    toSelect.selectedIndex = pages.length - 1;
+    
+    const grid = document.getElementById('pageGrid');
+    grid.innerHTML = '';
+    
+    console.log("Erstelle Grid mit Performance:", userPerformance);
+    
+    pages.forEach(page => {
+      const vocabCount = allVocabs.filter(v => parseInt(v.Page) === page).length;
+      const box = document.createElement('div');
+      box.className = 'page-box';
+      
+      // Performance-Daten laden
+      const pageKey = 'page_' + page;
+      const perf = userPerformance[pageKey];
+      
+      console.log("Seite", page, "Performance:", perf);
+      
+      if (vocabCount < 5) {
+        box.classList.add('disabled');
+      } else {
+        // Farbe basierend auf Performance
+        if (perf && perf.percent !== undefined) {
+          if (perf.percent === 100) {
+            box.classList.add('perfect');
+            console.log("Seite", page, "wird HELLGRÜN (100%)");
+          } else if (perf.percent >= 80) {
+            box.classList.add('green');
+            console.log("Seite", page, "wird GRÜN (", perf.percent, "%)");
+          } else if (perf.percent >= 50) {
+            box.classList.add('yellow');
+            console.log("Seite", page, "wird GELB (", perf.percent, "%)");
+          } else {
+            box.classList.add('red');
+            console.log("Seite", page, "wird ROT (", perf.percent, "%)");
+          }
+        } else {
+          console.log("Seite", page, "keine Performance-Daten");
+        }
+      }
+      
+      box.innerHTML = `
+        <div class="page-number">${page}</div>
+        ${perf && perf.percent !== undefined ? `<div class="page-percent">${perf.percent}%</div>` : ''}
+      `;
+      box.title = `${vocabCount} Vokabeln${perf ? ' - Letzter Score: ' + perf.percent + '%' : ''}`;
+      
+      if (vocabCount >= 5) {
+        box.onclick = () => startPageQuiz(page);
+      }
+      grid.appendChild(box);
+    });
+    
+    showScreen('pageSelectionScreen');
+    showStatus("Bereit zum Lernen! 🚀", 'success');
+  }
+  
+  function startPageQuiz(page) {
+    const vocabs = allVocabs.filter(v => parseInt(v.Page) === page);
+    if (vocabs.length < 5) {
+      showStatus("Zu wenig Vokabeln auf dieser Seite!", 'error');
+      return;
+    }
+    startQuiz(vocabs, 'page_' + page);
+  }
+  
+  function startIntervalQuiz() {
+    const from = parseInt(document.getElementById('pageFrom').value);
+    const to = parseInt(document.getElementById('pageTo').value);
+    
+    if (from > to) {
+      showStatus("'Von' muss kleiner als 'Bis' sein!", 'error');
+      return;
+    }
+    
+    // Sammle alle Vokabeln im Intervall
+    const allIntervalVocabs = allVocabs.filter(v => {
+      const page = parseInt(v.Page);
+      return page >= from && page <= to;
+    });
+    
+    if (allIntervalVocabs.length < 10) {
+      showStatus("Zu wenig Vokabeln in diesem Intervall (mindestens 10 benötigt)!", 'error');
+      return;
+    }
+    
+    // Gruppiere Vokabeln nach Seiten
+    const vocabsByPage = {};
+    allIntervalVocabs.forEach(v => {
+      const page = parseInt(v.Page);
+      if (!vocabsByPage[page]) {
+        vocabsByPage[page] = [];
+      }
+      vocabsByPage[page].push(v);
+    });
+    
+    const pages = Object.keys(vocabsByPage).map(p => parseInt(p));
+    const pageCount = pages.length;
+    
+    let selectedVocabs = [];
+    
+    if (pageCount === 1) {
+      // Nur eine Seite: 15 Vokabeln von dieser Seite
+      const shuffled = vocabsByPage[pages[0]].sort(() => 0.5 - Math.random());
+      selectedVocabs = shuffled.slice(0, Math.min(15, shuffled.length));
+    } else if (pageCount === 2) {
+      // Zwei Seiten: je ~7-8 Vokabeln (gesamt 15)
+      pages.forEach(page => {
+        const shuffled = vocabsByPage[page].sort(() => 0.5 - Math.random());
+        const count = Math.ceil(15 / 2);
+        selectedVocabs = selectedVocabs.concat(shuffled.slice(0, Math.min(count, shuffled.length)));
+      });
+    } else {
+      // 3+ Seiten: Wähle zufällig 3 Seiten, je 5 Vokabeln
+      const shuffledPages = pages.sort(() => 0.5 - Math.random());
+      const selectedPages = shuffledPages.slice(0, 3);
+      
+      selectedPages.forEach(page => {
+        const shuffled = vocabsByPage[page].sort(() => 0.5 - Math.random());
+        selectedVocabs = selectedVocabs.concat(shuffled.slice(0, Math.min(5, shuffled.length)));
+      });
+    }
+    
+    // Prüfe ob genug Vokabeln gesammelt wurden
+    if (selectedVocabs.length < 10) {
+      showStatus("Zu wenig Vokabeln verfügbar! Wähle ein größeres Intervall.", 'error');
+      return;
+    }
+    
+    // Shuffle final selection
+    selectedVocabs = selectedVocabs.sort(() => 0.5 - Math.random());
+    
+    startQuiz(selectedVocabs, 'interval_' + from + '_' + to, true);
+  }
+  
+  function startQuiz(vocabPool, performanceKey = null, isPreselected = false) {
+    if (isPreselected) {
+      // Vokabeln wurden bereits intelligent ausgewählt (bei Intervall)
+      quizVocabs = vocabPool;
+    } else {
+      // Normale Auswahl: shuffle und nimm bis zu 10
+      const shuffled = vocabPool.sort(() => 0.5 - Math.random());
+      quizVocabs = shuffled.slice(0, Math.min(10, vocabPool.length));
+    }
+    
+    currentQuestionIndex = 0;
+    score = 0;
+    answers = [];
+    window.currentPerformanceKey = performanceKey;
+    
+    document.getElementById('totalQuestions').textContent = quizVocabs.length;
+    
+    showScreen('quizScreen');
+    showQuestion();
+  }
+  
+  function showQuestion() {
+    if (currentQuestionIndex >= quizVocabs.length) {
+      showResults();
+      return;
+    }
+    
+    // Setze Processing-Lock zurück für neue Frage
+    isProcessingAnswer = false;
+    
+    const vocab = quizVocabs[currentQuestionIndex];
+    
+    document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+    document.getElementById('questionWord').textContent = vocab.German;
+    document.getElementById('answerInput').value = '';
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('answerInput').focus();
+    document.getElementById('submitBtn').disabled = false;
+    
+    startTimer();
+  }
+  
+  function startTimer() {
+    timeLeft = 15;
+    document.getElementById('timer').textContent = timeLeft;
+    document.getElementById('timer').classList.remove('warning');
+    
+    if (timer) clearInterval(timer);
+    
+    timer = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timer').textContent = timeLeft;
+      
+      if (timeLeft <= 5) {
+        document.getElementById('timer').classList.add('warning');
+      }
+      
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        submitAnswer(true);
+      }
+    }, 1000);
+  }
+  
+  // Lock-Variable um mehrfaches Absenden zu verhindern
+  let isProcessingAnswer = false;
+  
+  function submitAnswer(timeout = false) {
+    // Verhindere mehrfaches Absenden (Enter-Spam-Schutz)
+    if (isProcessingAnswer) {
+      return;
+    }
+    isProcessingAnswer = true;
+    
+    clearInterval(timer);
+    
+    const vocab = quizVocabs[currentQuestionIndex];
+    const userAnswer = document.getElementById('answerInput').value.trim();
+    
+    if (timeout) {
+      answers.push({
+        question: vocab.German,
+        correct: vocab.English,
+        user: "(keine Antwort)",
+        isCorrect: false
+      });
+      document.getElementById('feedback').textContent = "⏰ Zeit abgelaufen! Richtig wäre: " + vocab.English;
+      document.getElementById('feedback').className = 'feedback wrong';
+      document.getElementById('submitBtn').disabled = true;
+      
+      setTimeout(() => {
+        currentQuestionIndex++;
+        showQuestion();
+      }, 2000);
+      return;
+    }
+    
+    document.getElementById('submitBtn').disabled = true;
+    
+    // Prüfe Antwort (ohne AI, nur mit Regeln und Synonymen)
+    checkAnswer(userAnswer, vocab);
+  }
+  
+  function checkAnswer(userAnswer, vocab) {
+    const correctAnswer = vocab.English;
+    
+    // Normalisiere beide Antworten
+    let userNorm = userAnswer.toLowerCase().trim();
+    let correctNorm = correctAnswer.toLowerCase().trim();
+    
+    // Entferne Satzzeichen wie "...", ".", "!", "?" etc.
+    const removePunctuation = (text) => {
+      return text.replace(/[.!?,;:…]+$/g, '').trim(); // Entferne am Ende
+    };
+    
+    userNorm = removePunctuation(userNorm);
+    correctNorm = removePunctuation(correctNorm);
+    
+    // KONTRAKTION-NORMALISIERUNG: Erlaube Langformen für Kurzformen
+    // Wandle Kontraktionen in Langformen um, damit beide Versionen akzeptiert werden
+    const normalizeContractions = (text) => {
+      return text
+        // Negative Kontraktionen
+        .replace(/\bisn't\b/gi, 'is not')
+        .replace(/\baren't\b/gi, 'are not')
+        .replace(/\bwasn't\b/gi, 'was not')
+        .replace(/\bweren't\b/gi, 'were not')
+        .replace(/\bhasn't\b/gi, 'has not')
+        .replace(/\bhaven't\b/gi, 'have not')
+        .replace(/\bhadn't\b/gi, 'had not')
+        .replace(/\bwon't\b/gi, 'will not')
+        .replace(/\bwouldn't\b/gi, 'would not')
+        .replace(/\bshan't\b/gi, 'shall not')
+        .replace(/\bshouldn't\b/gi, 'should not')
+        .replace(/\bcan't\b/gi, 'can not')
+        .replace(/\bcannot\b/gi, 'can not')
+        .replace(/\bcouldn't\b/gi, 'could not')
+        .replace(/\bmightn't\b/gi, 'might not')
+        .replace(/\bmustn't\b/gi, 'must not')
+        .replace(/\bneedn't\b/gi, 'need not')
+        .replace(/\bdon't\b/gi, 'do not')
+        .replace(/\bdoesn't\b/gi, 'does not')
+        .replace(/\bdidn't\b/gi, 'did not')
+        // Positive Kontraktionen
+        .replace(/\bi'm\b/gi, 'i am')
+        .replace(/\byou're\b/gi, 'you are')
+        .replace(/\bhe's\b/gi, 'he is')  // Ambig: "he is" oder "he has" - wir nehmen "is"
+        .replace(/\bshe's\b/gi, 'she is')
+        .replace(/\bit's\b/gi, 'it is')
+        .replace(/\bwe're\b/gi, 'we are')
+        .replace(/\bthey're\b/gi, 'they are')
+        .replace(/\bthat's\b/gi, 'that is')
+        .replace(/\bwho's\b/gi, 'who is')
+        .replace(/\bwhat's\b/gi, 'what is')
+        .replace(/\bwhere's\b/gi, 'where is')
+        .replace(/\bwhen's\b/gi, 'when is')
+        .replace(/\bwhy's\b/gi, 'why is')
+        .replace(/\bhow's\b/gi, 'how is')
+        .replace(/\bthere's\b/gi, 'there is')
+        .replace(/\bhere's\b/gi, 'here is')
+        // "have" Kontraktionen
+        .replace(/\bi've\b/gi, 'i have')
+        .replace(/\byou've\b/gi, 'you have')
+        .replace(/\bwe've\b/gi, 'we have')
+        .replace(/\bthey've\b/gi, 'they have')
+        // "would/had" Kontraktionen
+        .replace(/\bi'd\b/gi, 'i would')  // Auch "i had" möglich
+        .replace(/\byou'd\b/gi, 'you would')
+        .replace(/\bhe'd\b/gi, 'he would')
+        .replace(/\bshe'd\b/gi, 'she would')
+        .replace(/\bwe'd\b/gi, 'we would')
+        .replace(/\bthey'd\b/gi, 'they would')
+        // "will" Kontraktionen
+        .replace(/\bi'll\b/gi, 'i will')
+        .replace(/\byou'll\b/gi, 'you will')
+        .replace(/\bhe'll\b/gi, 'he will')
+        .replace(/\bshe'll\b/gi, 'she will')
+        .replace(/\bit'll\b/gi, 'it will')
+        .replace(/\bwe'll\b/gi, 'we will')
+        .replace(/\bthey'll\b/gi, 'they will')
+        .replace(/\bthat'll\b/gi, 'that will')
+        .trim();
+    };
+    
+    // Normalisiere BEIDE Antworten (User UND korrekte Antwort)
+    userNorm = normalizeContractions(userNorm);
+    correctNorm = normalizeContractions(correctNorm);
+    
+    // Ersetze Abkürzungen mit vollen Wörtern für flexibleren Vergleich
+    const expandAbbreviations = (text) => {
+      return text
+        .replace(/\bsb\./gi, 'somebody')
+        .replace(/\bsb\b/gi, 'somebody')
+        .replace(/\bsth\./gi, 'something')
+        .replace(/\bsth\b/gi, 'something')
+        .trim();
+    };
+    
+    // Erweitere beide Versionen
+    const userExpanded = expandAbbreviations(userNorm);
+    const correctExpanded = expandAbbreviations(correctNorm);
+    
+    // Nutze die erweiterten Versionen für Vergleiche
+    userNorm = userExpanded;
+    correctNorm = correctExpanded;
+    
+    // Erstelle auch eine Version OHNE Klammer-Inhalte für Vergleich
+    // "subject (school)" → "subject"
+    const correctWithoutBrackets = correctNorm.replace(/\s*\([^)]*\)/g, '').trim();
+    
+    // WICHTIG: Nutze die Version OHNE Klammern für weitere Prüfungen!
+    const correctNoBrackets = correctWithoutBrackets;
+    const userNoBrackets = userNorm;
+    
+    // 1. Exakte Übereinstimmung (case-insensitive ist schon durch normalisierung)
+    if (userNoBrackets === correctNoBrackets) {
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 1a. Übereinstimmung MIT Original (falls Klammern im Original waren)
+    if (userNorm === correctNorm) {
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 1b. KOMMA-TOLERANZ: Prüfe ob die Antwort nur wegen fehlender Kommas falsch ist
+    // "Yes that is right" vs "Yes, that is right" → halber Fehler
+    const userNoCommas = userNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+    const correctNoCommas = correctNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+    
+    if (userNoCommas === correctNoCommas && userNoBrackets !== correctNoBrackets) {
+      // Nur wenn die Kommas unterschiedlich sind (aber sonst identisch)
+      console.log("⚠️ Komma(s) vergessen:", userAnswer, "→ Richtig:", correctAnswer);
+      handleAnswerResult('half', userAnswer, vocab, correctAnswer, -1, 'comma');
+      return;
+    }
+    
+    // 1c. RADIKALE VEREINFACHUNG: Wenn die User-Antwort (min. 4 Buchstaben) 
+    // IRGENDWO in der korrekten Antwort vorkommt, ist es richtig.
+    // Das vermeidet Grenzfälle und ist großzügig bei Variationen.
+    
+    // Entferne Leerzeichen für Substring-Check
+    const userNoSpaces = userNoBrackets.replace(/\s+/g, '');
+    const correctNoSpaces = correctNoBrackets.replace(/\s+/g, '');
+    
+    // Prüfe ob User-Eingabe lang genug ist (min. 4 Buchstaben)
+    if (userNoSpaces.length >= 4) {
+      // Prüfe ob die User-Antwort in der korrekten Antwort enthalten ist
+      if (correctNoSpaces.includes(userNoSpaces)) {
+        console.log("✓ User-Antwort in Lösung enthalten:", userAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+      
+      // ODER: Prüfe ob die korrekte Antwort in der User-Antwort enthalten ist
+      // (z.B. User: "newspaper", Richtig: "paper")
+      if (userNoSpaces.includes(correctNoSpaces)) {
+        console.log("✓ Lösung in User-Antwort enthalten:", userAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+    }
+    
+    // 2. ERWEITERTE VERB-PRÜFUNG - alle Variationen akzeptieren
+    // Entferne (to), to, (To), (TO) etc. und vergleiche nur das Verb
+    const cleanVerb = (text) => {
+      return text
+        .toLowerCase()
+        .replace(/^\(to\)\s*/i, '')  // Entferne (to), (To), (TO)
+        .replace(/^to\s+/i, '')       // Entferne to, To, TO
+        .trim();
+    };
+    
+    const userVerbClean = cleanVerb(userNoBrackets);
+    const correctVerbClean = cleanVerb(correctNoBrackets);
+    
+    if (userVerbClean === correctVerbClean) {
+      console.log("✓ Verb akzeptiert (verschiedene to-Varianten):", userAnswer, "=", correctAnswer);
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 3. Prüfe Synonyme aus dem hardcoded Dictionary
+    const correctSynonyms = synonyms[correctNorm] || [];
+    if (correctSynonyms.includes(userNorm)) {
+      console.log("✓ Synonym akzeptiert (Dictionary):", userAnswer, "für", correctAnswer);
+      handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 4. Prüfe Synonyme aus den Vokabel-Daten (vocab.synonyms)
+    if (vocab.synonyms && Array.isArray(vocab.synonyms)) {
+      const vocabSynonyms = vocab.synonyms.map(s => s.toLowerCase().trim());
+      
+      // Prüfe direkt
+      if (vocabSynonyms.includes(userNorm)) {
+        console.log("✓ Synonym akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+      
+      // Prüfe auch ohne (to) für Verben
+      const vocabSynonymsClean = vocabSynonyms.map(s => cleanVerb(s));
+      if (vocabSynonymsClean.includes(userVerbClean)) {
+        console.log("✓ Synonym-Verb akzeptiert (Vokabel-Daten):", userAnswer, "für", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+    }
+    
+    // 5. Prüfe ob Userantwort in der Synonym-Liste der richtigen Antwort ist (Dictionary)
+    for (let key in synonyms) {
+      // Prüfe direkt
+      if (synonyms[key].includes(correctNorm) && synonyms[key].includes(userNorm)) {
+        console.log("✓ Beide sind Synonyme (Dictionary):", userAnswer, "=", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+      
+      // Prüfe auch ohne (to) für Verben
+      const keyClean = cleanVerb(key);
+      const synonymsClean = synonyms[key].map(s => cleanVerb(s));
+      const correctClean = cleanVerb(correctNorm);
+      
+      if ((keyClean === correctClean || synonymsClean.includes(correctClean)) && 
+          (keyClean === userVerbClean || synonymsClean.includes(userVerbClean))) {
+        console.log("✓ Beide sind Synonyme-Verben (Dictionary):", userAnswer, "=", correctAnswer);
+        handleAnswerResult(true, userAnswer, vocab, correctAnswer);
+        return;
+      }
+    }
+    
+    // Prüfe auf offensichtlichen Nonsense (mehrere gleiche Buchstaben hintereinander)
+    const hasNonsense = /(.)\1{3,}/.test(userNorm); // 4+ gleiche Buchstaben nacheinander
+    if (hasNonsense) {
+      console.log("❌ Nonsense-Eingabe erkannt");
+      handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 6. BUCHSTABENDREHER-PRÜFUNG (unabhängig von Distance!)
+    // "door" vs "doro", "window" vs "wnidow", "cupboard" vs "cupboadr"  
+    // Mindestlänge: 3 Buchstaben
+    console.log("Vor Buchstabendreher-Check:", {
+      userLength: userNoBrackets.length,
+      correctLength: correctNoBrackets.length,
+      sameLength: userNoBrackets.length === correctNoBrackets.length,
+      userNoBrackets,
+      correctNoBrackets
+    });
+    
+    if (userNoBrackets.length >= 3 && correctNoBrackets.length >= 3 && userNoBrackets.length === correctNoBrackets.length) {
+      console.log("Prüfe Buchstabendreher:", userNoBrackets, "vs", correctNoBrackets);
+      const transPos = findTransposition(userNoBrackets, correctNoBrackets);
+      console.log("Transposition Position:", transPos);
+      if (transPos >= 0) {
+        console.log("⚠️ Buchstabendreher erkannt:", userAnswer, "vs", correctAnswer);
+        handleAnswerResult('half', userAnswer, vocab, correctAnswer, transPos);
+        return;
+      }
+    } else {
+      console.log("Buchstabendreher-Check übersprungen (Längen-Check failed)");
+    }
+    
+    // 7. INTELLIGENTE TIPPFEHLER-ERKENNUNG
+    const distance = getLevenshteinDistance(userNoBrackets, correctNoBrackets);
+    
+    // WICHTIGE LOGIK (OHNE AI):
+    // - Distance 1-2: Wort ist ÄHNLICH → wahrscheinlich Tippfehler → FALSCH
+    // - Distance >2: Wort ist ANDERS → unbekanntes Synonym → FALSCH
+    // Nur exakte Übereinstimmungen und definierte Synonyme werden akzeptiert!
+    
+    if (distance >= 1 && distance <= 2) {
+      // Kleine Abweichung = Tippfehler
+      console.log("❌ Tippfehler erkannt (Distance:", distance, ")");
+      handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+      return;
+    }
+    
+    // 7. Alles andere: Falsch (keine AI-Prüfung mehr)
+    // Wenn wir bis hier gekommen sind, ist die Antwort nicht korrekt
+    console.log("❌ Antwort nicht erkannt. Bitte exakte Schreibweise oder definiertes Synonym verwenden.");
+    handleAnswerResult(false, userAnswer, vocab, correctAnswer);
+  }
+  
+  // Finde Position des Buchstabendrehers (verbesserte Version)
+  function findTransposition(a, b) {
+    if (a.length !== b.length) return -1;
+    
+    // Finde alle Positionen die unterschiedlich sind
+    let diffs = [];
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        diffs.push(i);
+      }
+    }
+    
+    // Muss genau 2 Unterschiede geben
+    if (diffs.length !== 2) return -1;
+    
+    const [pos1, pos2] = diffs;
+    
+    // Prüfe ob es ein Dreher ist (Buchstaben sind vertauscht)
+    // "gilr" vs "girl": Position 1,2 -> g[i]l[r] vs g[i]r[l] -> i!=i ABER l==l und r==r vertauscht
+    if (a[pos1] === b[pos2] && a[pos2] === b[pos1]) {
+      return Math.min(pos1, pos2); // Gib die erste Position zurück
+    }
+    
+    return -1;
+  }
+  
+  // Levenshtein Distance für Tippfehler-Toleranz
+  function getLevenshteinDistance(a, b) {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+    
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[b.length][a.length];
+  }
+  
+  function handleAnswerResult(isCorrect, userAnswer, vocab, correctAnswer, transpositionPos, errorType) {
+    let scoreIncrement = 0;
+    
+    if (isCorrect === 'half') {
+      // HALBRICHTIG: Buchstabendreher ODER Komma vergessen
+      scoreIncrement = 0.5;
+      score += 0.5;
+      
+      if (errorType === 'comma') {
+        // Komma-Fehler
+        document.getElementById('feedback').innerHTML = "⚠️ Fast! Komma(s) vergessen: " + userAnswer + " → Richtig: " + correctAnswer;
+        document.getElementById('feedback').className = 'feedback half';
+      } else {
+        // Buchstabendreher
+        let markedAnswer = userAnswer;
+        if (transpositionPos >= 0 && transpositionPos < userAnswer.length - 1) {
+          const before = userAnswer.substring(0, transpositionPos);
+          const char1 = userAnswer[transpositionPos];
+          const char2 = userAnswer[transpositionPos + 1];
+          const after = userAnswer.substring(transpositionPos + 2);
+          markedAnswer = before + '<span style="color:#e74c3c; font-weight:700;">' + char1 + char2 + '</span>' + after;
+        }
+        
+        document.getElementById('feedback').innerHTML = "⚠️ Fast! Buchstabendreher: " + markedAnswer + " → Richtig: " + correctAnswer;
+        document.getElementById('feedback').className = 'feedback half';
+      }
+      
+    } else if (isCorrect) {
+      // RICHTIG
+      scoreIncrement = 1;
+      score++;
+      document.getElementById('feedback').textContent = "✓ Richtig!";
+      document.getElementById('feedback').className = 'feedback correct';
+      
+    } else {
+      // FALSCH
+      scoreIncrement = 0;
+      document.getElementById('feedback').textContent = "✗ Falsch! Richtig: " + correctAnswer;
+      document.getElementById('feedback').className = 'feedback wrong';
+    }
+    
+    answers.push({
+      question: vocab.German,
+      correct: correctAnswer,
+      user: userAnswer || "(keine Antwort)",
+      isCorrect: isCorrect === 'half' ? 'half' : isCorrect,
+      scoreValue: scoreIncrement
+    });
+    
+    setTimeout(() => {
+      currentQuestionIndex++;
+      showQuestion();
+    }, 2000);
+  }
+  
+  function showResults() {
+    const percent = Math.round((score / quizVocabs.length) * 100);
+    
+    document.getElementById('scorePercent').textContent = percent + '%';
+    document.getElementById('scoreCount').textContent = score;
+    document.getElementById('scoreTotalCount').textContent = quizVocabs.length;
+    
+    const resultsList = document.getElementById('resultsList');
+    resultsList.innerHTML = '';
+    
+    answers.forEach(answer => {
+      const item = document.createElement('div');
+      
+      // Bestimme die Klasse basierend auf dem Status
+      let statusClass = 'wrong';
+      let statusIcon = '✗';
+      if (answer.isCorrect === true) {
+        statusClass = 'correct';
+        statusIcon = '✓';
+      } else if (answer.isCorrect === 'half') {
+        statusClass = 'half';
+        statusIcon = '⚠️';
+      }
+      
+      item.className = 'result-item ' + statusClass;
+      item.innerHTML = `
+        <div>
+          <div class="result-word">${answer.question}</div>
+          <div class="result-answer">
+            Deine Antwort: ${answer.user}<br>
+            Richtig: ${answer.correct}
+            ${answer.isCorrect === 'half' ? '<br><small style="color:#856404;">Buchstabendreher - halbe Punkte</small>' : ''}
+          </div>
+        </div>
+        <div style="font-size: 24px;">
+          ${statusIcon}
+        </div>
+      `;
+      resultsList.appendChild(item);
+    });
+    
+    // Speichere Performance in Firebase
+    savePerformance(percent);
+    
+    showScreen('resultsScreen');
+  }
+  
+  async function savePerformance(percent) {
+    if (!currentUser || !window.currentPerformanceKey) {
+      console.log("Speichern abgebrochen: kein User oder Key");
+      return;
+    }
+    
+    try {
+      const perfData = {
+        percent: percent,
+        score: score,
+        total: quizVocabs.length,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('de-DE')
+      };
+      
+      console.log("Speichere Performance:", window.currentPerformanceKey, perfData);
+      
+      // Verwende userKey statt name für Firebase-Pfad
+      const userPath = currentUser.userKey || currentUser.name;
+      
+      // Prüfe ob es ein Intervall-Test ist
+      const isIntervalTest = window.currentPerformanceKey.startsWith('interval_');
+      
+      if (isIntervalTest) {
+        // Bei Intervall: Berechne Performance pro Seite
+        console.log("Intervall-Test erkannt, berechne Performance pro Seite...");
+        
+        // Gruppiere Antworten nach Seite
+        const pageStats = {};
+        
+        answers.forEach(answer => {
+          // Finde die Vokabel um die Seite zu bekommen
+          const vocab = quizVocabs.find(v => v.German === answer.question);
+          if (vocab) {
+            const page = parseInt(vocab.Page);
+            if (!pageStats[page]) {
+              pageStats[page] = { correct: 0, total: 0 };
+            }
+            pageStats[page].total++;
+            if (answer.isCorrect) {
+              pageStats[page].correct++;
+            }
+          }
+        });
+        
+        // Speichere jede Seite einzeln (nur wenn mindestens 5 Vokabeln getestet wurden)
+        for (let page in pageStats) {
+          const stats = pageStats[page];
+          
+          // Nur speichern wenn mindestens 5 Vokabeln von dieser Seite getestet wurden
+          if (stats.total < 5) {
+            console.log(`Seite ${page}: Zu wenig Vokabeln getestet (${stats.total}), überspringe Speicherung`);
+            continue;
+          }
+          
+          const pagePercent = Math.round((stats.correct / stats.total) * 100);
+          const pageKey = 'page_' + page;
+          
+          // Prüfe ob bereits besserer Score existiert
+          const existingPagePerf = userPerformance[pageKey];
+          if (existingPagePerf && existingPagePerf.percent >= pagePercent) {
+            console.log(`Seite ${page}: Bestehender Score besser (${existingPagePerf.percent}% vs ${pagePercent}%)`);
+            continue;
+          }
+          
+          const pageData = {
+            percent: pagePercent,
+            score: stats.correct,
+            total: stats.total,
+            timestamp: new Date().toISOString(),
+            date: new Date().toLocaleDateString('de-DE'),
+            fromInterval: window.currentPerformanceKey
+          };
+          
+          console.log(`Speichere Seite ${page}:`, pageData);
+          userPerformance[pageKey] = pageData;
+          sessionPerformance[pageKey] = pageData; // Track für Session
+          await db.ref('users/' + userPath + '/performance/' + pageKey).set(pageData);
+        }
+        
+        showStatus('Performance gespeichert! Einzelne Seiten aktualisiert. 💾', 'success');
+      }
+      
+      // Speichere auch den Gesamt-Intervall-Score (wie bisher)
+      
+      // WICHTIG: sessionPerformance immer aktualisieren für Time-Logging!
+      // (auch wenn Score schlechter ist als der Rekord)
+      sessionPerformance[window.currentPerformanceKey] = perfData;
+      console.log('✓ sessionPerformance aktualisiert:', window.currentPerformanceKey, perfData);
+      
       // UPDATE STREAK nach erfolgreichem Üben (IMMER, auch bei schlechterem Score!)
       await updateStreak();
       
