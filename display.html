@@ -2575,7 +2575,7 @@
       
       currentUser.lifetimeTotalVocabs = newLifetimeTotal;
       
-      const userPath = currentUser.userKey.replace(/\./g, '_');
+      // userPath ist bereits oben deklariert, nutze es einfach
       await db.ref('users/' + userPath + '/lifetimeTotalVocabs').set(newLifetimeTotal);
       
       console.log(`✓ lifetimeTotalVocabs aktualisiert: ${currentLifetimeTotal} + ${vocabsJustPracticed} = ${newLifetimeTotal}`);
