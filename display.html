@@ -1372,6 +1372,9 @@
       </div>
       
       <div style="text-align: center;">
+        <button onclick="goToMontiGame()" style="background: linear-gradient(135deg, #FFB700 0%, #FF8C00 100%); margin-bottom: 10px;">
+          <span>🦅</span> Monti Flug spielen
+        </button>
         <button onclick="logout()" class="modern-logout">
           <span>🚪</span> Logout
         </button>
@@ -3312,6 +3315,20 @@
   function backToSelection() {
     // Lade Performance neu, damit die Farben aktualisiert werden
     showPageSelection();
+  }
+  
+  function goToMontiGame() {
+    // Speichere aktuelle Session-Daten für Monti Game
+    try {
+      localStorage.setItem('lmg_currentUser', JSON.stringify(currentUser));
+      localStorage.setItem('lmg_userPerformance', JSON.stringify(userPerformance));
+      console.log('✓ Session-Daten für Monti Game gespeichert');
+    } catch (e) {
+      console.warn('localStorage Fehler:', e);
+    }
+    
+    // Leite zu Monti Game weiter
+    window.location.href = "montigame.html";
   }
   
   async function logout() {
