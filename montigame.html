@@ -478,11 +478,22 @@
                     
                     // Mappe Klassennamen zu Dateinamen
                     let vocabFile;
-                    if (className === 'class5a' || className === 'class5b' || className === 'class5') {
+                    if (className === '5a' || className === '5b' || className === '5' || 
+                        className === 'class5a' || className === 'class5b' || className === 'class5') {
                         vocabFile = 'voc5_4.json';
+                    } else if (className === '6' || className === 'class6') {
+                        vocabFile = 'voc6_4.json';
+                    } else if (className === '7' || className === 'class7') {
+                        vocabFile = 'voc7_4.json';
+                    } else if (className === '8' || className === 'class8') {
+                        vocabFile = 'voc8_4.json';
+                    } else if (className === '9' || className === 'class9') {
+                        vocabFile = 'voc9_4.json';
+                    } else if (className === '10' || className === 'class10') {
+                        vocabFile = 'voc10_4.json';
                     } else {
-                        // Für andere Klassen: class6 -> voc6_4.json
-                        vocabFile = `voc${className.replace('class', '')}_4.json`;
+                        // Fallback
+                        vocabFile = 'voc5_4.json';
                     }
                     
                     console.log('🔍 vocabFile:', vocabFile);
@@ -498,7 +509,9 @@
                     console.log('✓ JSON geladen, insgesamt', allVocabs.length, 'Vokabeln');
                     
                     // Filtere nur Vokabeln von geübten Seiten
-                    availableVocabs = allVocabs.filter(v => practicedPages.includes(v.page));
+                    availableVocabs = allVocabs.filter(v => 
+                        practicedPages.includes(parseInt(v.Page))
+                    );
                     
                     console.log('✓ Gefilterte Vokabeln von geübten Seiten:', availableVocabs.length);
                     console.log('✓ Beispiel-Vokabel:', availableVocabs[0]);
@@ -529,7 +542,7 @@
         function selectRandomVocab() {
             // Filtere bereits verwendete Vokabeln raus
             const unused = availableVocabs.filter(v => 
-                !usedVocabs.some(used => used.english === v.english)
+                !usedVocabs.some(used => used.English === v.English)
             );
             
             // Wenn alle verwendet wurden, reset
@@ -544,8 +557,8 @@
             usedVocabs.push(randomVocab);
             
             currentVocab = {
-                question: randomVocab.german, // Frage ist auf Deutsch
-                answers: [randomVocab.english, ...(randomVocab.synonyms || [])] // Antworten sind Englisch + Synonyme
+                question: randomVocab.German, // Frage ist auf Deutsch
+                answers: [randomVocab.English, ...(randomVocab.synonyms || [])] // Antworten sind Englisch + Synonyme
             };
             
             console.log('Neue Vokabel:', currentVocab);
