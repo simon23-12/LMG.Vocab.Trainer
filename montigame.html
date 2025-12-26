@@ -409,6 +409,10 @@
         </div>
     </div>
 
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Game State
@@ -436,6 +440,25 @@
         let availableVocabs = []; // Vokabeln von geübten Seiten
         let currentVocab = null;
         let usedVocabs = []; // Bereits gespielte Vokabeln in dieser Session
+        let highscore = 0; // Bester Score
+        
+        // Firebase initialisieren für Highscore-Speicherung
+        let db = null;
+        
+        function initFirebase() {
+            try {
+                if (typeof firebase === 'undefined') {
+                    console.warn('Firebase nicht geladen, Highscore-Speicherung nicht verfügbar');
+                    return;
+                }
+                
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                console.log('✓ Firebase initialisiert für Highscore');
+            } catch (error) {
+                console.error('Firebase Init Fehler:', error);
+            }
+        }
 
         // Lade User-Daten und Vokabeln
         async function loadUserAndVocabs() {
@@ -455,6 +478,19 @@
                 
                 console.log('✓ User geladen:', currentUser.name);
                 console.log('✓ Performance:', userPerformance);
+                
+                // Lade Highscore aus Firebase
+                if (db && currentUser.userKey) {
+                    try {
+                        const snapshot = await db.ref('users/' + currentUser.userKey + '/montiGameHighscore').once('value');
+                        highscore = snapshot.val() || 0;
+                        console.log('✓ Highscore geladen:', highscore);
+                        document.getElementById('highscore-value').textContent = highscore;
+                    } catch (error) {
+                        console.error('Fehler beim Laden des Highscores:', error);
+                        highscore = 0;
+                    }
+                }
                 
                 // Finde alle geübten Seiten
                 const practicedPages = Object.keys(userPerformance).map(key => {
@@ -1103,27 +1139,7 @@
 
         function handleTimeout() {
             // Zeit abgelaufen - behandle wie falsche Antwort
-            const newAltitude = Math.max(gameState.altitude - 50, 0);
-            gameState.altitude = newAltitude;
-            targetAltitude = newAltitude;
-            
-            triggerFall();
-            showPointsPopup('-50 Meter', false);
-            showFeedback('Zeit abgelaufen! ✗', false);
-            updateUI();
-            
-            document.getElementById('vocab-input').value = '';
-            
-            if (gameState.altitude <= 0) {
-                setTimeout(() => {
-                    endGame();
-                }, 1000);
-            } else {
-                // Wähle neue Vokabel
-                selectRandomVocab();
-                
-                startVocabTimer(); // Neuer Timer für nächste Vokabel
-            }
+            handleWrongAnswer();
         }
 
         function updateUI() {
@@ -1133,64 +1149,195 @@
         }
 
         function checkAnswer(answer) {
-            const normalizedAnswer = answer.trim().toLowerCase();
-            const correctAnswers = currentVocab.answers.map(a => a.toLowerCase());
+            const userAnswer = answer.trim();
             
-            if (correctAnswers.includes(normalizedAnswer)) {
-                // Correct!
-                clearInterval(vocabTimer); // Stop timer
+            // Normalisierung (wie in display.html)
+            const normalize = (text) => {
+                return text
+                    .toLowerCase()
+                    .replace(/[.,!?;:]/g, '') // Entferne Satzzeichen
+                    .replace(/\s+/g, ' ')     // Mehrfache Leerzeichen → einfach
+                    .trim();
+            };
+            
+            let userNorm = normalize(userAnswer);
+            
+            // Erweitere Kontraktionen (wie in display.html)
+            const normalizeContractions = (text) => {
+                return text
+                    .replace(/\bdon't\b/gi, 'do not')
+                    .replace(/\bdoesn't\b/gi, 'does not')
+                    .replace(/\bcan't\b/gi, 'cannot')
+                    .replace(/\bwon't\b/gi, 'will not')
+                    .replace(/\bshouldn't\b/gi, 'should not')
+                    .replace(/\bwouldn't\b/gi, 'would not')
+                    .replace(/\bcouldn't\b/gi, 'could not')
+                    .replace(/\bisn't\b/gi, 'is not')
+                    .replace(/\baren't\b/gi, 'are not')
+                    .replace(/\bwasn't\b/gi, 'was not')
+                    .replace(/\bweren't\b/gi, 'were not')
+                    .replace(/\bhasn't\b/gi, 'has not')
+                    .replace(/\bhaven't\b/gi, 'have not')
+                    .replace(/\bhadn't\b/gi, 'had not')
+                    .replace(/\bi'm\b/gi, 'i am')
+                    .replace(/\byou're\b/gi, 'you are')
+                    .replace(/\bhe's\b/gi, 'he is')
+                    .replace(/\bshe's\b/gi, 'she is')
+                    .replace(/\bit's\b/gi, 'it is')
+                    .replace(/\bwe're\b/gi, 'we are')
+                    .replace(/\bthey're\b/gi, 'they are')
+                    .replace(/\bthat's\b/gi, 'that is')
+                    .replace(/\bwho's\b/gi, 'who is')
+                    .replace(/\bwhat's\b/gi, 'what is')
+                    .replace(/\bhere's\b/gi, 'here is')
+                    .replace(/\bi've\b/gi, 'i have')
+                    .replace(/\byou've\b/gi, 'you have')
+                    .replace(/\bwe've\b/gi, 'we have')
+                    .replace(/\bthey've\b/gi, 'they have')
+                    .replace(/\bi'd\b/gi, 'i would')
+                    .replace(/\byou'd\b/gi, 'you would')
+                    .replace(/\bhe'd\b/gi, 'he would')
+                    .replace(/\bshe'd\b/gi, 'she would')
+                    .replace(/\bwe'd\b/gi, 'we would')
+                    .replace(/\bthey'd\b/gi, 'they would')
+                    .replace(/\bi'll\b/gi, 'i will')
+                    .replace(/\byou'll\b/gi, 'you will')
+                    .replace(/\bhe'll\b/gi, 'he will')
+                    .replace(/\bshe'll\b/gi, 'she will')
+                    .replace(/\bit'll\b/gi, 'it will')
+                    .replace(/\bwe'll\b/gi, 'we will')
+                    .replace(/\bthey'll\b/gi, 'they will')
+                    .replace(/\bthat'll\b/gi, 'that will')
+                    .trim();
+            };
+            
+            userNorm = normalizeContractions(userNorm);
+            
+            // Erweitere Abkürzungen
+            const expandAbbreviations = (text) => {
+                return text
+                    .replace(/\bsb\./gi, 'somebody')
+                    .replace(/\bsb\b/gi, 'somebody')
+                    .replace(/\bsth\./gi, 'something')
+                    .replace(/\bsth\b/gi, 'something')
+                    .trim();
+            };
+            
+            userNorm = expandAbbreviations(userNorm);
+            
+            // Prüfe alle möglichen Antworten
+            const correctAnswers = currentVocab.answers;
+            
+            for (let i = 0; i < correctAnswers.length; i++) {
+                let correctAnswer = correctAnswers[i];
+                let correctNorm = normalize(correctAnswer);
+                correctNorm = normalizeContractions(correctNorm);
+                correctNorm = expandAbbreviations(correctNorm);
                 
-                const newAltitude = Math.min(gameState.altitude + 10, 200); // Max 200m
-                gameState.altitude = newAltitude;
-                targetAltitude = newAltitude;
-                gameState.score += 10;
+                // Entferne Klammer-Inhalte für Vergleich
+                const correctNoBrackets = correctNorm.replace(/\s*\([^)]*\)/g, '').trim();
+                const userNoBrackets = userNorm;
                 
-                // Trigger wing flapping animation
-                triggerWingFlap();
+                // 1. Exakte Übereinstimmung
+                if (userNoBrackets === correctNoBrackets || userNorm === correctNorm) {
+                    handleCorrectAnswer();
+                    return;
+                }
                 
-                // Show +10 Meter popup
-                showPointsPopup('+10 Meter', true);
+                // 2. Komma-Toleranz
+                const userNoCommas = userNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+                const correctNoCommas = correctNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
                 
-                showFeedback('Richtig! ✓', true);
-                updateUI();
+                if (userNoCommas === correctNoCommas) {
+                    handleCorrectAnswer();
+                    return;
+                }
                 
-                document.getElementById('vocab-input').value = '';
+                // 3. Substring-Check (min. 4 Zeichen)
+                const userNoSpaces = userNoBrackets.replace(/\s+/g, '');
+                const correctNoSpaces = correctNoBrackets.replace(/\s+/g, '');
                 
-                // Wähle neue Vokabel
-                selectRandomVocab();
+                if (userNoSpaces.length >= 4) {
+                    if (correctNoSpaces.includes(userNoSpaces) || userNoSpaces.includes(correctNoSpaces)) {
+                        handleCorrectAnswer();
+                        return;
+                    }
+                }
                 
-                // Start new timer for next vocab
-                startVocabTimer();
+                // 4. Verb-Prüfung (to-Varianten)
+                const cleanVerb = (text) => {
+                    return text.toLowerCase()
+                        .replace(/^\(to\)\s*/i, '')
+                        .replace(/^to\s+/i, '')
+                        .trim();
+                };
+                
+                const userVerbClean = cleanVerb(userNoBrackets);
+                const correctVerbClean = cleanVerb(correctNoBrackets);
+                
+                if (userVerbClean === correctVerbClean) {
+                    handleCorrectAnswer();
+                    return;
+                }
+            }
+            
+            // Alles falsch
+            handleWrongAnswer();
+        }
+        
+        function handleCorrectAnswer() {
+            clearInterval(vocabTimer);
+            
+            const newAltitude = Math.min(gameState.altitude + 10, 200);
+            gameState.altitude = newAltitude;
+            targetAltitude = newAltitude;
+            gameState.score += 10;
+            
+            triggerWingFlap();
+            showPointsPopup('+10 Meter', true);
+            showFeedback('Richtig! ✓', true);
+            updateUI();
+            updateHighscore();
+            
+            document.getElementById('vocab-input').value = '';
+            selectRandomVocab();
+            startVocabTimer();
+        }
+        
+        function handleWrongAnswer() {
+            clearInterval(vocabTimer);
+            
+            const newAltitude = Math.max(gameState.altitude - 50, 0);
+            gameState.altitude = newAltitude;
+            targetAltitude = newAltitude;
+            
+            triggerFall();
+            showPointsPopup('-50 Meter', false);
+            showFeedback('Falsch! ✗', false);
+            updateUI();
+            
+            document.getElementById('vocab-input').value = '';
+            
+            if (gameState.altitude <= 0) {
+                setTimeout(() => {
+                    endGame();
+                }, 1000);
             } else {
-                // Wrong - Monti fällt 50m!
-                clearInterval(vocabTimer); // Stop timer
+                selectRandomVocab();
+                startVocabTimer();
+            }
+        }
+        
+        function updateHighscore() {
+            if (gameState.score > highscore) {
+                highscore = gameState.score;
+                document.getElementById('highscore-value').textContent = highscore;
                 
-                const newAltitude = Math.max(gameState.altitude - 50, 0); // Min 0m
-                gameState.altitude = newAltitude;
-                targetAltitude = newAltitude;
-                
-                // Trigger falling animation
-                triggerFall();
-                
-                // Show -50 Meter popup
-                showPointsPopup('-50 Meter', false);
-                
-                showFeedback('Falsch! ✗', false);
-                updateUI();
-                
-                document.getElementById('vocab-input').value = '';
-                
-                // Check if crashed
-                if (gameState.altitude <= 0) {
-                    setTimeout(() => {
-                        endGame();
-                    }, 1000); // Warte kurz bevor Game Over
-                } else {
-                    // Wähle neue Vokabel
-                    selectRandomVocab();
-                    
-                    // Start new timer for next vocab
-                    startVocabTimer();
+                // Speichere in Firebase
+                if (db && currentUser.userKey) {
+                    db.ref('users/' + currentUser.userKey + '/montiGameHighscore').set(highscore)
+                        .then(() => console.log('✓ Neuer Highscore gespeichert:', highscore))
+                        .catch(error => console.error('Fehler beim Speichern des Highscores:', error));
                 }
             }
         }
@@ -1300,6 +1447,7 @@
 
         // Initialize
         async function init() {
+            initFirebase(); // Firebase zuerst
             const success = await loadUserAndVocabs();
             if (success) {
                 selectRandomVocab(); // Setze erste Vokabel
