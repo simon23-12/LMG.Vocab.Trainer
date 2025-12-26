@@ -1,4072 +1,3159 @@
 [
   {
-    "English": "dreadlocks",
-    "German": "Rasta-Locken",
-    "Page": "203",
-    "synonyms": [
-      "dreads"
-    ]
+    "English": "the best thing about",
+    "German": "das Beste an",
+    "Page": "227",
+    "synonyms": ["the greatest thing about", "what's best about"]
   },
   {
-    "English": "curly",
-    "German": "lockig",
-    "Page": "203",
+    "English": "huge",
+    "German": "riesig, sehr groß",
+    "Page": "227",
+    "synonyms": ["enormous", "massive", "gigantic", "vast"]
+  },
+  {
+    "English": "as soon as",
+    "German": "sobald, sowie",
+    "Page": "227",
+    "synonyms": ["once", "when", "the moment"]
+  },
+  {
+    "English": "cathedral",
+    "German": "Kathedrale, Dom",
+    "Page": "227",
+    "synonyms": ["church", "minster"]
+  },
+  {
+    "English": "palace",
+    "German": "Palast, Schloss",
+    "Page": "227",
+    "synonyms": ["castle", "mansion"]
+  },
+  {
+    "English": "Welsh",
+    "German": "Walisisch; walisisch",
+    "Page": "227",
     "synonyms": []
   },
   {
-    "English": "curl",
-    "German": "Locke",
-    "Page": "203",
+    "English": "(to) reply (to)",
+    "German": "antworten (auf); erwidern, entgegnen",
+    "Page": "227",
+    "synonyms": ["(to) answer", "(to) respond"]
+  },
+  {
+    "English": "Europe",
+    "German": "Europa",
+    "Page": "227",
     "synonyms": []
   },
   {
-    "English": "kinky",
-    "German": "kraus, gekräuselt (Haare)",
-    "Page": "203",
+    "English": "western",
+    "German": "westlich, West-",
+    "Page": "227",
     "synonyms": []
   },
   {
-    "English": "(to) be dressed",
-    "German": "angezogen sein",
-    "Page": "203",
+    "English": "I see.",
+    "German": "Aha! / Verstehe.",
+    "Page": "227",
+    "synonyms": ["I understand.", "I get it."]
+  },
+  {
+    "English": "lift",
+    "German": "Fahrstuhl, Aufzug",
+    "Page": "227",
+    "synonyms": ["elevator"]
+  },
+  {
+    "English": "amazing",
+    "German": "erstaunlich, unglaublich",
+    "Page": "227",
+    "synonyms": ["incredible", "astonishing", "wonderful"]
+  },
+  {
+    "English": "quite",
+    "German": "ziemlich; völlig, ganz",
+    "Page": "227",
+    "synonyms": ["rather", "pretty", "fairly"]
+  },
+  {
+    "English": "How do you know ...?",
+    "German": "Woher weißt/kennst du ...?",
+    "Page": "227",
     "synonyms": []
   },
   {
-    "English": "(to) get dressed",
-    "German": "sich anziehen",
-    "Page": "203",
-    "synonyms": [
-      "dress"
-    ]
+    "English": "post",
+    "German": "Posting (auf Blog), Blog-Eintrag",
+    "Page": "227",
+    "synonyms": ["blog entry", "article"]
   },
   {
-    "English": "casually",
-    "German": "leger, lässig (gekleidet)",
-    "Page": "203",
-    "synonyms": [
-      "informally"
-    ]
+    "English": "(to) add (to)",
+    "German": "hinzufügen, ergänzen, addieren (zu)",
+    "Page": "227",
+    "synonyms": ["(to) include", "(to) append"]
   },
   {
-    "English": "blazer",
-    "German": "Sakko, Blazer (sportliches Jackett)",
-    "Page": "203",
-    "synonyms": [
-      "jacket"
-    ]
-  },
-  {
-    "English": "denim",
-    "German": "Jeansstoff",
-    "Page": "203",
+    "English": "carnival",
+    "German": "Karneval, Fasching",
+    "Page": "227",
     "synonyms": []
   },
   {
-    "English": "paint",
-    "German": "Farbe, Lack",
-    "Page": "203",
+    "English": "test",
+    "German": "Test",
+    "Page": "227",
+    "synonyms": ["exam", "quiz"]
+  },
+  {
+    "English": "(to) be into sth.",
+    "German": "etwas mögen, auf etwas stehen",
+    "Page": "227",
+    "synonyms": ["(to) like", "(to) be interested in"]
+  },
+  {
+    "English": "(to) enjoy",
+    "German": "genießen",
+    "Page": "227",
+    "synonyms": ["(to) like", "(to) love"]
+  },
+  {
+    "English": "by the way",
+    "German": "übrigens",
+    "Page": "227",
+    "synonyms": ["incidentally"]
+  },
+  {
+    "English": "south",
+    "German": "Süden; nach Süden; südlich",
+    "Page": "227",
     "synonyms": []
   },
   {
-    "English": "(to) paint",
-    "German": "malen, streichen",
-    "Page": "203",
+    "English": "darkness",
+    "German": "Dunkelheit, Finsternis",
+    "Page": "227",
+    "synonyms": ["dark", "gloom"]
+  },
+  {
+    "English": "clue",
+    "German": "(Lösungs-)Hinweis; Anhaltspunkt",
+    "Page": "227",
+    "synonyms": ["hint", "tip"]
+  },
+  {
+    "English": "skyline",
+    "German": "Skyline; Horizont",
+    "Page": "227",
+    "synonyms": ["horizon"]
+  },
+  {
+    "English": "false",
+    "German": "falsch",
+    "Page": "228",
+    "synonyms": ["wrong", "incorrect"]
+  },
+  {
+    "English": "(to) stay (at/with)",
+    "German": "(vorübergehend) wohnen, übernachten (in/bei)",
+    "Page": "228",
+    "synonyms": ["(to) lodge", "(to) sleep"]
+  },
+  {
+    "English": "timetable",
+    "German": "Fahrplan",
+    "Page": "228",
+    "synonyms": ["schedule"]
+  },
+  {
+    "English": "restaurant",
+    "German": "Restaurant",
+    "Page": "228",
     "synonyms": []
   },
   {
-    "English": "headscarf",
-    "German": "Kopftuch",
-    "Page": "203",
+    "English": "gallery",
+    "German": "Galerie",
+    "Page": "228",
     "synonyms": []
   },
   {
-    "English": "headscarves",
-    "German": "Kopftücher",
-    "Page": "203",
+    "English": "the Tube",
+    "German": "die U-Bahn (in London)",
+    "Page": "228",
+    "synonyms": ["the underground", "the metro"]
+  },
+  {
+    "English": "the underground",
+    "German": "die U-Bahn",
+    "Page": "228",
+    "synonyms": ["the tube", "the metro", "the subway"]
+  },
+  {
+    "English": "(to) go together",
+    "German": "zusammenpassen, zueinander passen",
+    "Page": "228",
+    "synonyms": ["(to) match", "(to) fit together"]
+  },
+  {
+    "English": "stress",
+    "German": "Betonung",
+    "Page": "228",
+    "synonyms": ["emphasis", "accent"]
+  },
+  {
+    "English": "stress mark",
+    "German": "Betonungszeichen",
+    "Page": "228",
     "synonyms": []
   },
   {
-    "English": "tie",
-    "German": "Krawatte, Schlips",
-    "Page": "203",
-    "synonyms": [
-      "necktie"
-    ]
+    "English": "stress",
+    "German": "betonen",
+    "Page": "228",
+    "synonyms": ["(to) emphasize"]
   },
   {
-    "English": "patriotic",
-    "German": "patriotisch, vaterlandsliebend",
-    "Page": "203",
+    "English": "small talk",
+    "German": "Smalltalk (spontan geführtes Gespräch in umgangssprachlichem Ton)",
+    "Page": "228",
+    "synonyms": ["chit-chat", "casual conversation"]
+  },
+  {
+    "English": "culture",
+    "German": "Kultur",
+    "Page": "228",
     "synonyms": []
   },
   {
-    "English": "hairstyle",
-    "German": "Frisur",
-    "Page": "203",
-    "synonyms": [
-      "hairdo"
-    ]
+    "English": "(to) expect sth.",
+    "German": "etwas erwarten",
+    "Page": "228",
+    "synonyms": ["(to) anticipate"]
   },
   {
-    "English": "(to) suggest sth.",
-    "German": "auf etwas hindeuten, etwas nahelegen",
-    "Page": "203",
-    "synonyms": [
-      "indicate",
-      "imply"
-    ]
+    "English": "(to) continue sth.",
+    "German": "etwas fortsetzen",
+    "Page": "228",
+    "synonyms": ["(to) carry on", "(to) go on"]
   },
   {
-    "English": "conservative",
-    "German": "konservativ; Konservative(r)",
-    "Page": "203",
-    "synonyms": [
-      "traditional"
-    ]
+    "English": "queue",
+    "German": "Schlange, Reihe (wartender Menschen)",
+    "Page": "228",
+    "synonyms": ["line"]
   },
   {
-    "English": "original",
-    "German": "originell",
-    "Page": "203",
-    "synonyms": [
-      "unique",
-      "creative"
-    ]
+    "English": "attraction",
+    "German": "Attraktion, Anziehungspunkt",
+    "Page": "228",
+    "synonyms": ["sight"]
   },
   {
-    "English": "(to) prefer sb. to do sth.",
-    "German": "(es) vorziehen, wenn jd. etwas täte/tun würde",
-    "Page": "203",
-    "synonyms": [
-      "would rather"
-    ]
-  },
-  {
-    "English": "award-winning",
-    "German": "preisgekrönt",
-    "Page": "204",
+    "English": "natural history",
+    "German": "Naturkunde",
+    "Page": "228",
     "synonyms": []
   },
   {
-    "English": "poet",
-    "German": "Dichter/in, Poet/in",
-    "Page": "204",
+    "English": "entry",
+    "German": "Eintritt, Zutritt",
+    "Page": "228",
+    "synonyms": ["admission"]
+  },
+  {
+    "English": "in fact",
+    "German": "eigentlich, in Wirklichkeit",
+    "Page": "228",
+    "synonyms": ["actually", "really"]
+  },
+  {
+    "English": "fact",
+    "German": "Tatsache, Fakt",
+    "Page": "228",
+    "synonyms": ["truth"]
+  },
+  {
+    "English": "(to) reserve",
+    "German": "reservieren, buchen",
+    "Page": "228",
+    "synonyms": ["(to) book"]
+  },
+  {
+    "English": "step",
+    "German": "Stufe",
+    "Page": "229",
+    "synonyms": ["stair"]
+  },
+  {
+    "English": "chance",
+    "German": "Gelegenheit, Möglichkeit, Chance",
+    "Page": "229",
+    "synonyms": ["opportunity"]
+  },
+  {
+    "English": "during",
+    "German": "während",
+    "Page": "229",
+    "synonyms": ["while"]
+  },
+  {
+    "English": "(to) guard",
+    "German": "bewachen",
+    "Page": "229",
+    "synonyms": ["(to) protect", "(to) watch over"]
+  },
+  {
+    "English": "raven",
+    "German": "Rabe",
+    "Page": "229",
     "synonyms": []
   },
   {
-    "English": "playwright",
-    "German": "Dramatiker/in, Bühnenautor/in",
-    "Page": "204",
+    "English": "blood",
+    "German": "Blut",
+    "Page": "229",
     "synonyms": []
   },
   {
-    "English": "novelist",
-    "German": "Romanautor/in",
-    "Page": "204",
+    "English": "(to) be home to sth.",
+    "German": "(irgend) sein für etwas; etwas beheimaten",
+    "Page": "229",
     "synonyms": []
   },
   {
-    "English": "(to) picture sb./sth.",
-    "German": "sich jn./etwas vorstellen",
-    "Page": "204",
-    "synonyms": [
-      "imagine",
-      "visualize"
-    ]
+    "English": "jewels",
+    "German": "Juwelen",
+    "Page": "229",
+    "synonyms": ["gems", "precious stones"]
   },
   {
-    "English": "desire",
-    "German": "Wunsch, Verlangen",
-    "Page": "204",
-    "synonyms": [
-      "wish",
-      "longing"
-    ]
+    "English": "education",
+    "German": "(Schul-, Aus-)Bildung; Erziehung",
+    "Page": "229",
+    "synonyms": ["schooling"]
   },
   {
-    "English": "awkward",
-    "German": "plump, peinlich, unangenehm",
-    "Page": "204",
-    "synonyms": [
-      "uncomfortable",
-      "clumsy"
-    ]
+    "English": "adult",
+    "German": "Erwachsene(r)",
+    "Page": "229",
+    "synonyms": ["grown-up"]
   },
   {
-    "English": "painfully",
-    "German": "furchtbar, äußerst, schmerzlich",
-    "Page": "204",
+    "English": "figure",
+    "German": "Zahl, Ziffer",
+    "Page": "229",
+    "synonyms": ["number", "digit"]
+  },
+  {
+    "English": "less (than)",
+    "German": "weniger (als)",
+    "Page": "229",
+    "synonyms": ["fewer"]
+  },
+  {
+    "English": "tortoise",
+    "German": "(Land-)Schildkröte",
+    "Page": "229",
+    "synonyms": ["turtle"]
+  },
+  {
+    "English": "parliament",
+    "German": "Parlament",
+    "Page": "229",
     "synonyms": []
   },
   {
-    "English": "pain",
-    "German": "Schmerz(en)",
-    "Page": "204",
-    "synonyms": [
-      "ache"
-    ]
+    "English": "at one time",
+    "German": "zur selben Zeit, gleichzeitig",
+    "Page": "229",
+    "synonyms": ["simultaneously", "at once"]
   },
   {
-    "English": "(to) cope",
-    "German": "zurechtkommen, klarkommen",
-    "Page": "204",
-    "synonyms": [
-      "manage",
-      "deal with"
-    ]
-  },
-  {
-    "English": "alarm",
-    "German": "Wecker",
-    "Page": "204",
-    "synonyms": [
-      "alarm clock"
-    ]
-  },
-  {
-    "English": "(to) wink (at sb.)",
-    "German": "(jm. zu)zwinkern",
-    "Page": "204",
+    "English": "Christmas",
+    "German": "Weihnachten",
+    "Page": "229",
     "synonyms": []
   },
   {
-    "English": "(to) shave",
-    "German": "(sich) rasieren",
-    "Page": "204",
+    "English": "ticket office",
+    "German": "Fahrkartenschalter; Kasse (für den Verkauf von Eintrittskarten)",
+    "Page": "229",
+    "synonyms": ["box office"]
+  },
+  {
+    "English": "detail",
+    "German": "Detail, Einzelheit",
+    "Page": "229",
+    "synonyms": ["particular"]
+  },
+  {
+    "English": "a family of four",
+    "German": "eine vierköpfige Familie",
+    "Page": "229",
     "synonyms": []
   },
   {
-    "English": "headphones",
-    "German": "Kopfhörer",
-    "Page": "204",
+    "English": "exact",
+    "German": "genau",
+    "Page": "229",
+    "synonyms": ["precise"]
+  },
+  {
+    "English": "linking word",
+    "German": "Bindewort",
+    "Page": "229",
+    "synonyms": ["conjunction"]
+  },
+  {
+    "English": "(to) link",
+    "German": "verbinden, verknüpfen",
+    "Page": "229",
+    "synonyms": ["(to) connect", "(to) join"]
+  },
+  {
+    "English": "instead of",
+    "German": "anstelle von, statt",
+    "Page": "229",
+    "synonyms": ["rather than"]
+  },
+  {
+    "English": "worth",
+    "German": "wert",
+    "Page": "229",
     "synonyms": []
   },
   {
-    "English": "hood",
-    "German": "Kapuze",
-    "Page": "204",
+    "English": "(to) roar",
+    "German": "brüllen",
+    "Page": "229",
+    "synonyms": ["(to) shout loudly"]
+  },
+  {
+    "English": "feedback",
+    "German": "Rückmeldung, Feedback",
+    "Page": "229",
+    "synonyms": ["response", "comment"]
+  },
+  {
+    "English": "(to) improve",
+    "German": "verbessern; sich verbessern",
+    "Page": "229",
+    "synonyms": ["(to) enhance", "(to) get better"]
+  },
+  {
+    "English": "(to) react (to)",
+    "German": "reagieren (auf)",
+    "Page": "230",
+    "synonyms": ["(to) respond"]
+  },
+  {
+    "English": "content",
+    "German": "Inhalt",
+    "Page": "230",
+    "synonyms": ["substance"]
+  },
+  {
+    "English": "spelling",
+    "German": "Rechtschreibung; Schreibweise",
+    "Page": "230",
     "synonyms": []
   },
   {
-    "English": "instructor",
-    "German": "Lehrer/in, Ausbilder/in",
-    "Page": "204",
-    "synonyms": [
-      "teacher",
-      "trainer"
-    ]
+    "English": "(to) point sth. out (to sb.)",
+    "German": "(jn.) auf etwas hinweisen",
+    "Page": "230",
+    "synonyms": ["(to) indicate", "(to) show"]
   },
   {
-    "English": "simple",
-    "German": "einfach, unkompliziert",
-    "Page": "204",
-    "synonyms": [
-      "easy",
-      "straightforward"
-    ]
-  },
-  {
-    "English": "branch",
-    "German": "Ast, Zweig; Zweigstelle, Filiale",
-    "Page": "204",
+    "English": "line",
+    "German": "(U-Bahn-)Linie",
+    "Page": "230",
     "synonyms": []
   },
   {
-    "English": "record",
-    "German": "Schallplatte",
-    "Page": "204",
-    "synonyms": [
-      "vinyl"
-    ]
-  },
-  {
-    "English": "(to) make sb. do sth.",
-    "German": "jn. dazu bringen, etwas zu tun; jn. veranlassen, etwas zu tun",
-    "Page": "204",
+    "English": "eastbound",
+    "German": "Richtung Osten",
+    "Page": "230",
     "synonyms": []
   },
   {
-    "English": "(to) let sb. do sth.",
-    "German": "jn. etwas tun lassen; jm. erlauben, etwas zu tun; zulassen, dass jemand etwas tut",
-    "Page": "204",
-    "synonyms": [
-      "allow",
-      "permit"
-    ]
+    "English": "(to) change",
+    "German": "umsteigen",
+    "Page": "230",
+    "synonyms": ["(to) switch", "(to) transfer"]
   },
   {
-    "English": "yet",
-    "German": "trotzdem, dennoch",
-    "Page": "205",
-    "synonyms": [
-      "still",
-      "nevertheless"
-    ]
+    "English": "announcement",
+    "German": "Durchsage, Ansage",
+    "Page": "230",
+    "synonyms": ["notice"]
   },
   {
-    "English": "nor",
-    "German": "und ich will auch nicht ...",
-    "Page": "205",
+    "English": "message",
+    "German": "Botschaft, Aussage",
+    "Page": "230",
+    "synonyms": ["note", "communication"]
+  },
+  {
+    "English": "(to) be on",
+    "German": "eingeschaltet sein, an sein (Radio, Licht usw.); laufen, übertragen werden (Programm, Sendung)",
+    "Page": "230",
+    "synonyms": ["(to) be running"]
+  },
+  {
+    "English": "remote control",
+    "German": "Fernbedienung",
+    "Page": "230",
+    "synonyms": ["remote"]
+  },
+  {
+    "English": "No way!",
+    "German": "Auf keinen Fall! / Kommt nicht in Frage!",
+    "Page": "230",
+    "synonyms": ["Absolutely not!"]
+  },
+  {
+    "English": "And anyway, ...",
+    "German": "Und überhaupt, ...",
+    "Page": "230",
+    "synonyms": ["Besides, ..."]
+  },
+  {
+    "English": "while",
+    "German": "während",
+    "Page": "230",
+    "synonyms": ["during"]
+  },
+  {
+    "English": "(to) turn sth. up/down",
+    "German": "etwas lauter/leiser stellen",
+    "Page": "230",
+    "synonyms": ["(to) increase/decrease volume"]
+  },
+  {
+    "English": "(to) turn",
+    "German": "sich drehen",
+    "Page": "230",
+    "synonyms": ["(to) rotate"]
+  },
+  {
+    "English": "each other",
+    "German": "sich (gegenseitig), einander",
+    "Page": "231",
+    "synonyms": ["one another"]
+  },
+  {
+    "English": "pub",
+    "German": "Kneipe, Lokal",
+    "Page": "231",
+    "synonyms": ["bar"]
+  },
+  {
+    "English": "towards the station/Mr Bell",
+    "German": "auf den Bahnhof/Mr Bell zu, in Richtung Bahnhof/Mr Bell",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "somewhat",
-    "German": "etwas, ein wenig",
-    "Page": "205",
-    "synonyms": [
-      "rather",
-      "slightly"
-    ]
+    "English": "mate",
+    "German": "Kumpel, Freund",
+    "Page": "231",
+    "synonyms": ["friend", "buddy"]
   },
   {
-    "English": "perspective",
-    "German": "Perspektive, Blickwinkel",
-    "Page": "205",
-    "synonyms": [
-      "viewpoint",
-      "point of view"
-    ]
+    "English": "several",
+    "German": "mehrere, verschiedene",
+    "Page": "231",
+    "synonyms": ["some", "a few"]
   },
   {
-    "English": "aggressive",
-    "German": "aggressiv",
-    "Page": "205",
-    "synonyms": [
-      "hostile",
-      "violent"
-    ]
+    "English": "route",
+    "German": "Strecke, Route",
+    "Page": "231",
+    "synonyms": ["path", "way"]
   },
   {
-    "English": "depressed",
-    "German": "deprimiert",
-    "Page": "205",
-    "synonyms": [
-      "sad",
-      "down"
-    ]
+    "English": "speed",
+    "German": "Geschwindigkeit",
+    "Page": "231",
+    "synonyms": ["velocity"]
   },
   {
-    "English": "light-hearted",
-    "German": "fröhlich, heiter",
-    "Page": "205",
-    "synonyms": [
-      "cheerful",
-      "upbeat"
-    ]
+    "English": "It was a pity that ...",
+    "German": "Es war schade, dass ...",
+    "Page": "231",
+    "synonyms": ["It was unfortunate that ..."]
   },
   {
-    "English": "melancholic",
-    "German": "trübsinnig",
-    "Page": "205",
-    "synonyms": [
-      "sad",
-      "gloomy"
-    ]
-  },
-  {
-    "English": "nostalgic",
-    "German": "nostalgisch",
-    "Page": "205",
+    "English": "platform",
+    "German": "Bahnsteig, Gleis",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "uplifting",
-    "German": "erhebend, aufmunternd",
-    "Page": "205",
-    "synonyms": [
-      "inspiring",
-      "encouraging"
-    ]
+    "English": "(to) hold on to, [hold], held, held",
+    "German": "sich an etwas festhalten",
+    "Page": "231",
+    "synonyms": ["(to) grip", "(to) grasp"]
   },
   {
-    "English": "poetry",
-    "German": "Gedichte, Lyrik",
-    "Page": "205",
-    "synonyms": [
-      "verse"
-    ]
+    "English": "(to) scan sth. (for sth.)",
+    "German": "etwas (nach etwas) absuchen",
+    "Page": "231",
+    "synonyms": ["(to) search", "(to) examine"]
   },
   {
-    "English": "(to) reflect",
-    "German": "reflektieren, (wider)spiegeln",
-    "Page": "205",
-    "synonyms": [
-      "mirror",
-      "show"
-    ]
-  },
-  {
-    "English": "(to) realize sth.",
-    "German": "etwas erkennen, sich einer Sache bewusst werden",
-    "Page": "205",
-    "synonyms": [
-      "understand",
-      "recognize"
-    ]
-  },
-  {
-    "English": "imagery",
-    "German": "bildhafte Sprache, Sprachbilder",
-    "Page": "205",
+    "English": "(to) fill",
+    "German": "füllen",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "simile",
-    "German": "Vergleich",
-    "Page": "205",
+    "English": "pavement",
+    "German": "Gehweg, Bürgersteig",
+    "Page": "231",
+    "synonyms": ["sidewalk"]
+  },
+  {
+    "English": "available",
+    "German": "erhältlich (am Telefon)",
+    "Page": "231",
+    "synonyms": ["obtainable"]
+  },
+  {
+    "English": "all around her",
+    "German": "überall um sie herum",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "metaphor",
-    "German": "Metapher",
-    "Page": "205",
+    "English": "whistle",
+    "German": "(Triller-)Pfeife",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "device",
-    "German": "Mittel, Gerät, Apparat",
-    "Page": "205",
-    "synonyms": [
-      "tool",
-      "instrument"
-    ]
-  },
-  {
-    "English": "gentle",
-    "German": "sanft(mütig)",
-    "Page": "205",
-    "synonyms": [
-      "mild",
-      "soft"
-    ]
-  },
-  {
-    "English": "dove",
-    "German": "Taube",
-    "Page": "206",
+    "English": "(to) blow a whistle, [blew], [blown]",
+    "German": "pfeifen (auf der Trillerpfeife)",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "(to) be considered sth.",
-    "German": "als etwas betrachtet werden; für etwas gehalten werden",
-    "Page": "206",
-    "synonyms": [
-      "be regarded as"
-    ]
-  },
-  {
-    "English": "hawk",
-    "German": "Habicht; (im übertragenen Sinn:) Falke",
-    "Page": "206",
+    "English": "(to) panic",
+    "German": "in Panik geraten",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "owl",
-    "German": "Eule",
-    "Page": "206",
+    "English": "(to) bend down, [bend], bent, bent",
+    "German": "sich hinunterbeugen, sich bücken",
+    "Page": "231",
+    "synonyms": ["(to) crouch"]
+  },
+  {
+    "English": "crowded",
+    "German": "voller Menschen, überfüllt",
+    "Page": "231",
+    "synonyms": ["packed", "busy"]
+  },
+  {
+    "English": "rope",
+    "German": "Seil",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "blind",
-    "German": "blind",
-    "Page": "206",
+    "English": "wing",
+    "German": "Flügel",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "peaceful",
-    "German": "friedlich, friedfertig",
-    "Page": "206",
-    "synonyms": [
-      "calm",
-      "tranquil"
-    ]
-  },
-  {
-    "English": "athletic",
-    "German": "athletisch, sportlich",
-    "Page": "206",
-    "synonyms": [
-      "sporty",
-      "fit"
-    ]
-  },
-  {
-    "English": "gay",
-    "German": "schwul, lesbisch",
-    "Page": "206",
-    "synonyms": [
-      "homosexual"
-    ]
-  },
-  {
-    "English": "straight",
-    "German": "hetero",
-    "Page": "206",
-    "synonyms": [
-      "heterosexual"
-    ]
-  },
-  {
-    "English": "conventional",
-    "German": "konventionell",
-    "Page": "206",
-    "synonyms": [
-      "traditional",
-      "orthodox"
-    ]
-  },
-  {
-    "English": "liberal",
-    "German": "liberal",
-    "Page": "206",
-    "synonyms": [
-      "progressive"
-    ]
-  },
-  {
-    "English": "religious",
-    "German": "religiös, gläubig",
-    "Page": "206",
+    "English": "rainbow",
+    "German": "Regenbogen",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "African-American",
-    "German": "Afroamerikaner/in; afroamerikanisch",
-    "Page": "206",
+    "English": "dizzy",
+    "German": "schwindlig",
+    "Page": "231",
+    "synonyms": ["light-headed"]
+  },
+  {
+    "English": "(to) scream",
+    "German": "schreien",
+    "Page": "231",
+    "synonyms": ["(to) yell", "(to) shout"]
+  },
+  {
+    "English": "hip",
+    "German": "Hüfte",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "upbringing",
-    "German": "Erziehung",
-    "Page": "206",
-    "synonyms": [
-      "education",
-      "raising"
-    ]
+    "English": "you",
+    "German": "man",
+    "Page": "231",
+    "synonyms": ["one"]
   },
   {
-    "English": "dialect",
-    "German": "Dialekt",
-    "Page": "206",
+    "English": "rhythm",
+    "German": "Rhythmus",
+    "Page": "231",
     "synonyms": []
   },
   {
-    "English": "particularly",
-    "German": "besonders, vor allem",
-    "Page": "206",
-    "synonyms": [
-      "especially",
-      "specifically"
-    ]
+    "English": "(to) scare sb.",
+    "German": "jn. erschrecken; jm. Angst machen",
+    "Page": "232",
+    "synonyms": ["(to) frighten"]
   },
   {
-    "English": "absolutely",
-    "German": "völlig begeistert",
-    "Page": "206",
-    "synonyms": [
-      "completely",
-      "totally"
-    ]
+    "English": "loudspeaker",
+    "German": "Lautsprecher; Megaphon",
+    "Page": "232",
+    "synonyms": ["speaker"]
   },
   {
-    "English": "completely",
-    "German": "völlig normal, ganz normal",
-    "Page": "206",
-    "synonyms": [
-      "entirely",
-      "totally"
-    ]
-  },
-  {
-    "English": "especially",
-    "German": "besonders hilfreich",
-    "Page": "206",
-    "synonyms": [
-      "particularly"
-    ]
-  },
-  {
-    "English": "extremely",
-    "German": "äußerst heiß",
-    "Page": "206",
-    "synonyms": [
-      "very",
-      "highly"
-    ]
-  },
-  {
-    "English": "(to) modify",
-    "German": "näher bestimmen",
-    "Page": "206",
-    "synonyms": [
-      "change",
-      "adjust"
-    ]
-  },
-  {
-    "English": "search engine",
-    "German": "(Internet-)Suchmaschine",
-    "Page": "206",
+    "English": "(to) mind",
+    "German": "etwas dagegen haben",
+    "Page": "232",
     "synonyms": []
   },
   {
-    "English": "(to) format",
-    "German": "formatieren (Text am Computer)",
-    "Page": "206",
+    "English": "(to) rest",
+    "German": "ruhen, sich ausruhen",
+    "Page": "232",
+    "synonyms": ["(to) relax"]
+  },
+  {
+    "English": "... he said under his breath.",
+    "German": "..., sagte er flüsternd / murmelte er.",
+    "Page": "232",
     "synonyms": []
   },
   {
-    "English": "electronic",
-    "German": "elektronisch",
-    "Page": "206",
-    "synonyms": [
-      "digital"
-    ]
+    "English": "empty",
+    "German": "leer",
+    "Page": "232",
+    "synonyms": ["vacant"]
   },
   {
-    "English": "visual",
-    "German": "optisch, visuell",
-    "Page": "206",
+    "English": "scientist",
+    "German": "Naturwissenschaftler/in",
+    "Page": "232",
+    "synonyms": ["researcher"]
+  },
+  {
+    "English": "(to) study",
+    "German": "studieren; untersuchen, beobachten; lernen",
+    "Page": "232",
+    "synonyms": ["(to) research", "(to) learn"]
+  },
+  {
+    "English": "workshop",
+    "German": "Werkstatt",
+    "Page": "232",
     "synonyms": []
   },
   {
-    "English": "proper",
-    "German": "richtige(r, s), angemessene(r, s), ordentliche(r, s)",
-    "Page": "207",
-    "synonyms": [
-      "correct",
-      "appropriate"
-    ]
+    "English": "carpenter",
+    "German": "Tischler/in, Zimmerer/Zimmerin",
+    "Page": "232",
+    "synonyms": ["woodworker"]
   },
   {
-    "English": "margin",
-    "German": "Rand",
-    "Page": "207",
-    "synonyms": [
-      "edge"
-    ]
-  },
-  {
-    "English": "(to) indent",
-    "German": "(eine Zeile) einrücken",
-    "Page": "207",
+    "English": "furniture",
+    "German": "Möbel",
+    "Page": "232",
     "synonyms": []
   },
   {
-    "English": "neither ... nor ...",
-    "German": "weder ... noch ...",
-    "Page": "207",
+    "English": "oil",
+    "German": "Öl",
+    "Page": "232",
     "synonyms": []
   },
   {
-    "English": "in relation to",
-    "German": "im Verhältnis zu",
-    "Page": "207",
-    "synonyms": [
-      "compared to",
-      "relative to"
-    ]
-  },
-  {
-    "English": "source",
-    "German": "Quelle (auch: Textquelle)",
-    "Page": "207",
-    "synonyms": [
-      "reference"
-    ]
-  },
-  {
-    "English": "font",
-    "German": "Schrift(art)",
-    "Page": "207",
-    "synonyms": [
-      "typeface"
-    ]
-  },
-  {
-    "English": "italics",
-    "German": "Kursivschrift",
-    "Page": "207",
+    "English": "hammer",
+    "German": "Hammer",
+    "Page": "232",
     "synonyms": []
   },
   {
-    "English": "bold (type)",
-    "German": "Fettdruck",
-    "Page": "207",
+    "English": "a piece of ...",
+    "German": "ein Stück ...",
+    "Page": "232",
     "synonyms": []
   },
   {
-    "English": "clarity",
-    "German": "Klarheit",
-    "Page": "207",
+    "English": "(to) come over (to)",
+    "German": "herüberkommen (zu/nach), vorbeikommen (bei)",
+    "Page": "232",
+    "synonyms": ["(to) visit", "(to) drop by"]
+  },
+  {
+    "English": "(to) make fun of sb./sth.",
+    "German": "sich über jn./etwas lustig machen",
+    "Page": "232",
+    "synonyms": ["(to) mock", "(to) tease"]
+  },
+  {
+    "English": "(to) give up",
+    "German": "aufgeben",
+    "Page": "232",
+    "synonyms": ["(to) quit"]
+  },
+  {
+    "English": "(to) cook",
+    "German": "kochen, zubereiten",
+    "Page": "232",
+    "synonyms": ["(to) prepare food"]
+  },
+  {
+    "English": "tonight",
+    "German": "heute Nacht, heute Abend",
+    "Page": "232",
+    "synonyms": ["this evening"]
+  },
+  {
+    "English": "actor",
+    "German": "Schauspieler/in",
+    "Page": "232",
+    "synonyms": ["performer"]
+  },
+  {
+    "English": "painter",
+    "German": "Maler/in",
+    "Page": "232",
+    "synonyms": ["artist"]
+  },
+  {
+    "English": "soldier",
+    "German": "Soldat/in",
+    "Page": "233",
     "synonyms": []
   },
   {
-    "English": "untidy",
-    "German": "unordentlich, unsauber",
-    "Page": "207",
-    "synonyms": [
-      "messy",
-      "sloppy"
-    ]
-  },
-  {
-    "English": "legible",
-    "German": "lesbar, leserlich",
-    "Page": "207",
-    "synonyms": [
-      "readable"
-    ]
-  },
-  {
-    "English": "pt",
-    "German": "Punkt (Abkürzung für point)",
-    "Page": "207",
+    "English": "architect",
+    "German": "Architekt/in",
+    "Page": "233",
     "synonyms": []
   },
   {
-    "English": "function",
-    "German": "Funktion",
-    "Page": "207",
-    "synonyms": [
-      "purpose",
-      "role"
-    ]
+    "English": "astronaut",
+    "German": "Astronaut/in",
+    "Page": "233",
+    "synonyms": ["cosmonaut", "spaceman"]
   },
   {
-    "English": "(to) type",
-    "German": "tippen, Maschine schreiben",
-    "Page": "207",
+    "English": "engineer",
+    "German": "Ingenieur/in",
+    "Page": "233",
     "synonyms": []
   },
   {
-    "English": "equality",
-    "German": "Gleichheit, Gleichberechtigung",
-    "Page": "207",
+    "English": "hairdresser",
+    "German": "Friseur/in",
+    "Page": "233",
+    "synonyms": ["stylist"]
+  },
+  {
+    "English": "musician",
+    "German": "Musiker/in",
+    "Page": "233",
     "synonyms": []
   },
   {
-    "English": "opinion piece",
-    "German": "Stellungnahme, Meinungsartikel",
-    "Page": "207",
-    "synonyms": [
-      "editorial"
-    ]
+    "English": "official",
+    "German": "Beamte(r), Beamtin",
+    "Page": "233",
+    "synonyms": []
   },
   {
-    "English": "(to) recognize",
-    "German": "anerkennen",
-    "Page": "207",
-    "synonyms": [
-      "acknowledge",
-      "accept"
-    ]
+    "English": "government",
+    "German": "Regierung",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "national",
+    "German": "national, National-",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "accident",
+    "German": "Unfall",
+    "Page": "233",
+    "synonyms": ["crash"]
+  },
+  {
+    "English": "altogether",
+    "German": "insgesamt, alles in allem",
+    "Page": "233",
+    "synonyms": ["in total"]
+  },
+  {
+    "English": "hostel",
+    "German": "Herberge, Wohnheim",
+    "Page": "233",
+    "synonyms": ["dormitory"]
+  },
+  {
+    "English": "(to) wonder",
+    "German": "sich fragen, gern wissen wollen",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "(to) pretend",
+    "German": "so tun, als ob",
+    "Page": "233",
+    "synonyms": ["(to) fake"]
+  },
+  {
+    "English": "Me neither.",
+    "German": "Ich auch nicht.",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "(to) go by",
+    "German": "vergehen, vorübergehen (Zeit)",
+    "Page": "233",
+    "synonyms": ["(to) pass"]
+  },
+  {
+    "English": "stupid",
+    "German": "dumm, blöd",
+    "Page": "233",
+    "synonyms": ["dumb", "foolish"]
+  },
+  {
+    "English": "downstream",
+    "German": "flussabwärts",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "edge",
+    "German": "Rand, Kante",
+    "Page": "233",
+    "synonyms": ["border"]
+  },
+  {
+    "English": "(to) reach",
+    "German": "erreichen",
+    "Page": "233",
+    "synonyms": ["(to) get to", "(to) arrive at"]
+  },
+  {
+    "English": "stick",
+    "German": "Stock",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "(to) grab",
+    "German": "schnappen, packen",
+    "Page": "233",
+    "synonyms": ["(to) seize", "(to) grasp"]
+  },
+  {
+    "English": "steep",
+    "German": "steil",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "(to) sing along (with sb.)",
+    "German": "(mit jm.) mitsingen",
+    "Page": "233",
+    "synonyms": []
+  },
+  {
+    "English": "(to) join in (sth.)",
+    "German": "(bei etwas) mitmachen",
+    "Page": "233",
+    "synonyms": ["(to) participate"]
+  },
+  {
+    "English": "before long",
+    "German": "schon bald",
+    "Page": "234",
+    "synonyms": ["soon"]
+  },
+  {
+    "English": "(to) tell sb. (not) to do sth.",
+    "German": "jn. auffordern, etwas (nicht) zu tun; jm. sagen, dass er/sie etwas (nicht) tun soll",
+    "Page": "234",
+    "synonyms": ["(to) instruct", "(to) order"]
+  },
+  {
+    "English": "danger",
+    "German": "Gefahr",
+    "Page": "234",
+    "synonyms": ["risk"]
+  },
+  {
+    "English": "warning",
+    "German": "Warnung",
+    "Page": "234",
+    "synonyms": ["alert"]
+  },
+  {
+    "English": "head teacher",
+    "German": "Schulleiter/in",
+    "Page": "234",
+    "synonyms": ["principal", "headmaster"]
+  },
+  {
+    "English": "(to) allow",
+    "German": "erlauben, zulassen",
+    "Page": "234",
+    "synonyms": ["(to) permit"]
+  },
+  {
+    "English": "topic sentence",
+    "German": "Satz, der in das Thema eines Absatzes einführt",
+    "Page": "234",
+    "synonyms": []
+  },
+  {
+    "English": "(to) organize",
+    "German": "organisieren, ordnen",
+    "Page": "234",
+    "synonyms": ["(to) arrange"]
+  },
+  {
+    "English": "climb",
+    "German": "Aufstieg, Anstieg",
+    "Page": "234",
+    "synonyms": ["ascent"]
+  },
+  {
+    "English": "summit",
+    "German": "Gipfel",
+    "Page": "234",
+    "synonyms": ["peak", "top"]
+  },
+  {
+    "English": "(to) manage sth.",
+    "German": "etwas schaffen, etwas zustande bringen",
+    "Page": "234",
+    "synonyms": ["(to) accomplish"]
+  },
+  {
+    "English": "real",
+    "German": "echt, wirklich",
+    "Page": "234",
+    "synonyms": ["genuine", "true"]
+  },
+  {
+    "English": "downhill",
+    "German": "bergab",
+    "Page": "234",
+    "synonyms": []
+  },
+  {
+    "English": "energy",
+    "German": "Energie, Kraft",
+    "Page": "234",
+    "synonyms": ["power"]
+  },
+  {
+    "English": "a total of ...",
+    "German": "eine Gesamtsumme von ...",
+    "Page": "234",
+    "synonyms": []
+  },
+  {
+    "English": "bar",
+    "German": "Riegel (Schokolade, Müsli), Tafel (Schokolade)",
+    "Page": "234",
+    "synonyms": []
+  },
+  {
+    "English": "hero",
+    "German": "Held/in",
+    "Page": "234",
+    "synonyms": []
+  },
+  {
+    "English": "(to) revise",
+    "German": "überarbeiten; (Lernstoff) wiederholen",
+    "Page": "234",
+    "synonyms": ["(to) review"]
+  },
+  {
+    "English": "carrot",
+    "German": "Möhre, Karotte",
+    "Page": "234",
+    "synonyms": []
+  },
+  {
+    "English": "(to) delete",
+    "German": "löschen; streichen",
+    "Page": "234",
+    "synonyms": ["(to) remove"]
+  },
+  {
+    "English": "Shall I ...?",
+    "German": "Soll ich ...?",
+    "Page": "234",
+    "synonyms": []
+  },
+  {
+    "English": "(to) sigh",
+    "German": "seufzen",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "stone",
+    "German": "Stein",
+    "Page": "235",
+    "synonyms": ["rock"]
+  },
+  {
+    "English": "(to) seem (to be/do)",
+    "German": "(zu sein/zu tun) scheinen",
+    "Page": "235",
+    "synonyms": ["(to) appear"]
+  },
+  {
+    "English": "(to) suppose",
+    "German": "annehmen, vermuten",
+    "Page": "235",
+    "synonyms": ["(to) assume", "(to) guess"]
+  },
+  {
+    "English": "(to) miss",
+    "German": "vermissen",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "actually",
+    "German": "eigentlich; übrigens; tatsächlich",
+    "Page": "235",
+    "synonyms": ["in fact", "really"]
+  },
+  {
+    "English": "factory",
+    "German": "Fabrik",
+    "Page": "235",
+    "synonyms": ["plant"]
+  },
+  {
+    "English": "mine",
+    "German": "Bergwerk",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "coal",
+    "German": "Kohle",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "headword",
+    "German": "Stichwort (im Wörterbuch)",
+    "Page": "235",
+    "synonyms": ["entry word"]
+  },
+  {
+    "English": "part of speech",
+    "German": "Wortart",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "translation",
+    "German": "Übersetzung",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "(to) look after sb./sth.",
+    "German": "aufpassen auf; sich kümmern um sich um (jn.) kümmern",
+    "Page": "235",
+    "synonyms": ["(to) care for", "(to) take care of"]
+  },
+  {
+    "English": "(to) look for sb./sth.",
+    "German": "suchen",
+    "Page": "235",
+    "synonyms": ["(to) search for"]
+  },
+  {
+    "English": "(to) look forward to sth.",
+    "German": "sich freuen auf",
+    "Page": "235",
+    "synonyms": ["(to) anticipate"]
+  },
+  {
+    "English": "(to) look into sth.",
+    "German": "untersuchen, prüfen",
+    "Page": "235",
+    "synonyms": ["(to) investigate"]
+  },
+  {
+    "English": "(to) look up",
+    "German": "hochschauen, aufblicken",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "(to) look sth. up",
+    "German": "nachschlagen (Wörter, Informationen)",
+    "Page": "235",
+    "synonyms": ["(to) search for"]
+  },
+  {
+    "English": "(to) come across/down/over/up with",
+    "German": "stoßen auf (zufällig) treffen bekommen (Krankheit), erkranken an herüberkommen, vorbeikommen haben, kommen auf (Idee, Vorschlag)",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "police",
+    "German": "Polizei",
+    "Page": "235",
+    "synonyms": []
+  },
+  {
+    "English": "(to) flow",
+    "German": "fließen",
+    "Page": "236",
+    "synonyms": ["(to) run"]
+  },
+  {
+    "English": "someone might like it",
+    "German": "jemand könnte es mögen",
+    "Page": "236",
+    "synonyms": []
+  },
+  {
+    "English": "argument",
+    "German": "Argument",
+    "Page": "236",
+    "synonyms": ["point", "reason"]
+  },
+  {
+    "English": "(to) hate",
+    "German": "hassen",
+    "Page": "236",
+    "synonyms": ["(to) despise", "(to) detest"]
+  },
+  {
+    "English": "although",
+    "German": "obwohl",
+    "Page": "236",
+    "synonyms": ["though", "even though"]
+  },
+  {
+    "English": "(to) spend time/money (on)",
+    "German": "Zeit verbringen (mit); Geld ausgeben (für)",
+    "Page": "236",
+    "synonyms": []
+  },
+  {
+    "English": "conservation",
+    "German": "Umweltschutz",
+    "Page": "236",
+    "synonyms": ["preservation"]
+  },
+  {
+    "English": "narrow",
+    "German": "schmal, eng",
+    "Page": "236",
+    "synonyms": []
+  },
+  {
+    "English": "(to) press",
+    "German": "drücken",
+    "Page": "236",
+    "synonyms": ["(to) push"]
+  },
+  {
+    "English": "finally",
+    "German": "endlich, schließlich",
+    "Page": "236",
+    "synonyms": ["eventually", "at last"]
+  },
+  {
+    "English": "(to) be able to do sth.",
+    "German": "etwas tun können; fähig sein / in der Lage sein, etwas zu tun",
+    "Page": "236",
+    "synonyms": ["can"]
+  },
+  {
+    "English": "noisy",
+    "German": "laut, lärmend, voller Lärm",
+    "Page": "236",
+    "synonyms": ["loud"]
+  },
+  {
+    "English": "(to) enter",
+    "German": "betreten, hineingehen in; eintreten",
+    "Page": "236",
+    "synonyms": ["(to) go into"]
+  },
+  {
+    "English": "meal",
+    "German": "Mahlzeit, Essen",
+    "Page": "236",
+    "synonyms": []
+  },
+  {
+    "English": "(to) keep doing sth.",
+    "German": "etwas immer wieder / immer weiter tun; etwas ständig tun",
+    "Page": "236",
+    "synonyms": ["(to) continue"]
+  },
+  {
+    "English": "silently",
+    "German": "lautlos, schweigend",
+    "Page": "236",
+    "synonyms": ["quietly"]
+  },
+  {
+    "English": "corridor",
+    "German": "Gang, Korridor",
+    "Page": "236",
+    "synonyms": ["hallway"]
+  },
+  {
+    "English": "star",
+    "German": "Stern",
+    "Page": "236",
+    "synonyms": []
+  },
+  {
+    "English": "magical",
+    "German": "zauberhaft, wunderbar; magisch",
+    "Page": "236",
+    "synonyms": ["enchanting"]
+  },
+  {
+    "English": "(to) lie down",
+    "German": "sich hinlegen",
+    "Page": "236",
+    "synonyms": ["(to) recline"]
+  },
+  {
+    "English": "busy",
+    "German": "belebt, geschäftig, hektisch",
+    "Page": "236",
+    "synonyms": ["crowded"]
+  },
+  {
+    "English": "(to) clear",
+    "German": "räumen; abräumen",
+    "Page": "236",
+    "synonyms": ["(to) tidy"]
+  },
+  {
+    "English": "breeze",
+    "German": "Brise",
+    "Page": "237",
+    "synonyms": ["gentle wind"]
+  },
+  {
+    "English": "(to) have a look (at sth.)",
+    "German": "nachschauen; einen Blick auf etwas werfen",
+    "Page": "237",
+    "synonyms": ["(to) check"]
+  },
+  {
+    "English": "(to) sit up",
+    "German": "sich aufsetzen",
+    "Page": "237",
+    "synonyms": []
+  },
+  {
+    "English": "wooden",
+    "German": "hölzern; Holz-",
+    "Page": "237",
+    "synonyms": []
+  },
+  {
+    "English": "wide",
+    "German": "weit, breit",
+    "Page": "237",
+    "synonyms": ["broad"]
+  },
+  {
+    "English": "figure",
+    "German": "Figur, Gestalt",
+    "Page": "237",
+    "synonyms": ["shape"]
+  },
+  {
+    "English": "note",
+    "German": "Note, Ton (Musik)",
+    "Page": "237",
+    "synonyms": []
+  },
+  {
+    "English": "such a ...",
+    "German": "so ein/e ...; solch ein/e ...",
+    "Page": "237",
+    "synonyms": []
   },
   {
     "English": "(to) make sth. up",
-    "German": "etwas bilden",
-    "Page": "207",
-    "synonyms": [
-      "constitute",
-      "compose"
-    ]
+    "German": "sich etwas ausdenken",
+    "Page": "237",
+    "synonyms": ["(to) invent"]
   },
   {
-    "English": "percent",
-    "German": "Prozent",
-    "Page": "207",
+    "English": "(to) argue",
+    "German": "streiten; sich streiten",
+    "Page": "237",
+    "synonyms": ["(to) quarrel", "(to) fight"]
+  },
+  {
+    "English": "bite",
+    "German": "Biss, Bissen",
+    "Page": "237",
     "synonyms": []
   },
   {
-    "English": "per cent",
-    "German": "Prozent",
-    "Page": "207",
+    "English": "office",
+    "German": "Büro",
+    "Page": "237",
     "synonyms": []
   },
   {
-    "English": "nonexistent",
-    "German": "nicht vorhanden, nicht existierend",
-    "Page": "207",
+    "English": "how to do sth.",
+    "German": "wie man etwas macht / machen kann / machen soll",
+    "Page": "237",
     "synonyms": []
   },
   {
-    "English": "(to) exist",
-    "German": "existieren",
-    "Page": "207",
-    "synonyms": [
-      "be"
-    ]
+    "English": "(to) behave",
+    "German": "sich verhalten, sich benehmen",
+    "Page": "237",
+    "synonyms": ["(to) act"]
   },
   {
-    "English": "(to) differ",
-    "German": "sich unterscheiden, verschieden sein",
-    "Page": "207",
-    "synonyms": [
-      "vary"
-    ]
-  },
-  {
-    "English": "biological",
-    "German": "biologisch",
-    "Page": "207",
+    "English": "mop",
+    "German": "Wischmopp",
+    "Page": "237",
     "synonyms": []
   },
   {
-    "English": "when it comes to ...",
-    "German": "was ... betrifft/anbelangt, ...",
-    "Page": "207",
-    "synonyms": [
-      "regarding",
-      "concerning"
-    ]
-  },
-  {
-    "English": "representation",
-    "German": "Vertretung, Repräsentanz",
-    "Page": "207",
+    "English": "(to) splash sb.",
+    "German": "jn. nass spritzen",
+    "Page": "237",
     "synonyms": []
   },
   {
-    "English": "(to) represent",
-    "German": "vertreten, repräsentieren",
-    "Page": "207",
+    "English": "punishment",
+    "German": "Bestrafung, Strafe",
+    "Page": "237",
+    "synonyms": ["penalty"]
+  },
+  {
+    "English": "point of view",
+    "German": "Standpunkt",
+    "Page": "238",
+    "synonyms": ["perspective"]
+  },
+  {
+    "English": "(to) explore",
+    "German": "erkunden, erforschen",
+    "Page": "238",
+    "synonyms": ["(to) discover"]
+  },
+  {
+    "English": "cruise",
+    "German": "Kreuzfahrt, Schiffsreise, Bootsfahrt",
+    "Page": "238",
     "synonyms": []
   },
   {
-    "English": "(to) have sb. do sth.",
-    "German": "jn. etwas tun lassen; veranlassen, dass jemand etwas tut",
-    "Page": "208",
+    "English": "stuff",
+    "German": "Zeug, Kram",
+    "Page": "238",
+    "synonyms": ["things"]
+  },
+  {
+    "English": "difference",
+    "German": "Unterschied",
+    "Page": "238",
     "synonyms": []
   },
   {
-    "English": "(to) have sb. do sth. - (to) have sth. done",
-    "German": "jn. etwas tun lassen; veranlassen, dass jemand etwas tut",
-    "Page": "208",
+    "English": "guidebook",
+    "German": "Reiseführer",
+    "Page": "238",
+    "synonyms": ["travel guide"]
+  },
+  {
+    "English": "opinion",
+    "German": "Meinung",
+    "Page": "238",
+    "synonyms": ["view"]
+  },
+  {
+    "English": "hang out",
+    "German": "abhängen, rumhängen",
+    "Page": "238",
+    "synonyms": ["(to) chill"]
+  },
+  {
+    "English": "submarine",
+    "German": "U-Boot",
+    "Page": "238",
     "synonyms": []
   },
   {
-    "English": "(to) have sth. done",
-    "German": "etwas machen/erledigen lassen",
-    "Page": "208",
+    "English": "dock",
+    "German": "Hafen",
+    "Page": "238",
+    "synonyms": ["port"]
+  },
+  {
+    "English": "guys",
+    "German": "Leute",
+    "Page": "238",
+    "synonyms": ["people"]
+  },
+  {
+    "English": "after that",
+    "German": "danach",
+    "Page": "238",
+    "synonyms": ["afterwards"]
+  },
+  {
+    "English": "(to) think sth. of sb./sth.",
+    "German": "etwas von etwas/jm. halten",
+    "Page": "238",
     "synonyms": []
   },
   {
-    "English": "(to) show up",
-    "German": "auftauchen, erscheinen",
-    "Page": "208",
-    "synonyms": [
-      "appear",
-      "turn up"
-    ]
-  },
-  {
-    "English": "husband",
-    "German": "Ehemann",
-    "Page": "208",
-    "synonyms": [
-      "spouse"
-    ]
-  },
-  {
-    "English": "counselor",
-    "German": "Berater/in, Betreuer/in",
-    "Page": "208",
-    "synonyms": [
-      "advisor",
-      "consultant"
-    ]
-  },
-  {
-    "English": "ridiculous",
-    "German": "lächerlich",
-    "Page": "208",
-    "synonyms": [
-      "absurd",
-      "silly"
-    ]
-  },
-  {
-    "English": "contribution",
-    "German": "Beitrag",
-    "Page": "208",
-    "synonyms": []
-  },
-  {
-    "English": "after all",
-    "German": "(schließlich) doch",
-    "Page": "208",
-    "synonyms": []
-  },
-  {
-    "English": "constantly",
-    "German": "ständig, dauernd",
-    "Page": "208",
-    "synonyms": [
-      "continuously",
-      "always"
-    ]
-  },
-  {
-    "English": "(to) eliminate",
-    "German": "abschaffen, beseitigen, eliminieren",
-    "Page": "208",
-    "synonyms": [
-      "remove",
-      "get rid of"
-    ]
-  },
-  {
-    "English": "in the meantime",
-    "German": "in der Zwischenzeit, inzwischen",
-    "Page": "208",
-    "synonyms": [
-      "meanwhile"
-    ]
-  },
-  {
-    "English": "importance",
-    "German": "Wichtigkeit, Bedeutung",
-    "Page": "208",
-    "synonyms": [
-      "significance"
-    ]
-  },
-  {
-    "English": "(to) produce",
-    "German": "produzieren, erzeugen, herstellen",
-    "Page": "208",
-    "synonyms": [
-      "make",
-      "manufacture"
-    ]
-  },
-  {
-    "English": "headline",
-    "German": "Schlagzeile, Überschrift",
-    "Page": "208",
-    "synonyms": [
-      "title",
-      "header"
-    ]
-  },
-  {
-    "English": "provocative",
-    "German": "provozierend, provokativ",
-    "Page": "208",
-    "synonyms": [
-      "controversial"
-    ]
-  },
-  {
-    "English": "(to) support",
-    "German": "unterstützen",
-    "Page": "208",
-    "synonyms": [
-      "help",
-      "back"
-    ]
-  },
-  {
-    "English": "(to) back sth. up",
-    "German": "etwas untermauern (Argument)",
-    "Page": "208",
-    "synonyms": [
-      "support",
-      "substantiate"
-    ]
-  },
-  {
-    "English": "(to) restate sth.",
-    "German": "etwas wiederholen, etwas noch einmal formulieren",
-    "Page": "208",
-    "synonyms": [
-      "repeat",
-      "rephrase"
-    ]
-  },
-  {
-    "English": "(to) call for sth.",
-    "German": "etwas verlangen, etwas fordern; zu etwas auffordern",
-    "Page": "208",
-    "synonyms": [
-      "demand",
-      "request"
-    ]
-  },
-  {
-    "English": "sex",
-    "German": "Geschlecht",
-    "Page": "208",
-    "synonyms": [
-      "gender"
-    ]
-  },
-  {
-    "English": "marriage",
-    "German": "Ehe; Heirat",
-    "Page": "208",
-    "synonyms": [
-      "wedding"
-    ]
-  },
-  {
-    "English": "same-sex marriage",
-    "German": "gleichgeschlechtliche Ehe",
-    "Page": "208",
-    "synonyms": []
-  },
-  {
-    "English": "paragraph break",
-    "German": "Absatzumbruch",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "pay",
-    "German": "Bezahlung, Lohn",
-    "Page": "209",
-    "synonyms": [
-      "salary",
-      "wages"
-    ]
-  },
-  {
-    "English": "(to) pay (for)",
-    "German": "bezahlen",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "(to) discriminate against sb.",
-    "German": "jn. diskriminieren, jn. benachteiligen",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "sadly",
-    "German": "leider, bedauerlicherweise",
-    "Page": "209",
-    "synonyms": [
-      "unfortunately"
-    ]
-  },
-  {
-    "English": "(to) take time off",
-    "German": "sich frei nehmen",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "(to) raise your voice",
-    "German": "seine Stimme erheben",
-    "Page": "209",
-    "synonyms": [
-      "speak up"
-    ]
-  },
-  {
-    "English": "fine",
-    "German": "Geldstrafe",
-    "Page": "209",
-    "synonyms": [
-      "penalty"
-    ]
-  },
-  {
-    "English": "(to) take sth./sb. seriously",
-    "German": "etwas/jn. ernst nehmen",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "unequal",
-    "German": "ungleich",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "persuasion",
-    "German": "Überredung, Überzeugung",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "(to) persuade",
-    "German": "überreden",
-    "Page": "209",
-    "synonyms": [
-      "convince"
-    ]
-  },
-  {
-    "English": "anecdote",
-    "German": "Anekdote",
-    "Page": "209",
-    "synonyms": [
-      "story"
-    ]
-  },
-  {
-    "English": "historical",
-    "German": "historisch, geschichtlich",
-    "Page": "209",
+    "English": "crossword",
+    "German": "Kreuzworträtsel",
+    "Page": "238",
     "synonyms": []
   },
   {
     "English": "factual",
-    "German": "sachlich, faktisch, den Tatsachen entsprechend",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "expressive",
-    "German": "ausdrucksstark, aussagekräftig",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "rhetorical",
-    "German": "rhetorisch",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "(to) deny",
-    "German": "bestreiten, abstreiten, leugnen",
-    "Page": "209",
-    "synonyms": [
-      "refute"
-    ]
-  },
-  {
-    "English": "emphatic",
-    "German": "nachdrücklich, eindringlich, emphatisch",
-    "Page": "209",
-    "synonyms": [
-      "forceful"
-    ]
-  },
-  {
-    "English": "improvement",
-    "German": "Verbesserung",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "cell",
-    "German": "Zelle",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "genetics",
-    "German": "Genetik",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "gene",
-    "German": "Gen",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "genetic",
-    "German": "genetisch",
-    "Page": "209",
-    "synonyms": []
-  },
-  {
-    "English": "human race",
-    "German": "Menschheit",
-    "Page": "209",
-    "synonyms": [
-      "humanity",
-      "mankind"
-    ]
-  },
-  {
-    "English": "aid",
-    "German": "Hilfe, Unterstützung",
-    "Page": "209",
-    "synonyms": [
-      "help",
-      "assistance"
-    ]
-  },
-  {
-    "English": "technology",
-    "German": "Technik, Technologie",
-    "Page": "210",
-    "synonyms": []
-  },
-  {
-    "English": "ancient",
-    "German": "(ur)alt, antik",
-    "Page": "210",
-    "synonyms": [
-      "old",
-      "prehistoric"
-    ]
-  },
-  {
-    "English": "(to) rust",
-    "German": "rosten, verrosten",
-    "Page": "210",
-    "synonyms": [
-      "corrode"
-    ]
-  },
-  {
-    "English": "(to) erode",
-    "German": "abtragen, erodieren, auswaschen (Boden)",
-    "Page": "210",
-    "synonyms": [
-      "wear away"
-    ]
-  },
-  {
-    "English": "earthquake",
-    "German": "Erdbeben",
-    "Page": "210",
-    "synonyms": []
-  },
-  {
-    "English": "species",
-    "German": "Art, Spezies",
-    "Page": "210",
-    "synonyms": []
-  },
-  {
-    "English": "record",
-    "German": "Aufzeichnung(en)",
-    "Page": "210",
-    "synonyms": []
+    "German": "sachlich, Sach-; faktisch; den Tatsachen entsprechend",
+    "Page": "238",
+    "synonyms": ["accurate"]
   },
   {
-    "English": "(to) record",
-    "German": "aufzeichnen (Musik, Daten); dokumentieren (Daten)",
-    "Page": "210",
+    "English": "introduction",
+    "German": "Einleitung, Einführung",
+    "Page": "238",
     "synonyms": []
-  },
-  {
-    "English": "(to) be around",
-    "German": "da sein, dabei sein, in der Nähe sein",
-    "Page": "210",
-    "synonyms": [
-      "be present"
-    ]
-  },
-  {
-    "English": "skeleton",
-    "German": "Skelett",
-    "Page": "210",
-    "synonyms": []
-  },
-  {
-    "English": "astonishment",
-    "German": "Erstaunen",
-    "Page": "210",
-    "synonyms": [
-      "amazement",
-      "surprise"
-    ]
-  },
-  {
-    "English": "excitement",
-    "German": "Aufregung, Begeisterung",
-    "Page": "210",
-    "synonyms": []
-  },
-  {
-    "English": "frustration",
-    "German": "Frust, Enttäuschung",
-    "Page": "210",
-    "synonyms": [
-      "disappointment"
-    ]
-  },
-  {
-    "English": "the ups and downs",
-    "German": "die Höhen und Tiefen",
-    "Page": "210",
-    "synonyms": []
-  },
-  {
-    "English": "compound",
-    "German": "Verbindung",
-    "Page": "210",
-    "synonyms": []
-  },
-  {
-    "English": "(to) contain",
-    "German": "enthalten, beinhalten",
-    "Page": "210",
-    "synonyms": [
-      "include"
-    ]
-  },
-  {
-    "English": "instruction",
-    "German": "Anweisung",
-    "Page": "210",
-    "synonyms": [
-      "direction"
-    ]
-  },
-  {
-    "English": "(to) instruct",
-    "German": "anweisen, etwas zu tun",
-    "Page": "210",
-    "synonyms": [
-      "tell",
-      "direct"
-    ]
-  },
-  {
-    "English": "organism",
-    "German": "Organismus",
-    "Page": "211",
-    "synonyms": []
-  },
-  {
-    "English": "(to) pack",
-    "German": "packen, verpacken",
-    "Page": "211",
-    "synonyms": []
-  },
-  {
-    "English": "controversial",
-    "German": "kontrovers, umstritten",
-    "Page": "211",
-    "synonyms": [
-      "disputed",
-      "debatable"
-    ]
-  },
-  {
-    "English": "whereas",
-    "German": "während, wohingegen",
-    "Page": "211",
-    "synonyms": [
-      "while"
-    ]
-  },
-  {
-    "English": "humanity",
-    "German": "Menschheit; Menschlichkeit, Humanität",
-    "Page": "211",
-    "synonyms": [
-      "mankind",
-      "humankind"
-    ]
-  },
-  {
-    "English": "bacteria",
-    "German": "Bakterien",
-    "Page": "211",
-    "synonyms": []
-  },
-  {
-    "English": "(to) be located (in ...)",
-    "German": "(in ...) liegen, sich (in ...) befinden",
-    "Page": "211",
-    "synonyms": [
-      "be situated"
-    ]
-  },
-  {
-    "English": "(to) remove",
-    "German": "entfernen, beseitigen, ausziehen (Kleidung)",
-    "Page": "211",
-    "synonyms": [
-      "take off",
-      "take away"
-    ]
-  },
-  {
-    "English": "(to) take sth. away; (to) take (clothes) off",
-    "German": "etwas wegnehmen; ausziehen",
-    "Page": "211",
-    "synonyms": [
-      "remove"
-    ]
-  },
-  {
-    "English": "harmless",
-    "German": "harmlos",
-    "Page": "211",
-    "synonyms": [
-      "safe",
-      "innocent"
-    ]
-  },
-  {
-    "English": "extraordinary",
-    "German": "außergewöhnlich",
-    "Page": "211",
-    "synonyms": [
-      "remarkable",
-      "exceptional"
-    ]
   },
   {
-    "English": "breakthrough",
-    "German": "Durchbruch",
-    "Page": "211",
+    "English": "body",
+    "German": "Hauptteil (eines Textes)",
+    "Page": "238",
     "synonyms": []
   },
   {
-    "English": "precise",
-    "German": "genau, präzise",
-    "Page": "211",
-    "synonyms": [
-      "accurate",
-      "exact"
-    ]
+    "English": "conclusion",
+    "German": "Schluss(folgerung)",
+    "Page": "238",
+    "synonyms": ["ending"]
   },
   {
-    "English": "accurate",
-    "German": "genau, präzise",
-    "Page": "211",
-    "synonyms": [
-      "precise",
-      "correct"
-    ]
+    "English": "schedule",
+    "German": "(Zeit-)Plan, Programm",
+    "Page": "238",
+    "synonyms": ["timetable"]
   },
   {
-    "English": "method",
-    "German": "Methode",
-    "Page": "211",
-    "synonyms": [
-      "approach",
-      "technique"
-    ]
-  },
-  {
-    "English": "cancer",
-    "German": "Krebs (Erkrankung)",
-    "Page": "211",
+    "English": "(to) get/have a day off",
+    "German": "einen Tag frei bekommen/haben",
+    "Page": "238",
     "synonyms": []
-  },
-  {
-    "English": "permanent",
-    "German": "permanent, dauerhaft",
-    "Page": "211",
-    "synonyms": [
-      "lasting",
-      "constant"
-    ]
-  },
-  {
-    "English": "pill",
-    "German": "Pille, Tablette",
-    "Page": "211",
-    "synonyms": [
-      "tablet"
-    ]
   },
   {
-    "English": "fear (of)",
-    "German": "Angst (vor)",
-    "Page": "211",
-    "synonyms": []
+    "English": "(to) earn",
+    "German": "verdienen (Geld)",
+    "Page": "239",
+    "synonyms": ["(to) make money"]
   },
   {
-    "English": "so-called",
-    "German": "sogenannt",
-    "Page": "211",
+    "English": "experience",
+    "German": "Erfahrung(en)",
+    "Page": "239",
     "synonyms": []
   },
   {
-    "English": "topping",
-    "German": "Überzug, Belag, Soße",
-    "Page": "211",
+    "English": "(to) be born",
+    "German": "geboren sein/werden",
+    "Page": "239",
     "synonyms": []
-  },
-  {
-    "English": "unethical",
-    "German": "unethisch",
-    "Page": "211",
-    "synonyms": [
-      "immoral"
-    ]
-  },
-  {
-    "English": "with regard to",
-    "German": "bezüglich",
-    "Page": "211",
-    "synonyms": [
-      "concerning",
-      "regarding"
-    ]
-  },
-  {
-    "English": "(to) acquire",
-    "German": "erwerben, in den Besitz gelangen",
-    "Page": "211",
-    "synonyms": [
-      "obtain",
-      "get"
-    ]
-  },
-  {
-    "English": "newsreader",
-    "German": "Nachrichtensprecher/in",
-    "Page": "211",
-    "synonyms": [
-      "news anchor"
-    ]
   },
   {
-    "English": "power line",
-    "German": "Überlandleitung",
-    "Page": "211",
+    "English": "(to) grow up",
+    "German": "erwachsen werden; aufwachsen",
+    "Page": "239",
     "synonyms": []
   },
   {
-    "English": "(to) repair",
-    "German": "reparieren",
-    "Page": "211",
-    "synonyms": [
-      "fix",
-      "mend"
-    ]
-  },
-  {
-    "English": "high winds",
-    "German": "starker Wind, starke Winde",
-    "Page": "211",
-    "synonyms": []
+    "English": "(to) invent",
+    "German": "erfinden",
+    "Page": "239",
+    "synonyms": ["(to) create"]
   },
   {
-    "English": "rail link",
-    "German": "Bahnverbindung",
-    "Page": "211",
-    "synonyms": []
+    "English": "modern",
+    "German": "modern",
+    "Page": "239",
+    "synonyms": ["contemporary"]
   },
   {
-    "English": "applause",
-    "German": "Beifall, Applaus",
-    "Page": "212",
+    "English": "success",
+    "German": "Erfolg",
+    "Page": "239",
     "synonyms": []
-  },
-  {
-    "English": "climax",
-    "German": "Höhepunkt",
-    "Page": "212",
-    "synonyms": [
-      "peak",
-      "culmination"
-    ]
-  },
-  {
-    "English": "single",
-    "German": "einzelne(r, s)",
-    "Page": "212",
-    "synonyms": [
-      "one",
-      "sole"
-    ]
-  },
-  {
-    "English": "(to) define",
-    "German": "definieren; charakterisieren, ausmachen",
-    "Page": "212",
-    "synonyms": [
-      "explain",
-      "describe"
-    ]
   },
   {
-    "English": "meeting",
-    "German": "Treffen; Besprechung, Versammlung",
-    "Page": "212",
-    "synonyms": [
-      "gathering"
-    ]
+    "English": "(to) perform",
+    "German": "auftreten (Künstler/-in)",
+    "Page": "239",
+    "synonyms": ["(to) play"]
   },
   {
-    "English": "jungle",
-    "German": "Dschungel",
-    "Page": "212",
-    "synonyms": []
+    "English": "popular (with)",
+    "German": "populär, beliebt (bei)",
+    "Page": "239",
+    "synonyms": ["well-liked"]
   },
   {
-    "English": "the locals",
-    "German": "die Einheimischen",
-    "Page": "212",
-    "synonyms": []
+    "English": "monument (to)",
+    "German": "Denkmal, Monument (für/zum Gedenken an)",
+    "Page": "239",
+    "synonyms": ["memorial"]
   },
   {
-    "English": "villager",
-    "German": "Dorfbewohner/in",
-    "Page": "212",
+    "English": "a one-hour concert",
+    "German": "ein einstündiges Konzert",
+    "Page": "239",
     "synonyms": []
-  },
-  {
-    "English": "(to) observe",
-    "German": "beobachten",
-    "Page": "212",
-    "synonyms": [
-      "watch",
-      "notice"
-    ]
-  },
-  {
-    "English": "(to) affect",
-    "German": "betreffen, sich auswirken auf; beeinflussen",
-    "Page": "212",
-    "synonyms": [
-      "influence",
-      "impact"
-    ]
-  },
-  {
-    "English": "drunk",
-    "German": "betrunken",
-    "Page": "212",
-    "synonyms": [
-      "intoxicated"
-    ]
-  },
-  {
-    "English": "(to) save",
-    "German": "sparen; speichern; sichern",
-    "Page": "212",
-    "synonyms": [
-      "store",
-      "rescue"
-    ]
-  },
-  {
-    "English": "therefore",
-    "German": "daher, deshalb",
-    "Page": "212",
-    "synonyms": [
-      "thus",
-      "consequently"
-    ]
   },
   {
-    "English": "(to) infect",
-    "German": "infizieren; anstecken",
-    "Page": "212",
+    "English": "banana",
+    "German": "Banane",
+    "Page": "239",
     "synonyms": []
   },
   {
-    "English": "cream",
-    "German": "Creme, Salbe",
-    "Page": "212",
+    "English": "proud (of)",
+    "German": "stolz (auf)",
+    "Page": "239",
     "synonyms": []
-  },
-  {
-    "English": "liquid",
-    "German": "Flüssigkeit",
-    "Page": "212",
-    "synonyms": [
-      "fluid"
-    ]
-  },
-  {
-    "English": "manners",
-    "German": "Manieren",
-    "Page": "212",
-    "synonyms": [
-      "etiquette",
-      "behavior"
-    ]
-  },
-  {
-    "English": "no matter if/whether; no matter what/who/how/...",
-    "German": "ganz gleich, ob; ganz gleich, was/wer/wie/...",
-    "Page": "212",
-    "synonyms": [
-      "regardless"
-    ]
   },
   {
-    "English": "(to) happen to do sth.",
-    "German": "zufällig(erweise) etwas tun",
-    "Page": "213",
+    "English": "accent",
+    "German": "Akzent",
+    "Page": "239",
     "synonyms": []
   },
   {
-    "English": "(to) teach sb. a lesson",
-    "German": "jm. eine Lektion erteilen",
-    "Page": "213",
+    "English": "for hours/weeks/...",
+    "German": "seit Stunden/Wochen/...",
+    "Page": "239",
     "synonyms": []
-  },
-  {
-    "English": "(to) trade",
-    "German": "(ein)tauschen; Handel treiben",
-    "Page": "213",
-    "synonyms": [
-      "exchange",
-      "swap"
-    ]
   },
   {
-    "English": "bullet",
-    "German": "(Gewehr-)Kugel",
-    "Page": "213",
+    "English": "since 10 o'clock/Monday/last week/...",
+    "German": "seit 10 Uhr/Montag/letzter Woche/...",
+    "Page": "239",
     "synonyms": []
-  },
-  {
-    "English": "(to) return",
-    "German": "zurückkehren, zurückkommen",
-    "Page": "213",
-    "synonyms": [
-      "come back",
-      "go back"
-    ]
-  },
-  {
-    "English": "greeting",
-    "German": "Begrüßung",
-    "Page": "213",
-    "synonyms": [
-      "hello",
-      "salutation"
-    ]
-  },
-  {
-    "English": "(to) respond",
-    "German": "antworten, erwidern; reagieren",
-    "Page": "213",
-    "synonyms": [
-      "answer",
-      "reply",
-      "react"
-    ]
   },
   {
-    "English": "post",
-    "German": "Pfosten",
-    "Page": "213",
-    "synonyms": [
-      "pole"
-    ]
-  },
-  {
-    "English": "turtle",
-    "German": "Wasserschildkröte",
-    "Page": "213",
+    "English": "support a team",
+    "German": "eine Mannschaft unterstützen; Fan einer Mannschaft sein",
+    "Page": "239",
     "synonyms": []
-  },
-  {
-    "English": "the other day",
-    "German": "neulich",
-    "Page": "213",
-    "synonyms": [
-      "recently"
-    ]
-  },
-  {
-    "English": "sense",
-    "German": "Vernunft, Verstand",
-    "Page": "213",
-    "synonyms": [
-      "reason",
-      "logic"
-    ]
   },
   {
-    "English": "pole",
-    "German": "Stange, Pfahl, Mast",
-    "Page": "213",
-    "synonyms": [
-      "post"
-    ]
-  },
-  {
-    "English": "flagpole",
-    "German": "Fahnenmast",
-    "Page": "213",
+    "English": "password",
+    "German": "Passwort",
+    "Page": "239",
     "synonyms": []
   },
   {
-    "English": "tent poles",
-    "German": "Zeltstangen",
-    "Page": "213",
+    "English": "stadium",
+    "German": "Stadion",
+    "Page": "239",
     "synonyms": []
   },
   {
-    "English": "curtain pole",
-    "German": "Gardinenstange",
-    "Page": "213",
-    "synonyms": []
+    "English": "leader",
+    "German": "Leiter/in",
+    "Page": "239",
+    "synonyms": ["chief", "head"]
   },
   {
-    "English": "telegraph pole",
-    "German": "Telegrafenmast",
-    "Page": "213",
-    "synonyms": []
+    "English": "(to) lead, [led], led",
+    "German": "führen, leiten",
+    "Page": "239",
+    "synonyms": ["(to) guide"]
   },
   {
-    "English": "totem pole",
-    "German": "Totempfahl",
-    "Page": "213",
+    "English": "on board",
+    "German": "an Bord",
+    "Page": "239",
     "synonyms": []
   },
   {
-    "English": "ski poles",
-    "German": "Skistöcke",
-    "Page": "213",
+    "English": "scarf",
+    "German": "Schal",
+    "Page": "240",
     "synonyms": []
-  },
-  {
-    "English": "(to) come to an understanding",
-    "German": "sich einigen; zu einer Übereinkunft kommen",
-    "Page": "213",
-    "synonyms": [
-      "reach an agreement"
-    ]
   },
   {
-    "English": "none of us",
-    "German": "keine/r von uns",
-    "Page": "213",
+    "English": "like",
+    "German": "als ob",
+    "Page": "240",
     "synonyms": []
   },
   {
-    "English": "stingy",
-    "German": "knauserig, geizig",
-    "Page": "213",
-    "synonyms": [
-      "mean",
-      "tight"
-    ]
+    "English": "(to) photograph",
+    "German": "fotografieren",
+    "Page": "240",
+    "synonyms": ["(to) take a photo"]
   },
   {
-    "English": "(to) refuse",
-    "German": "sich weigern, ablehnen",
-    "Page": "214",
-    "synonyms": [
-      "decline",
-      "reject"
-    ]
-  },
-  {
-    "English": "(to) refuse to do sth.",
-    "German": "sich weigern / es ablehnen, etwas zu tun",
-    "Page": "214",
+    "English": "public",
+    "German": "öffentlich(-s)",
+    "Page": "240",
     "synonyms": []
   },
   {
-    "English": "mattress",
-    "German": "Matratze",
-    "Page": "214",
+    "English": "(the) public",
+    "German": "die Öffentlichkeit",
+    "Page": "240",
     "synonyms": []
-  },
-  {
-    "English": "(to) reach for sth.",
-    "German": "nach etwas greifen",
-    "Page": "214",
-    "synonyms": [
-      "grab"
-    ]
   },
   {
-    "English": "(to) unwrap",
-    "German": "auspacken, auswickeln",
-    "Page": "214",
-    "synonyms": [
-      "open"
-    ]
+    "English": "absolutely",
+    "German": "völlig, absolut",
+    "Page": "240",
+    "synonyms": ["completely"]
   },
   {
-    "English": "(to) indicate sth./sb.",
-    "German": "auf etwas/jn. zeigen, deuten, hinweisen",
-    "Page": "214",
-    "synonyms": [
-      "point to",
-      "show"
-    ]
+    "English": "for ages",
+    "German": "seit einer Ewigkeit, ewig lange",
+    "Page": "240",
+    "synonyms": ["for a long time"]
   },
   {
-    "English": "narrative",
-    "German": "Erzählung, Geschichte",
-    "Page": "214",
-    "synonyms": [
-      "story"
-    ]
+    "English": "polite",
+    "German": "höflich",
+    "Page": "240",
+    "synonyms": ["courteous"]
   },
   {
-    "English": "prose",
-    "German": "Prosa",
-    "Page": "214",
-    "synonyms": []
+    "English": "impolite",
+    "German": "unhöflich",
+    "Page": "240",
+    "synonyms": ["rude"]
   },
   {
-    "English": "fiction",
-    "German": "Belletristik, Prosa(literatur); Märchen, Fiktion",
-    "Page": "214",
-    "synonyms": []
+    "English": "(to) remember sth.",
+    "German": "an etwas denken; sich etwas merken",
+    "Page": "240",
+    "synonyms": ["(to) recall"]
   },
   {
-    "English": "graphic novel",
-    "German": "Bildroman, Comicroman",
-    "Page": "214",
+    "English": "law",
+    "German": "Gesetz",
+    "Page": "240",
     "synonyms": []
   },
   {
-    "English": "non-fiction",
-    "German": "Sachliteratur",
-    "Page": "214",
+    "English": "(to) publish",
+    "German": "veröffentlichen, verlegen",
+    "Page": "240",
     "synonyms": []
-  },
-  {
-    "English": "companion",
-    "German": "Begleiter/in, Gefährte/-in",
-    "Page": "214",
-    "synonyms": [
-      "friend"
-    ]
-  },
-  {
-    "English": "sympathy",
-    "German": "Sympathie, Mitgefühl",
-    "Page": "214",
-    "synonyms": [
-      "compassion"
-    ]
-  },
-  {
-    "English": "(to) succeed",
-    "German": "Erfolg haben",
-    "Page": "214",
-    "synonyms": [
-      "be successful"
-    ]
   },
   {
-    "English": "(to) succeed in doing sth.",
-    "German": "es schaffen, etwas zu tun",
-    "Page": "214",
-    "synonyms": [
-      "manage to do"
-    ]
-  },
-  {
-    "English": "observation",
-    "German": "Beobachtung",
-    "Page": "214",
+    "English": "social media",
+    "German": "soziale Medien",
+    "Page": "240",
     "synonyms": []
   },
   {
-    "English": "omniscient",
-    "German": "allwissend",
-    "Page": "214",
-    "synonyms": [
-      "all-knowing"
-    ]
+    "English": "permission",
+    "German": "Erlaubnis",
+    "Page": "240",
+    "synonyms": ["consent"]
   },
   {
-    "English": "messaging app",
-    "German": "Chatprogramm",
-    "Page": "214",
-    "synonyms": []
+    "English": "situation",
+    "German": "Situation",
+    "Page": "240",
+    "synonyms": ["circumstance"]
   },
   {
-    "English": "footage",
-    "German": "Bildmaterial, Film(material)",
-    "Page": "214",
-    "synonyms": []
+    "English": "focus",
+    "German": "Mittelpunkt, Schwerpunkt",
+    "Page": "240",
+    "synonyms": ["center"]
   },
   {
-    "English": "cotton",
-    "German": "Baumwolle",
-    "Page": "214",
+    "English": "nurse",
+    "German": "Krankenschwester, Krankenpfleger",
+    "Page": "240",
     "synonyms": []
   },
   {
-    "English": "reflection",
-    "German": "Betrachtung, Reflexion",
-    "Page": "214",
+    "English": "exchange",
+    "German": "Austausch",
+    "Page": "240",
     "synonyms": []
-  },
-  {
-    "English": "review",
-    "German": "Rezension, Besprechung, Kritik",
-    "Page": "214",
-    "synonyms": [
-      "critique"
-    ]
-  },
-  {
-    "English": "(to) review",
-    "German": "besprechen, rezensieren",
-    "Page": "214",
-    "synonyms": [
-      "critique"
-    ]
-  },
-  {
-    "English": "fictional",
-    "German": "fiktiv, erfunden",
-    "Page": "214",
-    "synonyms": [
-      "imaginary"
-    ]
   },
   {
-    "English": "misunderstanding",
-    "German": "Missverständnis",
-    "Page": "214",
+    "English": "(to) score",
+    "German": "Treffer erzielen, Tor schießen",
+    "Page": "240",
     "synonyms": []
-  },
-  {
-    "English": "(to) narrate",
-    "German": "schildern, erzählen",
-    "Page": "215",
-    "synonyms": [
-      "tell",
-      "recount"
-    ]
   },
   {
-    "English": "(to) bathe",
-    "German": "baden",
-    "Page": "215",
-    "synonyms": [
-      "wash"
-    ]
-  },
-  {
-    "English": "ignorant",
-    "German": "unwissend, nicht informiert, schlecht informiert",
-    "Page": "215",
+    "English": "score",
+    "German": "Spielstand; Punktestand",
+    "Page": "240",
     "synonyms": []
-  },
-  {
-    "English": "wife",
-    "German": "Ehefrau",
-    "Page": "215",
-    "synonyms": [
-      "spouse"
-    ]
-  },
-  {
-    "English": "(to) put sth. off",
-    "German": "etwas verschieben",
-    "Page": "215",
-    "synonyms": [
-      "postpone",
-      "delay"
-    ]
-  },
-  {
-    "English": "for now",
-    "German": "einstweilen, vorerst, fürs Erste",
-    "Page": "215",
-    "synonyms": [
-      "at the moment"
-    ]
-  },
-  {
-    "English": "(to) abandon sb.",
-    "German": "jn. verlassen, im Stich lassen; aussetzen",
-    "Page": "215",
-    "synonyms": [
-      "desert",
-      "leave"
-    ]
   },
   {
-    "English": "(to) breastfeed, -fed, -fed",
-    "German": "stillen",
-    "Page": "215",
-    "synonyms": [
-      "nurse"
-    ]
+    "English": "final",
+    "German": "letzte(-r, -s), End-",
+    "Page": "240",
+    "synonyms": ["last"]
   },
   {
-    "English": "eventually",
-    "German": "schließlich, letzten Endes",
-    "Page": "215",
-    "synonyms": [
-      "finally",
-      "in the end"
-    ]
+    "English": "result",
+    "German": "Ergebnis, Resultat",
+    "Page": "240",
+    "synonyms": ["outcome"]
   },
   {
-    "English": "literally",
-    "German": "im wahrsten Sinne des Wortes, buchstäblich",
-    "Page": "215",
-    "synonyms": []
+    "English": "as a result",
+    "German": "folglich",
+    "Page": "240",
+    "synonyms": ["consequently"]
   },
   {
-    "English": "(to) grow smaller/old/..., grew, grown",
-    "German": "(allmählich) kleiner/alt/... werden",
-    "Page": "215",
-    "synonyms": [
-      "become"
-    ]
+    "English": "emotion",
+    "German": "Gefühl, Emotion",
+    "Page": "240",
+    "synonyms": ["feeling"]
   },
   {
-    "English": "(to) grow",
-    "German": "wachsen; aufwachsen; angebaut werden; anbauen, anpflanzen; (allmählich) werden; jm. näherkommen",
-    "Page": "215",
+    "English": "including",
+    "German": "einschließlich; darunter (auch)",
+    "Page": "240",
     "synonyms": []
-  },
-  {
-    "English": "enormous",
-    "German": "riesig, gewaltig, enorm",
-    "Page": "215",
-    "synonyms": [
-      "huge",
-      "massive"
-    ]
-  },
-  {
-    "English": "credible",
-    "German": "glaubwürdig, glaubhaft",
-    "Page": "215",
-    "synonyms": [
-      "believable"
-    ]
-  },
-  {
-    "English": "informative",
-    "German": "informativ, lehrreich",
-    "Page": "215",
-    "synonyms": [
-      "educational"
-    ]
-  },
-  {
-    "English": "strongly",
-    "German": "nachdrücklich, entschieden, energisch",
-    "Page": "215",
-    "synonyms": [
-      "firmly",
-      "forcefully"
-    ]
-  },
-  {
-    "English": "engaging",
-    "German": "fesselnd (Literatur, Film u.Ä.)",
-    "Page": "215",
-    "synonyms": [
-      "captivating",
-      "absorbing"
-    ]
-  },
-  {
-    "English": "distant",
-    "German": "(weit) entfernt, fern",
-    "Page": "215",
-    "synonyms": [
-      "far",
-      "remote"
-    ]
-  },
-  {
-    "English": "(to) inform sb.",
-    "German": "jn. informieren",
-    "Page": "215",
-    "synonyms": [
-      "tell",
-      "notify"
-    ]
-  },
-  {
-    "English": "plot",
-    "German": "Handlung(sverlauf) (eines Films/einer Geschichte)",
-    "Page": "215",
-    "synonyms": [
-      "storyline"
-    ]
-  },
-  {
-    "English": "(to) hint (at sth.)",
-    "German": "(etwas) andeuten, durchblicken lassen",
-    "Page": "216",
-    "synonyms": [
-      "suggest",
-      "imply"
-    ]
-  },
-  {
-    "English": "(to) summarize",
-    "German": "zusammenfassen",
-    "Page": "216",
-    "synonyms": [
-      "sum up"
-    ]
   },
   {
-    "English": "suitable",
-    "German": "geeignet, passend",
-    "Page": "216",
-    "synonyms": [
-      "appropriate",
-      "fitting"
-    ]
+    "English": "goalkeeper",
+    "German": "Torwart, Torfrau",
+    "Page": "241",
+    "synonyms": ["goalie"]
   },
   {
-    "English": "(to) appeal to sb.",
-    "German": "für jn. attraktiv sein, jn. ansprechen",
-    "Page": "216",
-    "synonyms": [
-      "attract"
-    ]
-  },
-  {
-    "English": "ladder",
-    "German": "Leiter",
-    "Page": "216",
-    "synonyms": []
+    "English": "referee",
+    "German": "Schiedsrichter/in",
+    "Page": "241",
+    "synonyms": ["umpire"]
   },
   {
-    "English": "genre",
-    "German": "Gattung, Genre",
-    "Page": "216",
-    "synonyms": []
+    "English": "pitch",
+    "German": "(Sport-)Platz, Spielfeld",
+    "Page": "241",
+    "synonyms": ["field"]
   },
   {
-    "English": "semi-",
-    "German": "halb-, Halb-",
-    "Page": "216",
+    "English": "free kick",
+    "German": "Freistoß",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "autobiographical",
-    "German": "autobiografisch",
-    "Page": "216",
+    "English": "(to) pronounce",
+    "German": "aussprechen",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "intended",
-    "German": "beabsichtigt, gemeint",
-    "Page": "216",
-    "synonyms": [
-      "meant"
-    ]
+    "English": "(to) order",
+    "German": "ordnen",
+    "Page": "241",
+    "synonyms": ["(to) arrange"]
   },
   {
-    "English": "powerful",
-    "German": "mächtig, kräftig, stark",
-    "Page": "216",
-    "synonyms": [
-      "strong"
-    ]
+    "English": "(to) structure",
+    "German": "strukturieren, gliedern",
+    "Page": "241",
+    "synonyms": ["(to) organize"]
   },
   {
-    "English": "lover",
-    "German": "Liebhaber/in",
-    "Page": "216",
-    "synonyms": []
+    "English": "equipment",
+    "German": "Ausrüstung",
+    "Page": "241",
+    "synonyms": ["gear"]
   },
   {
-    "English": "(to) be set in",
-    "German": "spielen in",
-    "Page": "216",
+    "English": "nature",
+    "German": "Natur",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "hilarious",
-    "German": "urkomisch, unheimlich witzig",
-    "Page": "216",
-    "synonyms": [
-      "very funny"
-    ]
-  },
-  {
-    "English": "account",
-    "German": "Bericht, Schilderung, Darstellung",
-    "Page": "216",
-    "synonyms": [
-      "report"
-    ]
-  },
-  {
-    "English": "emphasis",
-    "German": "Betonung, Hervorhebung",
-    "Page": "216",
-    "synonyms": [
-      "stress"
-    ]
-  },
-  {
-    "English": "(to) emphasize",
-    "German": "betonen, hervorheben",
-    "Page": "216",
-    "synonyms": [
-      "stress",
-      "highlight"
-    ]
-  },
-  {
-    "English": "entertaining",
-    "German": "unterhaltsam, amüsant, kurzweilig",
-    "Page": "216",
-    "synonyms": [
-      "amusing"
-    ]
   },
   {
-    "English": "read",
-    "German": "Lektüre",
-    "Page": "216",
+    "English": "bully",
+    "German": "(Schul-)Tyrann",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "enjoyable",
-    "German": "angenehm, unterhaltsam",
-    "Page": "216",
-    "synonyms": [
-      "pleasant"
-    ]
-  },
-  {
-    "English": "lifelike",
-    "German": "lebensecht, realistisch",
-    "Page": "216",
-    "synonyms": [
-      "realistic"
-    ]
-  },
-  {
-    "English": "gripping",
-    "German": "spannend, fesselnd",
-    "Page": "216",
-    "synonyms": [
-      "thrilling",
-      "captivating"
-    ]
-  },
-  {
-    "English": "meaningful",
-    "German": "aussagekräftig",
-    "Page": "216",
-    "synonyms": [
-      "significant"
-    ]
-  },
-  {
-    "English": "(to) quote",
-    "German": "zitieren",
-    "Page": "216",
-    "synonyms": [
-      "cite"
-    ]
-  },
-  {
-    "English": "diversity",
-    "German": "Vielfalt, Verschiedenartigkeit",
-    "Page": "216",
-    "synonyms": [
-      "variety"
-    ]
   },
   {
-    "English": "display",
-    "German": "Ausstellung, Vorführung, Schau",
-    "Page": "216",
-    "synonyms": [
-      "exhibition"
-    ]
+    "English": "(to) solve",
+    "German": "lösen",
+    "Page": "241",
+    "synonyms": ["(to) resolve"]
   },
   {
-    "English": "(to) title",
-    "German": "betiteln, benennen",
-    "Page": "216",
-    "synonyms": [
-      "name",
-      "call"
-    ]
-  },
-  {
-    "English": "harmony",
-    "German": "Harmonie, Eintracht",
-    "Page": "217",
+    "English": "slow motion",
+    "German": "Zeitlupe",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "(to) embrace",
-    "German": "annehmen, mit offenen Armen begrüßen; (sich) umarmen",
-    "Page": "217",
-    "synonyms": [
-      "accept",
-      "hug"
-    ]
-  },
-  {
-    "English": "derogatory",
-    "German": "abfällig, abwertend",
-    "Page": "217",
-    "synonyms": [
-      "disparaging"
-    ]
   },
   {
-    "English": "stereotype",
-    "German": "Klischee(vorstellung), Stereotyp",
-    "Page": "217",
+    "English": "It was no different",
+    "German": "es war nicht anders",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "(to) be present",
-    "German": "vorhanden sein; anwesend sein",
-    "Page": "217",
-    "synonyms": [
-      "be there"
-    ]
-  },
-  {
-    "English": "(to) capture",
-    "German": "(ein)fangen (auch im übertragenen Sinne)",
-    "Page": "217",
-    "synonyms": [
-      "catch",
-      "seize"
-    ]
-  },
-  {
-    "English": "(to) paste",
-    "German": "(an)kleben; (Computer) einfügen",
-    "Page": "217",
+    "English": "canal",
+    "German": "Kanal",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "(to) install",
-    "German": "installieren, einrichten",
-    "Page": "217",
-    "synonyms": [
-      "set up"
-    ]
   },
   {
-    "English": "(to) take a stand (on sth. / against sth.)",
-    "German": "Stellung beziehen (zu etwas); ein Zeichen setzen",
-    "Page": "217",
+    "English": "(to) shine, [shone], shone",
+    "German": "scheinen (Sonne)",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "collective",
-    "German": "gemeinschaftlich, vereint",
-    "Page": "217",
-    "synonyms": [
-      "joint",
-      "shared"
-    ]
-  },
-  {
-    "English": "awareness",
-    "German": "Bewusstsein, Aufmerksamkeit",
-    "Page": "217",
+    "English": "laughter",
+    "German": "Gelächter",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "flash mob",
-    "German": "Flashmob",
-    "Page": "217",
+    "English": "surface",
+    "German": "Oberfläche",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "(to) rise up, rose, risen",
-    "German": "sich erheben, aufstehen",
-    "Page": "217",
-    "synonyms": [
-      "stand up"
-    ]
-  },
-  {
-    "English": "(to) make a difference",
-    "German": "etwas bewirken, etwas bewegen",
-    "Page": "217",
-    "synonyms": [
-      "have an impact"
-    ]
   },
   {
-    "English": "disruption",
-    "German": "Störung, Beeinträchtigung; Zusammenbruch",
-    "Page": "217",
+    "English": "(to) burn",
+    "German": "brennen; verbrennen",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "(to) frighten sb.",
-    "German": "jm. Angst machen",
-    "Page": "217",
-    "synonyms": [
-      "scare"
-    ]
-  },
-  {
-    "English": "seldom",
-    "German": "selten",
-    "Page": "217",
-    "synonyms": [
-      "rarely"
-    ]
-  },
-  {
-    "English": "aim",
-    "German": "Ziel",
-    "Page": "217",
-    "synonyms": [
-      "goal",
-      "objective"
-    ]
   },
   {
-    "English": "(to) aim at",
-    "German": "zielen auf",
-    "Page": "217",
-    "synonyms": [
-      "target"
-    ]
-  },
-  {
-    "English": "crisis",
-    "German": "Krise",
-    "Page": "217",
+    "English": "(to) drown",
+    "German": "ertrinken",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "particular",
-    "German": "bestimmt(e, s), spezielle(r, s)",
-    "Page": "217",
-    "synonyms": [
-      "specific",
-      "certain"
-    ]
-  },
-  {
-    "English": "option",
-    "German": "Option, (Wahl-)Möglichkeit",
-    "Page": "217",
-    "synonyms": [
-      "choice",
-      "alternative"
-    ]
-  },
-  {
-    "English": "(to) be committed to sth.",
-    "German": "sich für etwas verpflichten, sich zu etwas bekennen",
-    "Page": "217",
-    "synonyms": [
-      "be dedicated to"
-    ]
-  },
-  {
-    "English": "convinced",
-    "German": "überzeugt",
-    "Page": "217",
-    "synonyms": [
-      "certain",
-      "sure"
-    ]
-  },
-  {
-    "English": "rarely",
-    "German": "selten, kaum je",
-    "Page": "217",
-    "synonyms": [
-      "seldom"
-    ]
   },
   {
-    "English": "exercise (no pl)",
-    "German": "Bewegung, (körperliches) Training",
-    "Page": "218",
+    "English": "nowhere",
+    "German": "nirgendwo, nirgendwohin",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "(to) refine",
-    "German": "verfeinern, weiterentwickeln",
-    "Page": "218",
-    "synonyms": [
-      "improve",
-      "perfect"
-    ]
+    "English": "(to) dive in",
+    "German": "hineinspringen",
+    "Page": "241",
+    "synonyms": ["(to) jump in"]
   },
   {
-    "English": "opener",
-    "German": "Eröffnung",
-    "Page": "218",
-    "synonyms": [
-      "opening"
-    ]
-  },
-  {
-    "English": "ironic",
-    "German": "ironisch",
-    "Page": "218",
+    "English": "dry",
+    "German": "trocken",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "dinosaur",
-    "German": "Dinosaurier",
-    "Page": "218",
-    "synonyms": []
+    "English": "(to) save sb. from sth.",
+    "German": "jn. von/vor etwas retten",
+    "Page": "241",
+    "synonyms": ["(to) rescue"]
   },
   {
-    "English": "the United Nations (UN)",
-    "German": "die Vereinten Nationen",
-    "Page": "218",
-    "synonyms": []
+    "English": "(to) marry sb.",
+    "German": "jn. heiraten",
+    "Page": "241",
+    "synonyms": ["(to) wed"]
   },
   {
-    "English": "statistic",
-    "German": "statistische Tatsache, statistische Größe",
-    "Page": "218",
+    "English": "career",
+    "German": "Karriere",
+    "Page": "241",
     "synonyms": []
   },
   {
-    "English": "carbon",
-    "German": "Kohlenstoff",
-    "Page": "218",
+    "English": "sailor",
+    "German": "Seemann, Matrose, Matrosin",
+    "Page": "241",
     "synonyms": []
-  },
-  {
-    "English": "(to) release",
-    "German": "abgeben, freisetzen",
-    "Page": "218",
-    "synonyms": [
-      "emit",
-      "discharge"
-    ]
   },
   {
-    "English": "bang",
-    "German": "Knall",
-    "Page": "218",
-    "synonyms": [
-      "explosion"
-    ]
+    "English": "body",
+    "German": "Leiche",
+    "Page": "241",
+    "synonyms": ["corpse"]
   },
   {
-    "English": "memorable",
-    "German": "einprägsam, unvergesslich",
-    "Page": "218",
-    "synonyms": [
-      "unforgettable"
-    ]
-  },
-  {
-    "English": "technological",
-    "German": "technologisch",
-    "Page": "218",
+    "English": "local",
+    "German": "örtlich, Lokal-; am/vom Ort",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "progress (no pl)",
-    "German": "Fortschritt(e)",
-    "Page": "218",
+    "English": "(to) spread, spread, spread",
+    "German": "(sich) ausbreiten, verbreiten",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "delivery",
-    "German": "Lieferung",
-    "Page": "218",
+    "English": "funeral",
+    "German": "Trauerfeier",
+    "Page": "242",
     "synonyms": []
-  },
-  {
-    "English": "package",
-    "German": "Paket",
-    "Page": "218",
-    "synonyms": [
-      "parcel"
-    ]
   },
   {
-    "English": "automation",
-    "German": "Automatisierung",
-    "Page": "218",
-    "synonyms": []
+    "English": "(to) take place",
+    "German": "stattfinden",
+    "Page": "242",
+    "synonyms": ["(to) occur"]
   },
   {
-    "English": "drone",
-    "German": "Drohne",
-    "Page": "218",
-    "synonyms": []
+    "English": "(to) name",
+    "German": "(be)nennen",
+    "Page": "242",
+    "synonyms": ["(to) call"]
   },
   {
-    "English": "robot",
-    "German": "Roboter",
-    "Page": "218",
+    "English": "impression",
+    "German": "Eindruck",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "artificial",
-    "German": "künstlich, Kunst-",
-    "Page": "218",
-    "synonyms": [
-      "synthetic"
-    ]
+    "English": "march",
+    "German": "Marsch, Demonstration",
+    "Page": "242",
+    "synonyms": ["parade"]
   },
   {
-    "English": "bee",
-    "German": "Biene",
-    "Page": "218",
+    "English": "(to) wave (at sb.)",
+    "German": "(jm. zu)winken",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "(to) pollinate",
-    "German": "bestäuben",
-    "Page": "219",
+    "English": "northern",
+    "German": "nördlich, Nord-",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "pollen",
-    "German": "Blütenstaub",
-    "Page": "219",
+    "English": "speed limit",
+    "German": "Geschwindigkeitsbegrenzung, -beschränkung",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "production",
-    "German": "Produktion, Herstellung",
-    "Page": "219",
+    "English": "giant",
+    "German": "Riese",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "panel discussion",
-    "German": "Podiumsdiskussion",
-    "Page": "219",
+    "English": "coffee",
+    "German": "Kaffee",
+    "Page": "242",
     "synonyms": []
   },
   {
-    "English": "(to) exaggerate",
-    "German": "übertreiben",
-    "Page": "219",
-    "synonyms": [
-      "overstate"
-    ]
+    "English": "wonder",
+    "German": "Wunder",
+    "Page": "242",
+    "synonyms": ["miracle"]
   },
   {
-    "English": "(to) be likely to do sth.",
-    "German": "wahrscheinlich etwas tun (werden)",
-    "Page": "219",
+    "English": "cliff",
+    "German": "Klippe",
+    "Page": "242",
     "synonyms": []
-  },
-  {
-    "English": "breakdown",
-    "German": "Zusammenbruch",
-    "Page": "219",
-    "synonyms": [
-      "collapse"
-    ]
-  },
-  {
-    "English": "electricity",
-    "German": "Elektrizität, Strom",
-    "Page": "219",
-    "synonyms": [
-      "power"
-    ]
   },
   {
-    "English": "electric",
-    "German": "elektrisch",
-    "Page": "219",
-    "synonyms": []
+    "English": "column",
+    "German": "Säule",
+    "Page": "242",
+    "synonyms": ["pillar"]
   },
   {
-    "English": "social networking",
-    "German": "Kommunikation über Online-Plattformen",
-    "Page": "219",
+    "English": "(to) rise up, [rose], risen",
+    "German": "aufragen, emporragen (Berge, Säulen, Türme, ...)",
+    "Page": "243",
     "synonyms": []
   },
   {
-    "English": "radical",
-    "German": "radikal",
-    "Page": "219",
-    "synonyms": [
-      "extreme"
-    ]
+    "English": "nearly",
+    "German": "fast, beinahe",
+    "Page": "243",
+    "synonyms": ["almost"]
   },
   {
-    "English": "corporation",
-    "German": "(Handels-)Gesellschaft, Konzern; Körperschaft",
-    "Page": "219",
-    "synonyms": [
-      "company"
-    ]
+    "English": "(to) form",
+    "German": "bilden, formen",
+    "Page": "243",
+    "synonyms": ["(to) create"]
   },
   {
-    "English": "reality",
-    "German": "Realität, Wirklichkeit",
-    "Page": "219",
+    "English": "challenge",
+    "German": "Herausforderung",
+    "Page": "243",
     "synonyms": []
-  },
-  {
-    "English": "(to) claim",
-    "German": "angeben, behaupten",
-    "Page": "219",
-    "synonyms": [
-      "assert",
-      "state"
-    ]
   },
   {
-    "English": "obvious",
-    "German": "offensichtlich",
-    "Page": "219",
-    "synonyms": [
-      "clear",
-      "evident"
-    ]
-  },
-  {
-    "English": "radiologist",
-    "German": "Radiologe/-in",
-    "Page": "219",
+    "English": "(to) challenge sb. (to sth.)",
+    "German": "jn. herausfordern (zu etwas)",
+    "Page": "243",
     "synonyms": []
-  },
-  {
-    "English": "(to) feature sth.",
-    "German": "featuren, über etwas berichten",
-    "Page": "219",
-    "synonyms": [
-      "showcase"
-    ]
-  },
-  {
-    "English": "elsewhere",
-    "German": "anderswo",
-    "Page": "219",
-    "synonyms": [
-      "somewhere else"
-    ]
   },
   {
-    "English": "fluent",
-    "German": "fließend, flüssig (Sprache)",
-    "Page": "219",
+    "English": "(to) bet, bet, bet",
+    "German": "wetten",
+    "Page": "243",
     "synonyms": []
   },
   {
-    "English": "capacity",
-    "German": "Fähigkeit, Leistungsvermögen",
-    "Page": "219",
-    "synonyms": [
-      "ability",
-      "capability"
-    ]
+    "English": "(to) build, [built], built, built",
+    "German": "bauen",
+    "Page": "243",
+    "synonyms": ["(to) construct"]
   },
   {
-    "English": "disconnection",
-    "German": "Abkopplung, Trennung",
-    "Page": "219",
-    "synonyms": [
-      "separation"
-    ]
+    "English": "(to) be left",
+    "German": "übrig sein",
+    "Page": "243",
+    "synonyms": ["(to) remain"]
   },
   {
-    "English": "(to) meditate",
-    "German": "meditieren",
-    "Page": "220",
-    "synonyms": []
+    "English": "legend",
+    "German": "Legende, Sage",
+    "Page": "243",
+    "synonyms": ["myth"]
   },
   {
-    "English": "basis",
-    "German": "Basis, Grundlage",
-    "Page": "220",
-    "synonyms": [
-      "foundation"
-    ]
+    "English": "curious",
+    "German": "wissbegierig, neugierig",
+    "Page": "243",
+    "synonyms": ["inquisitive"]
   },
   {
-    "English": "brain",
-    "German": "Gehirn",
-    "Page": "220",
+    "English": "passport",
+    "German": "(Reise-)Pass",
+    "Page": "243",
     "synonyms": []
-  },
-  {
-    "English": "(to) alter",
-    "German": "verändern, abändern",
-    "Page": "220",
-    "synonyms": [
-      "change",
-      "modify"
-    ]
   },
   {
-    "English": "accurate",
-    "German": "aktuell(e,r), gegenwärtige(r,s)",
-    "Page": "220",
-    "synonyms": [
-      "current",
-      "present"
-    ]
+    "English": "ID card",
+    "German": "Personalausweis",
+    "Page": "243",
+    "synonyms": ["identity card"]
   },
   {
-    "English": "(to) generate",
-    "German": "generieren, erzeugen",
-    "Page": "220",
-    "synonyms": [
-      "create",
-      "produce"
-    ]
-  },
-  {
-    "English": "misinformation (no pl)",
-    "German": "Fehlinformation(en), Falschinformation(en)",
-    "Page": "220",
+    "English": "airport",
+    "German": "Flughafen",
+    "Page": "243",
     "synonyms": []
   },
   {
-    "English": "toxic",
-    "German": "toxisch, schädlich",
-    "Page": "220",
-    "synonyms": [
-      "poisonous",
-      "harmful"
-    ]
+    "English": "safe",
+    "German": "sicher, in Sicherheit",
+    "Page": "243",
+    "synonyms": ["secure"]
   },
   {
-    "English": "database",
-    "German": "Datenbank",
-    "Page": "220",
+    "English": "(to) keep",
+    "German": "halten; behalten",
+    "Page": "243",
     "synonyms": []
   },
   {
-    "English": "threat",
-    "German": "(Be-)Drohung",
-    "Page": "220",
-    "synonyms": [
-      "danger"
-    ]
+    "English": "immediately",
+    "German": "sofort",
+    "Page": "244",
+    "synonyms": ["at once", "right away"]
   },
   {
-    "English": "sentient",
-    "German": "empfindungsfähig",
-    "Page": "220",
+    "English": "border",
+    "German": "Grenze",
+    "Page": "244",
     "synonyms": []
   },
   {
-    "English": "collection",
-    "German": "Sammlung",
-    "Page": "220",
+    "English": "euro (€)",
+    "German": "Euro",
+    "Page": "244",
     "synonyms": []
-  },
-  {
-    "English": "distinct",
-    "German": "verschieden, unterschiedlich; deutlich",
-    "Page": "220",
-    "synonyms": [
-      "different",
-      "separate"
-    ]
   },
   {
-    "English": "unqualified",
-    "German": "unqualifiziert",
-    "Page": "220",
-    "synonyms": []
+    "English": "(to) change",
+    "German": "wechseln, umtauschen (Geld)",
+    "Page": "244",
+    "synonyms": ["(to) exchange"]
   },
   {
-    "English": "morality",
-    "German": "Moral, Anstand, gute Sitten",
-    "Page": "220",
-    "synonyms": [
-      "ethics"
-    ]
+    "English": "letterbox",
+    "German": "Briefkasten",
+    "Page": "244",
+    "synonyms": ["mailbox"]
   },
   {
-    "English": "physics",
-    "German": "Physik",
-    "Page": "220",
+    "English": "suit",
+    "German": "Anzug",
+    "Page": "244",
     "synonyms": []
   },
   {
-    "English": "vehicle",
-    "German": "Fahrzeug",
-    "Page": "220",
+    "English": "(to) smoke",
+    "German": "rauchen",
+    "Page": "244",
     "synonyms": []
   },
   {
-    "English": "traffic",
-    "German": "Verkehr",
-    "Page": "220",
+    "English": "pipe",
+    "German": "(Tabak-)Pfeife",
+    "Page": "244",
     "synonyms": []
   },
   {
-    "English": "(to) generalize",
-    "German": "verallgemeinern",
-    "Page": "220",
+    "English": "pot",
+    "German": "Gefäß, Topf",
+    "Page": "244",
     "synonyms": []
-  },
-  {
-    "English": "a bunch of ...",
-    "German": "eine Menge ..., ein Bündel ...",
-    "Page": "220",
-    "synonyms": [
-      "a lot of"
-    ]
-  },
-  {
-    "English": "sceptical",
-    "German": "skeptisch",
-    "Page": "220",
-    "synonyms": [
-      "doubtful"
-    ]
   },
   {
-    "English": "tight",
-    "German": "fest, eng; knapp, eng anliegend (Kleidung)",
-    "Page": "220",
+    "English": "What else can you do?",
+    "German": "Was kannst du (sonst) noch tun?",
+    "Page": "244",
     "synonyms": []
   },
   {
-    "English": "regulation",
-    "German": "Vorschrift, Regulierung",
-    "Page": "220",
-    "synonyms": [
-      "rule"
-    ]
+    "English": "service",
+    "German": "Gottesdienst",
+    "Page": "244",
+    "synonyms": ["religious service"]
   },
   {
-    "English": "unpredicted",
-    "German": "unvorhergesehen",
-    "Page": "220",
-    "synonyms": [
-      "unexpected"
-    ]
-  },
-  {
-    "English": "consequence",
-    "German": "Folge, Konsequenz",
-    "Page": "221",
-    "synonyms": [
-      "result",
-      "outcome"
-    ]
-  },
-  {
-    "English": "polarization",
-    "German": "Polarisierung",
-    "Page": "221",
+    "English": "by 8 pm",
+    "German": "bis (spätestens) 20 Uhr",
+    "Page": "244",
     "synonyms": []
   },
   {
-    "English": "(to) stem from sth.",
-    "German": "von etwas herrühren; etwas entspringen",
-    "Page": "221",
-    "synonyms": [
-      "originate from"
-    ]
+    "English": "(to) have a shower",
+    "German": "(sich) duschen",
+    "Page": "244",
+    "synonyms": ["(to) take a shower"]
   },
   {
-    "English": "think tank",
-    "German": "Expertenkommission, Denkfabrik",
-    "Page": "221",
+    "English": "(to) share sth.",
+    "German": "(sich) etwas teilen",
+    "Page": "244",
     "synonyms": []
-  },
-  {
-    "English": "potential",
-    "German": "potenziell, möglich",
-    "Page": "221",
-    "synonyms": [
-      "possible"
-    ]
   },
   {
-    "English": "(to) have sb's. best interests at heart",
-    "German": "jds. Bestes wollen",
-    "Page": "221",
+    "English": "the Atlantic (Ocean)",
+    "German": "der Atlantik, der Atlantische Ozean",
+    "Page": "244",
     "synonyms": []
   },
   {
-    "English": "deliberate",
-    "German": "absichtlich, vorsätzlich",
-    "Page": "221",
-    "synonyms": [
-      "intentional",
-      "on purpose"
-    ]
+    "English": "advantage",
+    "German": "Vorteil",
+    "Page": "244",
+    "synonyms": ["benefit"]
   },
   {
-    "English": "(to) last",
-    "German": "(an)dauern; halten",
-    "Page": "221",
-    "synonyms": [
-      "continue",
-      "endure"
-    ]
+    "English": "disadvantage",
+    "German": "Nachteil",
+    "Page": "244",
+    "synonyms": ["drawback"]
   },
   {
-    "English": "(to) take - (to) last",
-    "German": "(Zeit benötigen) take; (andauern, halten) last",
-    "Page": "221",
-    "synonyms": []
+    "English": "beginning",
+    "German": "Anfang, Beginn",
+    "Page": "244",
+    "synonyms": ["start"]
   },
   {
-    "English": "strike",
-    "German": "Streik",
-    "Page": "221",
-    "synonyms": []
+    "English": "guest",
+    "German": "Gast",
+    "Page": "244",
+    "synonyms": ["visitor"]
   },
   {
-    "English": "(to) go on strike",
-    "German": "streiken, in den Streik treten",
-    "Page": "221",
+    "English": "facial expression",
+    "German": "Gesichtsausdruck, Mimik",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "(to) be on strike",
-    "German": "streiken, sich im Streik befinden",
-    "Page": "221",
+    "English": "interaction",
+    "German": "Interaktion, Umgang",
+    "Page": "245",
     "synonyms": []
-  },
-  {
-    "English": "sequence",
-    "German": "Abfolge, Reihenfolge",
-    "Page": "221",
-    "synonyms": [
-      "order",
-      "series"
-    ]
-  },
-  {
-    "English": "isle",
-    "German": "(kleine) Insel, Eiland",
-    "Page": "221",
-    "synonyms": [
-      "island"
-    ]
   },
   {
-    "English": "frequency",
-    "German": "Häufigkeit",
-    "Page": "221",
+    "English": "owner",
+    "German": "Besitzer/in",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "manner",
-    "German": "Art und Weise",
-    "Page": "221",
-    "synonyms": [
-      "way",
-      "method"
-    ]
+    "English": "weird",
+    "German": "seltsam, komisch",
+    "Page": "245",
+    "synonyms": ["strange", "odd"]
   },
   {
-    "English": "(to) manage sth.",
-    "German": "etwas handhaben, bedienen; mit etwas umgehen",
-    "Page": "221",
-    "synonyms": [
-      "handle",
-      "deal with"
-    ]
+    "English": "(to) stare (at sb./sth.)",
+    "German": "(jn./etwas an)starren",
+    "Page": "245",
+    "synonyms": ["(to) gaze"]
   },
   {
-    "English": "(to) charge",
-    "German": "(auf)laden",
-    "Page": "221",
-    "synonyms": []
-  },
-  {
-    "English": "(to) swipe",
-    "German": "(am Touchscreen) wischen, (mit dem Finger) streichen/fahren; (Kreditkarte u.Ä.) durchziehen",
-    "Page": "221",
-    "synonyms": []
+    "English": "(to) joke",
+    "German": "scherzen, Witze machen",
+    "Page": "245",
+    "synonyms": ["(to) kid"]
   },
   {
-    "English": "button",
-    "German": "Knopf, Taste",
-    "Page": "221",
+    "English": "sense of humour",
+    "German": "(Sinn für) Humor",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "icon",
-    "German": "Symbol, Icon",
-    "Page": "222",
+    "English": "(to) survive",
+    "German": "überleben",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "menu",
-    "German": "(Computer) Menü",
-    "Page": "222",
-    "synonyms": []
+    "English": "argument",
+    "German": "Streit, Auseinandersetzung",
+    "Page": "245",
+    "synonyms": ["quarrel", "dispute"]
   },
   {
-    "English": "search bar",
-    "German": "(Computer) Suchfeld, Suchleiste",
-    "Page": "222",
+    "English": "(to) be starving",
+    "German": "einen Riesenhunger haben",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "tab",
-    "German": "Tab, Reiter (Karteikarte, Browser)",
-    "Page": "222",
+    "English": "(to) unpack",
+    "German": "auspacken",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "(to) navigate",
-    "German": "navigieren, steuern",
-    "Page": "222",
-    "synonyms": []
+    "English": "rude",
+    "German": "unhöflich, unverschämt",
+    "Page": "245",
+    "synonyms": ["impolite"]
   },
   {
-    "English": "data",
-    "German": "Daten",
-    "Page": "222",
-    "synonyms": []
+    "English": "trail",
+    "German": "Weg, Pfad",
+    "Page": "245",
+    "synonyms": ["path"]
   },
   {
-    "English": "(to) download sth.",
-    "German": "etwas herunterladen",
-    "Page": "222",
-    "synonyms": []
+    "English": "stream",
+    "German": "Bach",
+    "Page": "245",
+    "synonyms": ["brook"]
   },
   {
-    "English": "memory",
-    "German": "(Computer) Speicher",
-    "Page": "222",
+    "English": "ashes",
+    "German": "Asche (sterbliche Überreste)",
+    "Page": "245",
     "synonyms": []
-  },
-  {
-    "English": "(to) run",
-    "German": "ausführen (Computerprogramm)",
-    "Page": "222",
-    "synonyms": [
-      "execute"
-    ]
-  },
-  {
-    "English": "(to) browse",
-    "German": "(durch)stöbern, (durch)blättern; browsen, (im Internet) surfen",
-    "Page": "222",
-    "synonyms": [
-      "surf"
-    ]
   },
   {
-    "English": "(to) customize",
-    "German": "anpassen, individuell einrichten",
-    "Page": "222",
-    "synonyms": [
-      "personalize"
-    ]
-  },
-  {
-    "English": "settings",
-    "German": "Einstellungen",
-    "Page": "222",
+    "English": "boyfriend",
+    "German": "Freund",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "attachment",
-    "German": "Anhang (einer E-Mail)",
-    "Page": "222",
+    "English": "girlfriend",
+    "German": "Freundin",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "friend request",
-    "German": "Freundschaftsanfrage",
-    "Page": "222",
-    "synonyms": []
+    "English": "(to) welcome sb. (to)",
+    "German": "jn. begrüßen (in), jn. willkommen heißen (in)",
+    "Page": "245",
+    "synonyms": ["(to) greet"]
   },
   {
-    "English": "feature article",
-    "German": "Sonderbericht, Sonderbeitrag",
-    "Page": "222",
+    "English": "regional",
+    "German": "regional",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "(to) buzz off",
-    "German": "abschwirren, einen Abflug machen",
-    "Page": "222",
-    "synonyms": [
-      "go away"
-    ]
-  },
-  {
-    "English": "trap",
-    "German": "Falle",
-    "Page": "222",
+    "English": "standard",
+    "German": "Standard, Standard-",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "(to) sting, stung, stung",
-    "German": "stechen; brennen",
-    "Page": "222",
+    "English": "capital",
+    "German": "Hauptstadt",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "crop",
-    "German": "(Feld-)Frucht",
-    "Page": "222",
+    "English": "crown",
+    "German": "Krone",
+    "Page": "245",
     "synonyms": []
   },
   {
-    "English": "colony",
-    "German": "Kolonie",
-    "Page": "222",
+    "English": "currency",
+    "German": "Währung",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "factor",
-    "German": "Faktor",
-    "Page": "222",
+    "English": "the EU (the European Union)",
+    "German": "die Europäische Union",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "use",
-    "German": "Gebrauch, Verwendung",
-    "Page": "222",
+    "English": "nation",
+    "German": "Nation, Volk",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "pesticide",
-    "German": "Schädlingsbekämpfungsmittel, Pestizid",
-    "Page": "222",
+    "English": "peace",
+    "German": "Friede, Frieden",
+    "Page": "246",
     "synonyms": []
-  },
-  {
-    "English": "varied",
-    "German": "abwechslungsreich; verschiedenartig, vielfältig",
-    "Page": "222",
-    "synonyms": [
-      "diverse"
-    ]
   },
   {
-    "English": "diet",
-    "German": "Ernährung(sweise), Speiseplan; Diät",
-    "Page": "222",
+    "English": "population",
+    "German": "Bevölkerung, Einwohner(zahl)",
+    "Page": "246",
     "synonyms": []
-  },
-  {
-    "English": "(to) rely on sth.",
-    "German": "auf etwas angewiesen sein",
-    "Page": "222",
-    "synonyms": [
-      "depend on"
-    ]
   },
   {
-    "English": "parasite",
-    "German": "Parasit",
-    "Page": "223",
+    "English": "president",
+    "German": "Präsident/in",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "mite",
-    "German": "Milbe",
-    "Page": "223",
+    "English": "republic",
+    "German": "Republik",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "(to) weaken",
-    "German": "schwächen",
-    "Page": "223",
-    "synonyms": []
+    "English": "state",
+    "German": "Staat",
+    "Page": "246",
+    "synonyms": ["country"]
   },
   {
-    "English": "immune system",
-    "German": "Immunsystem",
-    "Page": "223",
+    "English": "coordinator",
+    "German": "Koordinator/in",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "(to) be prone to sth.",
-    "German": "anfällig sein für etwas; zu etwas neigen",
-    "Page": "223",
+    "English": "layout",
+    "German": "Layout, Gestaltung",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "hibernation",
-    "German": "Winterschlaf",
-    "Page": "223",
+    "English": "editor",
+    "German": "Redakteur/in; Herausgeber/in",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "habitat",
-    "German": "Lebensraum",
-    "Page": "223",
+    "English": "research",
+    "German": "Recherche, Forschung(en)",
+    "Page": "246",
     "synonyms": []
-  },
-  {
-    "English": "(to) shrink, shrank, shrunk",
-    "German": "schrumpfen, (ein)laufen, sich verringern",
-    "Page": "223",
-    "synonyms": [
-      "decrease",
-      "reduce"
-    ]
   },
   {
-    "English": "(to) compensate",
-    "German": "kompensieren, ausgleichen; entschädigen",
-    "Page": "223",
-    "synonyms": [
-      "make up for"
-    ]
+    "English": "(to) suggest sth. (to sb.)",
+    "German": "(jm.) etwas vorschlagen",
+    "Page": "246",
+    "synonyms": ["(to) propose"]
   },
   {
-    "English": "worrying",
-    "German": "beunruhigend",
-    "Page": "223",
-    "synonyms": [
-      "alarming",
-      "concerning"
-    ]
+    "English": "discussion",
+    "German": "Diskussion",
+    "Page": "246",
+    "synonyms": ["debate"]
   },
   {
-    "English": "(to) lay, laid, laid",
-    "German": "legen",
-    "Page": "223",
+    "English": "decision",
+    "German": "Entscheidung",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "(to) lie, lay, lain",
-    "German": "liegen",
-    "Page": "223",
+    "English": "stable",
+    "German": "(Pferde-, Kuh)Stall",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "(to) ensure",
-    "German": "gewährleisten, sicherstellen",
-    "Page": "223",
-    "synonyms": [
-      "make sure"
-    ]
+    "English": "choice",
+    "German": "Wahl, Auswahl",
+    "Page": "246",
+    "synonyms": ["option"]
   },
   {
-    "English": "survival",
-    "German": "Überleben",
-    "Page": "223",
+    "English": "reins",
+    "German": "Zügel",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "muesli",
-    "German": "Müsli",
-    "Page": "223",
+    "English": "ditch",
+    "German": "Graben",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "(to) announce",
-    "German": "bekanntgeben, verkünden",
-    "Page": "223",
-    "synonyms": [
-      "declare",
-      "proclaim"
-    ]
-  },
-  {
-    "English": "generation",
-    "German": "Erzeugung",
-    "Page": "223",
-    "synonyms": []
-  },
-  {
-    "English": "pilot",
-    "German": "Pilot/in",
-    "Page": "223",
+    "English": "beyond",
+    "German": "jenseits (von), über ... hinaus/hinweg",
+    "Page": "246",
     "synonyms": []
-  },
-  {
-    "English": "overall",
-    "German": "gesamt; Gesamte(r, s)",
-    "Page": "223",
-    "synonyms": [
-      "total",
-      "general"
-    ]
   },
   {
-    "English": "effectiveness",
-    "German": "Wirksamkeit, Effektivität",
-    "Page": "223",
+    "English": "straight",
+    "German": "direkt, geradeaus",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "disappearance",
-    "German": "Verschwinden, Aussterben",
-    "Page": "223",
+    "English": "shallow",
+    "German": "flach, nicht tief",
+    "Page": "246",
     "synonyms": []
-  },
-  {
-    "English": "(to) damage",
-    "German": "(be)schädigen, schaden",
-    "Page": "223",
-    "synonyms": [
-      "harm",
-      "hurt"
-    ]
   },
   {
-    "English": "infrastructure",
-    "German": "Infrastruktur",
-    "Page": "223",
+    "English": "What's up?",
+    "German": "Was gibt's? / Was ist los?",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "polar bear",
-    "German": "Eisbär",
-    "Page": "223",
+    "English": "just as good/bad/...",
+    "German": "genauso gut/schlecht/...",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "organic",
-    "German": "biologisch angebaut, Bio-",
-    "Page": "223",
+    "English": "(to) gallop",
+    "German": "galoppieren",
+    "Page": "246",
     "synonyms": []
-  },
-  {
-    "English": "concise",
-    "German": "knapp, kurz, prägnant",
-    "Page": "223",
-    "synonyms": [
-      "brief",
-      "succinct"
-    ]
-  },
-  {
-    "English": "nightmare",
-    "German": "Albtraum",
-    "Page": "224",
-    "synonyms": [
-      "bad dream"
-    ]
   },
   {
-    "English": "(to) pinch",
-    "German": "kneifen",
-    "Page": "224",
+    "English": "distance",
+    "German": "Ferne, Entfernung",
+    "Page": "246",
     "synonyms": []
   },
   {
-    "English": "viewer",
-    "German": "Zuschauer/in",
-    "Page": "224",
-    "synonyms": [
-      "spectator"
-    ]
+    "English": "below",
+    "German": "unten, darunter; unter, unterhalb (von)",
+    "Page": "246",
+    "synonyms": ["beneath"]
   },
   {
-    "English": "imagination",
-    "German": "Fantasie, Vorstellungskraft",
-    "Page": "224",
+    "English": "above",
+    "German": "oben, darüber; über, oberhalb (von)",
+    "Page": "247",
     "synonyms": []
   },
   {
-    "English": "bookstore",
-    "German": "Buchladen, Buchhandlung",
-    "Page": "224",
+    "English": "jolt",
+    "German": "Ruck, Stoß",
+    "Page": "247",
     "synonyms": []
   },
   {
-    "English": "bankrupt",
-    "German": "bankrott",
-    "Page": "224",
+    "English": "saddle",
+    "German": "Sattel",
+    "Page": "247",
     "synonyms": []
   },
   {
-    "English": "clerk",
-    "German": "(Büro-)Angestellte(r)",
-    "Page": "224",
-    "synonyms": []
+    "English": "(to) slip",
+    "German": "(aus)rutschen",
+    "Page": "247",
+    "synonyms": ["(to) slide"]
   },
   {
-    "English": "for sale",
-    "German": "zum Verkauf, zu verkaufen",
-    "Page": "224",
+    "English": "butter",
+    "German": "Butter",
+    "Page": "247",
     "synonyms": []
-  },
-  {
-    "English": "identical",
-    "German": "identisch",
-    "Page": "224",
-    "synonyms": [
-      "same"
-    ]
-  },
-  {
-    "English": "alternative",
-    "German": "Alternative",
-    "Page": "224",
-    "synonyms": [
-      "option",
-      "choice"
-    ]
   },
   {
-    "English": "hypothetical",
-    "German": "hypothetisch",
-    "Page": "224",
+    "English": "(to) sink, [sank], sunk",
+    "German": "sinken",
+    "Page": "247",
     "synonyms": []
   },
   {
-    "English": "vertical",
-    "German": "vertikal, senkrecht",
-    "Page": "224",
-    "synonyms": []
+    "English": "(to) stretch sth. out",
+    "German": "ausstrecken",
+    "Page": "247",
+    "synonyms": ["(to) extend"]
   },
   {
-    "English": "civilization",
-    "German": "Zivilisation",
-    "Page": "224",
+    "English": "direction",
+    "German": "Richtung",
+    "Page": "247",
     "synonyms": []
-  },
-  {
-    "English": "smart",
-    "German": "schlau, intelligent",
-    "Page": "224",
-    "synonyms": [
-      "clever",
-      "intelligent"
-    ]
   },
   {
-    "English": "ratio",
-    "German": "(Größen-, Zahlen-)Verhältnis",
-    "Page": "224",
+    "English": "(to) dial",
+    "German": "wählen (Telefonnummer)",
+    "Page": "247",
     "synonyms": []
-  },
-  {
-    "English": "(to) program",
-    "German": "programmieren",
-    "Page": "224",
-    "synonyms": [
-      "code"
-    ]
-  },
-  {
-    "English": "band",
-    "German": "Gruppe, Bande, Gang",
-    "Page": "224",
-    "synonyms": [
-      "group"
-    ]
   },
   {
-    "English": "(to) rule",
-    "German": "herrschen, beherrschen",
-    "Page": "224",
-    "synonyms": [
-      "govern",
-      "control"
-    ]
+    "English": "(to) recognize",
+    "German": "erkennen",
+    "Page": "247",
+    "synonyms": ["(to) identify"]
   },
   {
-    "English": "immortality",
-    "German": "Unsterblichkeit, Unvergänglichkeit",
-    "Page": "224",
+    "English": "tide",
+    "German": "Gezeiten, Ebbe und Flut",
+    "Page": "247",
     "synonyms": []
-  },
-  {
-    "English": "(to) put sth. (+ adv)",
-    "German": "etwas (auf eine bestimmte Art) ausdrücken, formulieren",
-    "Page": "224",
-    "synonyms": [
-      "express"
-    ]
-  },
-  {
-    "English": "(to) accomplish sth.",
-    "German": "etwas erreichen, vollbringen, bewirken",
-    "Page": "225",
-    "synonyms": [
-      "achieve",
-      "complete"
-    ]
-  },
-  {
-    "English": "charming",
-    "German": "charmant, bezaubernd",
-    "Page": "225",
-    "synonyms": [
-      "delightful"
-    ]
-  },
-  {
-    "English": "(to) glance (at)",
-    "German": "einen (kurzen) Blick werfen (auf)",
-    "Page": "225",
-    "synonyms": [
-      "peek"
-    ]
   },
   {
-    "English": "(to) straighten sth.",
-    "German": "etwas gerade rücken, biegen; etwas strecken, straffen",
-    "Page": "225",
+    "English": "signal",
+    "German": "Signal, Zeichen",
+    "Page": "247",
     "synonyms": []
   },
   {
-    "English": "nuclear",
-    "German": "Kern-, Atom-",
-    "Page": "225",
-    "synonyms": []
+    "English": "calm",
+    "German": "ruhig",
+    "Page": "247",
+    "synonyms": ["peaceful"]
   },
   {
-    "English": "anywhere",
-    "German": "überall, überallhin",
-    "Page": "225",
+    "English": "(to) teach, [taught], taught",
+    "German": "unterrichten, lehren",
+    "Page": "247",
     "synonyms": []
-  },
-  {
-    "English": "analogy",
-    "German": "Analogie, Vergleich",
-    "Page": "225",
-    "synonyms": [
-      "comparison"
-    ]
   },
   {
-    "English": "decent",
-    "German": "anständig, angemessen",
-    "Page": "225",
-    "synonyms": [
-      "proper",
-      "respectable"
-    ]
+    "English": "thought",
+    "German": "Gedanke",
+    "Page": "247",
+    "synonyms": ["idea"]
   },
   {
-    "English": "physical",
-    "German": "physisch, körperlich",
-    "Page": "225",
-    "synonyms": [
-      "bodily"
-    ]
+    "English": "motor",
+    "German": "Motor",
+    "Page": "247",
+    "synonyms": ["engine"]
   },
   {
-    "English": "cushion",
-    "German": "Kissen",
-    "Page": "225",
-    "synonyms": [
-      "pillow"
-    ]
+    "English": "truck",
+    "German": "Lastwagen, LKW",
+    "Page": "247",
+    "synonyms": ["lorry"]
   },
   {
-    "English": "loose",
-    "German": "lose, locker",
-    "Page": "225",
+    "English": "the Highlands",
+    "German": "das schottische Hochland",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "romance",
-    "German": "Romantik, romantische Liebe",
-    "Page": "225",
-    "synonyms": []
+    "English": "atmosphere",
+    "German": "Atmosphäre; Stimmung",
+    "Page": "248",
+    "synonyms": ["mood"]
   },
   {
     "English": "romantic",
-    "German": "romantisch; Liebes-",
-    "Page": "225",
+    "German": "romantisch, Liebes-",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "(to) occur to sb.",
-    "German": "jm. einfallen, in den Sinn kommen",
-    "Page": "225",
+    "English": "sunset",
+    "German": "Sonnenuntergang",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "familiar (to sb. / with sth.)",
-    "German": "(jm. / mit etwas) vertraut",
-    "Page": "225",
+    "English": "bagpiper",
+    "German": "Dudelsackpfeifer/in, Dudelsackspieler/in, Sackpfeifer/in",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "dozen",
-    "German": "Dutzend",
-    "Page": "225",
+    "English": "bagpipes",
+    "German": "Dudelsack, Sackpfeife",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "somehow",
-    "German": "irgendwie",
-    "Page": "225",
+    "English": "sheepdog",
+    "German": "Hütehund",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "cheek",
-    "German": "Wange",
-    "Page": "225",
+    "English": "trials",
+    "German": "Turnier, Wettkampf",
+    "Page": "248",
+    "synonyms": ["competition"]
+  },
+  {
+    "English": "portion",
+    "German": "Portion",
+    "Page": "248",
+    "synonyms": ["serving"]
+  },
+  {
+    "English": "Help yourself.",
+    "German": "Bedien dich!",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "reasonable",
-    "German": "vernünftig, akzeptabel",
-    "Page": "225",
-    "synonyms": [
-      "sensible",
-      "fair"
-    ]
-  },
-  {
-    "English": "sincerity",
-    "German": "Ernsthaftigkeit, Aufrichtigkeit",
-    "Page": "225",
-    "synonyms": [
-      "honesty"
-    ]
-  },
-  {
-    "English": "sincere",
-    "German": "aufrichtig, ehrlich",
-    "Page": "225",
-    "synonyms": [
-      "honest",
-      "genuine"
-    ]
-  },
-  {
-    "English": "bright",
-    "German": "klug, gescheit, 'hell'",
-    "Page": "225",
-    "synonyms": [
-      "intelligent",
-      "smart"
-    ]
-  },
-  {
-    "English": "beneath",
-    "German": "unterhalb (von)",
-    "Page": "225",
-    "synonyms": [
-      "under",
-      "below"
-    ]
-  },
-  {
-    "English": "addicted (to)",
-    "German": "süchtig (nach), abhängig (von)",
-    "Page": "225",
+    "English": "I didn't enjoy myself.",
+    "German": "Ich habe mich nicht amüsiert. / Ich hatte keinen Spaß.",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "straightforward",
-    "German": "einfach, klar (ausgedrückt)",
-    "Page": "226",
-    "synonyms": [
-      "simple",
-      "clear"
-    ]
+    "English": "(to) relax",
+    "German": "sich entspannen, sich ausruhen",
+    "Page": "248",
+    "synonyms": ["(to) rest"]
   },
   {
-    "English": "(to) lose one's temper",
-    "German": "die Beherrschung verlieren",
-    "Page": "226",
-    "synonyms": [
-      "get angry"
-    ]
+    "English": "upset",
+    "German": "aufgebracht, gekränkt, mitgenommen",
+    "Page": "248",
+    "synonyms": ["distressed"]
   },
   {
-    "English": "inner",
-    "German": "innere(r, s)",
-    "Page": "226",
-    "synonyms": [
-      "internal"
-    ]
+    "English": "jealous (of)",
+    "German": "neidisch (auf); eifersüchtig (auf)",
+    "Page": "248",
+    "synonyms": ["envious"]
   },
   {
-    "English": "motivation",
-    "German": "Motivation",
-    "Page": "226",
+    "English": "(to) control",
+    "German": "kontrollieren, beherrschen; unter Kontrolle halten/bekommen",
+    "Page": "248",
+    "synonyms": ["(to) manage"]
+  },
+  {
+    "English": "movement",
+    "German": "Bewegung",
+    "Page": "248",
+    "synonyms": ["motion"]
+  },
+  {
+    "English": "serious",
+    "German": "ernst, ernsthaft",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "(to) slam",
-    "German": "schlagen, zuknallen (Tür)",
-    "Page": "226",
-    "synonyms": [
-      "bang"
-    ]
+    "English": "(to) protect sb./sth. (from sb./sth.)",
+    "German": "jn./etwas (be)schützen (vor jm./etwas)",
+    "Page": "248",
+    "synonyms": ["(to) guard"]
   },
   {
-    "English": "surroundings",
-    "German": "Umgebung",
-    "Page": "226",
-    "synonyms": [
-      "environment"
-    ]
+    "English": "comfortable",
+    "German": "bequem; angenehm",
+    "Page": "248",
+    "synonyms": ["cozy"]
   },
   {
-    "English": "(to) convey",
-    "German": "vermitteln, übermitteln",
-    "Page": "226",
-    "synonyms": [
-      "communicate",
-      "express"
-    ]
-  },
-  {
-    "English": "pace",
-    "German": "Tempo, Geschwindigkeit; Schritt",
-    "Page": "226",
-    "synonyms": [
-      "speed"
-    ]
-  },
-  {
-    "English": "evidence (no pl)",
-    "German": "Nachweis, Beleg, Beweis",
-    "Page": "226",
-    "synonyms": [
-      "proof"
-    ]
-  },
-  {
-    "English": "sensitive",
-    "German": "einfühlsam, sensibel",
-    "Page": "226",
+    "English": "judge",
+    "German": "Richter/in",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "stylistic",
-    "German": "stilistisch, Stil-",
-    "Page": "226",
+    "English": "(to) escape",
+    "German": "fliehen",
+    "Page": "248",
+    "synonyms": ["(to) flee"]
+  },
+  {
+    "English": "escape",
+    "German": "Flucht",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "completion",
-    "German": "Vervollständigung, Abschluss, Fertigstellung",
-    "Page": "226",
+    "English": "split screen",
+    "German": "geteilter Bildschirm; Bildschirm(auf)teilung",
+    "Page": "248",
     "synonyms": []
   },
   {
-    "English": "(to) activate",
-    "German": "aktivieren",
-    "Page": "226",
+    "English": "flock of sheep/goats",
+    "German": "Schafen-/Ziegenherde",
+    "Page": "249",
     "synonyms": []
   },
   {
-    "English": "survey",
-    "German": "Umfrage, Studie",
-    "Page": "226",
-    "synonyms": [
-      "poll"
-    ]
+    "English": "comment",
+    "German": "Bemerkung, Kommentar",
+    "Page": "249",
+    "synonyms": ["remark"]
   },
   {
-    "English": "(to) predict",
-    "German": "vorhersagen, voraussagen",
-    "Page": "226",
-    "synonyms": [
-      "forecast"
-    ]
-  },
-  {
-    "English": "(to) be concerned about sth.",
-    "German": "über/um/wegen etw. besorgt sein",
-    "Page": "226",
-    "synonyms": [
-      "worry about"
-    ]
-  },
-  {
-    "English": "despite",
-    "German": "trotz, obwohl",
-    "Page": "226",
+    "English": "royal",
+    "German": "königlich",
+    "Page": "249",
     "synonyms": []
   },
   {
-    "English": "(to) view oneself as sth.",
-    "German": "sich als jd./etwas betrachten",
-    "Page": "226",
-    "synonyms": [
-      "see oneself as"
-    ]
+    "English": "complicated",
+    "German": "kompliziert",
+    "Page": "249",
+    "synonyms": ["complex"]
   },
   {
-    "English": "confident",
-    "German": "selbstsicher, zuversichtlich",
-    "Page": "226",
-    "synonyms": [
-      "self-assured"
-    ]
-  },
-  {
-    "English": "overwhelming",
-    "German": "überwältigend",
-    "Page": "226",
+    "English": "(to) prefer sth. (to sth.)",
+    "German": "etwas (einer anderen Sache) vorziehen; etwas lieber tun (als anderes)",
+    "Page": "249",
     "synonyms": []
   },
   {
-    "English": "(to) chair",
-    "German": "den Vorsitz führen, innehaben",
-    "Page": "226",
-    "synonyms": [
-      "lead",
-      "moderate"
-    ]
+    "English": "purse",
+    "German": "Portemonnaie, Geldbörse",
+    "Page": "249",
+    "synonyms": ["wallet"]
   },
   {
-    "English": "moderator",
-    "German": "Moderator/in",
-    "Page": "226",
+    "English": "wee",
+    "German": "klein",
+    "Page": "249",
+    "synonyms": ["tiny", "little"]
+  },
+  {
+    "English": "Get lost!",
+    "German": "Verzieh dich!",
+    "Page": "249",
+    "synonyms": ["Go away!"]
+  },
+  {
+    "English": "(to) make a fuss about sth.",
+    "German": "großen Wirbel um etwas machen",
+    "Page": "249",
     "synonyms": []
   },
   {
-    "English": "(to) research",
-    "German": "recherchieren",
-    "Page": "226",
-    "synonyms": [
-      "investigate"
-    ]
-  },
-  {
-    "English": "(to) ban sth.",
-    "German": "verbieten, für unzulässig erklären",
-    "Page": "226",
-    "synonyms": [
-      "prohibit",
-      "forbid"
-    ]
-  },
-  {
-    "English": "(to) concern sb.",
-    "German": "jn. betreffen, angehen; jn. beunruhigen",
-    "Page": "226",
-    "synonyms": [
-      "affect",
-      "worry"
-    ]
-  },
-  {
-    "English": "aspect",
-    "German": "Aspekt, Gesichtspunkt",
-    "Page": "227",
-    "synonyms": [
-      "point",
-      "facet"
-    ]
-  },
-  {
-    "English": "(to) take sides",
-    "German": "Partei ergreifen",
-    "Page": "227",
+    "English": "dishwasher",
+    "German": "Geschirrspüler",
+    "Page": "249",
     "synonyms": []
   },
   {
-    "English": "firmly",
-    "German": "bestimmt, entschieden, nachdrücklich",
-    "Page": "227",
-    "synonyms": [
-      "decisively"
-    ]
+    "English": "typical (of)",
+    "German": "typisch (für)",
+    "Page": "249",
+    "synonyms": ["characteristic"]
   },
   {
-    "English": "thorough",
-    "German": "gründlich, sorgfältig",
-    "Page": "227",
-    "synonyms": [
-      "careful",
-      "detailed"
-    ]
+    "English": "volcano",
+    "German": "Vulkan",
+    "Page": "249",
+    "synonyms": []
   },
   {
-    "English": "(to) rank sth.",
-    "German": "etwas einstufen, etwas anordnen",
-    "Page": "227",
-    "synonyms": [
-      "classify"
-    ]
+    "English": "army",
+    "German": "Armee",
+    "Page": "249",
+    "synonyms": ["military"]
   },
   {
-    "English": "counter-argument",
-    "German": "Gegenargument",
-    "Page": "227",
+    "English": "originally",
+    "German": "ursprünglich",
+    "Page": "249",
+    "synonyms": ["initially"]
+  },
+  {
+    "English": "material",
+    "German": "Material, Stoff",
+    "Page": "249",
+    "synonyms": ["fabric"]
+  },
+  {
+    "English": "well-known",
+    "German": "bekannt, wohlbekannt",
+    "Page": "249",
+    "synonyms": ["famous"]
+  },
+  {
+    "English": "classical",
+    "German": "klassisch",
+    "Page": "249",
+    "synonyms": []
+  },
+  {
+    "English": "flute",
+    "German": "Querflöte",
+    "Page": "249",
+    "synonyms": []
+  },
+  {
+    "English": "trumpet",
+    "German": "Trompete",
+    "Page": "249",
+    "synonyms": []
+  },
+  {
+    "English": "violin",
+    "German": "Violine, Geige",
+    "Page": "249",
+    "synonyms": []
+  },
+  {
+    "English": "summary",
+    "German": "Zusammenfassung",
+    "Page": "249",
+    "synonyms": ["overview"]
+  },
+  {
+    "English": "(to) sum sth. up",
+    "German": "etwas zusammenfassen",
+    "Page": "250",
+    "synonyms": ["(to) summarize"]
+  },
+  {
+    "English": "tradition",
+    "German": "Tradition",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "search (for)",
+    "German": "Durchsuchung; Suche (nach)",
+    "Page": "250",
+    "synonyms": ["hunt"]
+  },
+  {
+    "English": "term",
+    "German": "Ausdruck, Begriff",
+    "Page": "250",
+    "synonyms": ["word", "expression"]
+  },
+  {
+    "English": "unusual",
+    "German": "ungewöhnlich",
+    "Page": "250",
+    "synonyms": ["uncommon", "rare"]
+  },
+  {
+    "English": "usual",
+    "German": "gewöhnlich, üblich",
+    "Page": "250",
+    "synonyms": ["normal", "typical"]
+  },
+  {
+    "English": "(to) interest sb.",
+    "German": "jn. interessieren",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "heading",
+    "German": "Überschrift",
+    "Page": "250",
+    "synonyms": ["title", "headline"]
+  },
+  {
+    "English": "digital",
+    "German": "digital",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "slide",
+    "German": "Folie (bei Präsentationen mit Computerprogramm)",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "(to) fit",
+    "German": "passen",
+    "Page": "250",
+    "synonyms": ["(to) match"]
+  },
+  {
+    "English": "missing",
+    "German": "verschollen, vermisst",
+    "Page": "250",
+    "synonyms": ["lost"]
+  },
+  {
+    "English": "heather",
+    "German": "Heide(kraut)",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "tension",
+    "German": "Spannung, Anspannung",
+    "Page": "250",
+    "synonyms": ["stress"]
+  },
+  {
+    "English": "whistle",
+    "German": "Pfiff",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "(to) race",
+    "German": "rasen",
+    "Page": "250",
+    "synonyms": ["(to) rush", "(to) speed"]
+  },
+  {
+    "English": "in horror",
+    "German": "entsetzt",
+    "Page": "250",
+    "synonyms": ["in shock"]
+  },
+  {
+    "English": "noise",
+    "German": "Geräusch; Lärm",
+    "Page": "250",
+    "synonyms": ["sound"]
+  },
+  {
+    "English": "(to) reach over",
+    "German": "die Hand ausstrecken",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "(to) beat, [beat], beaten",
+    "German": "schlagen; besiegen",
+    "Page": "250",
+    "synonyms": ["(to) defeat"]
+  },
+  {
+    "English": "(to) read sb.'s mind",
+    "German": "jemandes Gedanken lesen",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "shepherd",
+    "German": "Schäfer/in, Schafhirte/-hirtin",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "(to) burst into tears, burst, burst",
+    "German": "in Tränen ausbrechen",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "volunteer",
+    "German": "Freiwillige(r), Ehrenamtliche(r)",
+    "Page": "250",
+    "synonyms": []
+  },
+  {
+    "English": "gently",
+    "German": "behutsam, sanft",
+    "Page": "250",
+    "synonyms": ["softly", "carefully"]
+  },
+  {
+    "English": "awake",
+    "German": "wach",
+    "Page": "251",
+    "synonyms": []
+  },
+  {
+    "English": "(to) knock (on sth.)",
+    "German": "(an)klopfen (an etwas)",
+    "Page": "251",
+    "synonyms": ["(to) tap"]
+  },
+  {
+    "English": "memorial",
+    "German": "Denkmal; Gedenk-",
+    "Page": "251",
+    "synonyms": ["monument"]
+  },
+  {
+    "English": "in second place",
+    "German": "auf dem zweiten Platz; an zweiter Stelle",
+    "Page": "251",
     "synonyms": []
   }
 ]
+
