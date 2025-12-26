@@ -361,6 +361,9 @@
                 <p>🏆 Schaffst du heute einen neuen Highscore?</p>
             </div>
             <div class="start-hint">Drücke ENTER zum Starten!</div>
+            <button onclick="window.location.href='display.html'" style="margin-top: 20px; background: #0066CC; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 18px; cursor: pointer; font-family: 'Comic Sans MS', Arial, sans-serif;">
+                ← Zurück zum Menü
+            </button>
         </div>
 
         <!-- Countdown Screen -->
@@ -402,6 +405,7 @@
             <h1>Monti ist gelandet! 🛬</h1>
             <div class="final-score">Dein Score: <span id="final-score-value">0</span></div>
             <button onclick="location.reload()">Nochmal spielen</button>
+            <button onclick="window.location.href='display.html'" style="background: #0066CC; margin-top: 10px;">Zurück zum Menü</button>
         </div>
     </div>
 
@@ -415,11 +419,120 @@
             isPaused: false
         };
 
-        // Test vocabulary
-        const currentVocab = {
-            english: "test",
-            german: ["test"] // Akzeptierte Übersetzungen
+        // Firebase Config (gleich wie in display.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
+            authDomain: "testdatabase-4daf4.firebaseapp.com",
+            databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "testdatabase-4daf4",
+            storageBucket: "testdatabase-4daf4.firebasestorage.app",
+            messagingSenderId: "743231387214",
+            appId: "1:743231387214:web:166169b25f72616280351f"
         };
+
+        // User & Vocabulary data
+        let currentUser = null;
+        let userPerformance = {};
+        let availableVocabs = []; // Vokabeln von geübten Seiten
+        let currentVocab = null;
+        let usedVocabs = []; // Bereits gespielte Vokabeln in dieser Session
+
+        // Lade User-Daten und Vokabeln
+        async function loadUserAndVocabs() {
+            try {
+                // Lade User aus localStorage
+                const savedUser = localStorage.getItem('lmg_currentUser');
+                const savedPerformance = localStorage.getItem('lmg_userPerformance');
+                
+                if (!savedUser) {
+                    alert('Bitte logge dich zuerst ein!');
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                
+                currentUser = JSON.parse(savedUser);
+                userPerformance = savedPerformance ? JSON.parse(savedPerformance) : {};
+                
+                console.log('✓ User geladen:', currentUser.name);
+                console.log('✓ Performance:', userPerformance);
+                
+                // Finde alle geübten Seiten
+                const practicedPages = Object.keys(userPerformance).map(key => {
+                    const match = key.match(/^page_(\d+)$/);
+                    return match ? parseInt(match[1]) : null;
+                }).filter(p => p !== null);
+                
+                console.log('✓ Geübte Seiten:', practicedPages);
+                
+                if (practicedPages.length === 0) {
+                    alert('Du hast noch keine Seiten geübt! Übe zuerst ein paar Seiten, bevor du das Monti Game spielst.');
+                    window.location.href = 'display.html';
+                    return false;
+                }
+                
+                // Lade Vokabeln von allen geübten Seiten
+                for (const pageNum of practicedPages) {
+                    try {
+                        const className = currentUser.class || 'class5';
+                        const url = `https://raw.githubusercontent.com/simon23-12/LMG.Vokabeltrainer/refs/heads/main/vocab/voc${className.replace('class', '')}_4.json`;
+                        const response = await fetch(url);
+                        const allVocabs = await response.json();
+                        
+                        // Filtere Vokabeln dieser Seite
+                        const pageVocabs = allVocabs.filter(v => v.page === pageNum);
+                        availableVocabs.push(...pageVocabs);
+                        
+                        console.log(`✓ Seite ${pageNum}: ${pageVocabs.length} Vokabeln geladen`);
+                    } catch (error) {
+                        console.error(`Fehler beim Laden von Seite ${pageNum}:`, error);
+                    }
+                }
+                
+                console.log('✓ Insgesamt verfügbare Vokabeln:', availableVocabs.length);
+                
+                if (availableVocabs.length === 0) {
+                    alert('Keine Vokabeln gefunden!');
+                    window.location.href = 'display.html';
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Fehler beim Laden:', error);
+                alert('Fehler beim Laden der Daten!');
+                window.location.href = 'display.html';
+                return false;
+            }
+        }
+
+        // Wähle zufällige neue Vokabel
+        function selectRandomVocab() {
+            // Filtere bereits verwendete Vokabeln raus
+            const unused = availableVocabs.filter(v => 
+                !usedVocabs.some(used => used.english === v.english)
+            );
+            
+            // Wenn alle verwendet wurden, reset
+            if (unused.length === 0) {
+                console.log('Alle Vokabeln gespielt, reset!');
+                usedVocabs = [];
+                return selectRandomVocab();
+            }
+            
+            // Wähle zufällige Vokabel
+            const randomVocab = unused[Math.floor(Math.random() * unused.length)];
+            usedVocabs.push(randomVocab);
+            
+            currentVocab = {
+                question: randomVocab.german, // Frage ist auf Deutsch
+                answers: [randomVocab.english, ...(randomVocab.synonyms || [])] // Antworten sind Englisch + Synonyme
+            };
+            
+            console.log('Neue Vokabel:', currentVocab);
+            
+            // Update UI
+            document.getElementById('vocab-question').textContent = currentVocab.question;
+        }
 
         // Three.js Setup
         let scene, camera, renderer, monti;
@@ -993,6 +1106,9 @@
                     endGame();
                 }, 1000);
             } else {
+                // Wähle neue Vokabel
+                selectRandomVocab();
+                
                 startVocabTimer(); // Neuer Timer für nächste Vokabel
             }
         }
@@ -1005,7 +1121,7 @@
 
         function checkAnswer(answer) {
             const normalizedAnswer = answer.trim().toLowerCase();
-            const correctAnswers = currentVocab.german.map(g => g.toLowerCase());
+            const correctAnswers = currentVocab.answers.map(a => a.toLowerCase());
             
             if (correctAnswers.includes(normalizedAnswer)) {
                 // Correct!
@@ -1026,6 +1142,9 @@
                 updateUI();
                 
                 document.getElementById('vocab-input').value = '';
+                
+                // Wähle neue Vokabel
+                selectRandomVocab();
                 
                 // Start new timer for next vocab
                 startVocabTimer();
@@ -1054,6 +1173,9 @@
                         endGame();
                     }, 1000); // Warte kurz bevor Game Over
                 } else {
+                    // Wähle neue Vokabel
+                    selectRandomVocab();
+                    
                     // Start new timer for next vocab
                     startVocabTimer();
                 }
@@ -1164,8 +1286,16 @@
         }
 
         // Initialize
-        initThreeJS();
-        animate();
+        async function init() {
+            const success = await loadUserAndVocabs();
+            if (success) {
+                selectRandomVocab(); // Setze erste Vokabel
+                initThreeJS();
+                animate();
+            }
+        }
+        
+        init();
     </script>
 </body>
 </html>
