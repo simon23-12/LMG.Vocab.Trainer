@@ -470,25 +470,31 @@
                     return false;
                 }
                 
-                // Lade Vokabeln von allen geübten Seiten
-                for (const pageNum of practicedPages) {
-                    try {
-                        const className = currentUser.class || 'class5';
-                        const url = `https://raw.githubusercontent.com/simon23-12/LMG.Vokabeltrainer/refs/heads/main/vocab/voc${className.replace('class', '')}_4.json`;
-                        const response = await fetch(url);
-                        const allVocabs = await response.json();
-                        
-                        // Filtere Vokabeln dieser Seite
-                        const pageVocabs = allVocabs.filter(v => v.page === pageNum);
-                        availableVocabs.push(...pageVocabs);
-                        
-                        console.log(`✓ Seite ${pageNum}: ${pageVocabs.length} Vokabeln geladen`);
-                    } catch (error) {
-                        console.error(`Fehler beim Laden von Seite ${pageNum}:`, error);
-                    }
+                // Lade Vokabeln EINMAL von GitHub
+                try {
+                    const className = currentUser.class || 'class5';
+                    const url = `https://raw.githubusercontent.com/simon23-12/LMG.Vokabeltrainer/refs/heads/main/vocab/voc${className.replace('class', '')}_4.json`;
+                    
+                    console.log('📥 Lade Vokabeln von:', url);
+                    
+                    const response = await fetch(url);
+                    const text = await response.text();
+                    const allVocabs = JSON.parse(text);
+                    
+                    console.log('✓ JSON geladen, insgesamt', allVocabs.length, 'Vokabeln');
+                    
+                    // Filtere nur Vokabeln von geübten Seiten
+                    availableVocabs = allVocabs.filter(v => practicedPages.includes(v.page));
+                    
+                    console.log('✓ Gefilterte Vokabeln von geübten Seiten:', availableVocabs.length);
+                    console.log('✓ Beispiel-Vokabel:', availableVocabs[0]);
+                    
+                } catch (error) {
+                    console.error('Fehler beim Laden der Vokabeln:', error);
+                    alert('Fehler beim Laden der Vokabeln!');
+                    window.location.href = 'display.html';
+                    return false;
                 }
-                
-                console.log('✓ Insgesamt verfügbare Vokabeln:', availableVocabs.length);
                 
                 if (availableVocabs.length === 0) {
                     alert('Keine Vokabeln gefunden!');
@@ -847,8 +853,6 @@
             mountainPart.add(snowCap);
             
             return mountainPart;
-            
-            scene.add(landscape);
         }
         
         function createTree() {
