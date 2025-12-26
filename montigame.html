@@ -474,6 +474,8 @@
                 try {
                     const className = currentUser.class || 'class5';
                     
+                    console.log('🔍 className:', className);
+                    
                     // Mappe Klassennamen zu Dateinamen
                     let vocabFile;
                     if (className === 'class5a' || className === 'class5b' || className === 'class5') {
@@ -482,6 +484,8 @@
                         // Für andere Klassen: class6 -> voc6_4.json
                         vocabFile = `voc${className.replace('class', '')}_4.json`;
                     }
+                    
+                    console.log('🔍 vocabFile:', vocabFile);
                     
                     const url = `https://raw.githubusercontent.com/simon23-12/LMG.Vokabeltrainer/refs/heads/main/vocab/english/${vocabFile}`;
                     
