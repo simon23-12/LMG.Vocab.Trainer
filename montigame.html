@@ -54,8 +54,9 @@
             width: 100%;
             height: 100%;
             background-image: url('https://github.com/simon23-12/LMG.Vocab.Trainer/blob/main/images/montigame.jpg?raw=true');
-            background-size: cover;
+            background-size: contain;
             background-position: center;
+            background-repeat: no-repeat;
             opacity: 0;
             animation: fadeInImage 1s ease-in-out 0.5s forwards;
         }
@@ -355,6 +356,7 @@
             border-radius: 15px;
             border: 3px solid #0066CC;
             min-width: 400px;
+            pointer-events: all;
         }
 
         #vocab-question {
@@ -374,10 +376,6 @@
             text-align: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin-bottom: 10px;
-            touch-action: manipulation;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
         }
 
         #vocab-input:focus {
@@ -435,8 +433,10 @@
             width: 100%;
             height: 100%;
             background-image: url('https://github.com/simon23-12/LMG.Vocab.Trainer/blob/main/images/montilanded.jpg?raw=true');
-            background-size: cover;
+            background-size: contain;
             background-position: center;
+            background-repeat: no-repeat;
+            background-color: #87CEEB;
             display: none;
             flex-direction: column;
             justify-content: center;
