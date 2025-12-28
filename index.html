@@ -936,8 +936,9 @@
     const duration = baseDuration + (Math.random() * 10);
     wordElement.style.animationDuration = duration + 's';
     
-    // Random delay (0-15 seconds) for staggered start
-    const delay = Math.random() * 15;
+    // NEGATIVE delay = animation already in progress (no static words!)
+    // Random value between 0 and -duration means word appears somewhere along its path
+    const delay = -(Math.random() * duration);
     wordElement.style.animationDelay = delay + 's';
     
     wordElement.textContent = word;
