@@ -1575,12 +1575,6 @@
     ]
   },
   {
-    "English": "Unit 1 - The first day at school",
-    "German": "Einheit 1 - Der erste Tag in der Schule",
-    "Page": "189",
-    "synonyms": []
-  },
-  {
     "English": "the first day",
     "German": "der erste Tag",
     "Page": "189",
@@ -1925,6 +1919,12 @@
       "house",
       "residence"
     ]
+  },
+  {
+    "English": "Part A",
+    "German": "Teil A",
+    "Page": "190",
+    "synonyms": []
   },
   {
     "English": "on the way to ...",
@@ -2393,6 +2393,12 @@
     "synonyms": []
   },
   {
+    "English": "Part B",
+    "German": "Teil B",
+    "Page": "192",
+    "synonyms": []
+  },
+  {
     "English": "Miss Bell",
     "German": "Frau Bell (übliche Anrede von Lehrerinnen)",
     "Page": "192",
@@ -2834,6 +2840,12 @@
     "synonyms": []
   },
   {
+    "English": "Part C",
+    "German": "Teil C",
+    "Page": "194",
+    "synonyms": []
+  },
+  {
     "English": "(to) find",
     "German": "finden",
     "Page": "194",
@@ -3166,12 +3178,6 @@
     "synonyms": []
   },
   {
-    "English": "Unit 2 - Homes and families",
-    "German": "Einheit 2 - Häuser und Familien",
-    "Page": "196",
-    "synonyms": []
-  },
-  {
     "English": "family",
     "German": "Familie",
     "Page": "196",
@@ -3327,6 +3333,12 @@
   {
     "English": "task",
     "German": "Aufgabe",
+    "Page": "197",
+    "synonyms": []
+  },
+  {
+    "English": "Part A",
+    "German": "Teil A",
     "Page": "197",
     "synonyms": []
   },
@@ -3595,6 +3607,12 @@
     "synonyms": []
   },
   {
+    "English": "Part B",
+    "German": "Teil B",
+    "Page": "198",
+    "synonyms": []
+  },
+  {
     "English": "uncle",
     "German": "Onkel",
     "Page": "198",
@@ -3743,6 +3761,12 @@
   {
     "English": "twins",
     "German": "Zwillinge",
+    "Page": "199",
+    "synonyms": []
+  },
+  {
+    "English": "Part C",
+    "German": "Teil C",
     "Page": "199",
     "synonyms": []
   },
@@ -4121,12 +4145,6 @@
     "synonyms": []
   },
   {
-    "English": "Unit 3 - Clubs and hobbies",
-    "German": "Einheit 3 - Klubs und Hobbys",
-    "Page": "201",
-    "synonyms": []
-  },
-  {
     "English": "hobby",
     "German": "Hobby",
     "Page": "201",
@@ -4302,6 +4320,12 @@
   {
     "English": "from ... to ...",
     "German": "von ... bis ...",
+    "Page": "202",
+    "synonyms": []
+  },
+  {
+    "English": "Part A",
+    "German": "Teil A",
     "Page": "202",
     "synonyms": []
   },
@@ -4673,6 +4697,12 @@
     "synonyms": []
   },
   {
+    "English": "Part B",
+    "German": "Teil B",
+    "Page": "204",
+    "synonyms": []
+  },
+  {
     "English": "(to) finish sth.",
     "German": "etwas beenden; mit etwas fertig werden/sein",
     "Page": "204",
@@ -4833,6 +4863,12 @@
     "synonyms": [
       "meter"
     ]
+  },
+  {
+    "English": "Part C",
+    "German": "Teil C",
+    "Page": "205",
+    "synonyms": []
   },
   {
     "English": "on Saturday afternoon",
@@ -5287,12 +5323,6 @@
     ]
   },
   {
-    "English": "Unit 4 - Plymouth - a city by the sea",
-    "German": "Einheit 4 - Plymouth - eine Stadt am Meer",
-    "Page": "207",
-    "synonyms": []
-  },
-  {
     "English": "by the sea",
     "German": "am Meer",
     "Page": "207",
@@ -5358,6 +5388,12 @@
   {
     "English": "under",
     "German": "unter",
+    "Page": "208",
+    "synonyms": []
+  },
+  {
+    "English": "Part A",
+    "German": "Teil A",
     "Page": "208",
     "synonyms": []
   },
@@ -5681,6 +5717,12 @@
     ]
   },
   {
+    "English": "Part B",
+    "German": "Teil B",
+    "Page": "209",
+    "synonyms": []
+  },
+  {
     "English": "talk",
     "German": "Vortrag, Referat, Rede",
     "Page": "209",
@@ -5826,6 +5868,12 @@
   {
     "English": "the same as ...",
     "German": "der-/die-/dasselbe wie ...",
+    "Page": "210",
+    "synonyms": []
+  },
+  {
+    "English": "Part C",
+    "German": "Teil C",
     "Page": "210",
     "synonyms": []
   },
