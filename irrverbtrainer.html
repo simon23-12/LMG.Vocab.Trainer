@@ -581,18 +581,28 @@
   <script>
     // Firebase Configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyCwho4lym4BT7hXUO2Bu4dCEz2bdOMBA7I",
-      authDomain: "vocabulary-a00a7.firebaseapp.com",
-      databaseURL: "https://vocabulary-a00a7-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "vocabulary-a00a7",
-      storageBucket: "vocabulary-a00a7.firebasestorage.app",
-      messagingSenderId: "1051687553127",
-      appId: "1:1051687553127:web:7cf983ff2e3d47b8c9fbae",
-      measurementId: "G-4X60J21LV2"
+      apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
+      authDomain: "testdatabase-4daf4.firebaseapp.com",
+      databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "testdatabase-4daf4",
+      storageBucket: "testdatabase-4daf4.firebasestorage.app",
+      messagingSenderId: "743231387214",
+      appId: "1:743231387214:web:166169b25f72616280351f"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    // Initialize Firebase
+    let app, db;
+    let firebaseReady = false;
+
+    try {
+      app = firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      firebaseReady = true;
+      console.log('✓ Firebase initialized successfully');
+    } catch (error) {
+      console.error('❌ Firebase initialization error:', error);
+      alert('Fehler beim Verbinden mit Firebase. Bitte Seite neu laden.');
+    }
 
     // Global Variables
     let currentUser = null;
@@ -1024,7 +1034,16 @@
 
     // Save Results to Firebase
     async function saveResultsToFirebase(percent, infinitiveAccuracy, simplePastAccuracy, pastParticipleAccuracy) {
+      if (!firebaseReady) {
+        console.error('Firebase not ready, cannot save results');
+        alert('Fehler: Firebase-Verbindung nicht bereit. Ergebnisse konnten nicht gespeichert werden.');
+        return;
+      }
+
       try {
+        console.log('=== Saving Results to Firebase ===');
+        console.log('UserKey:', currentUser.userKey);
+        
         const resultData = {
           percent: percent,
           score: score,
@@ -1037,15 +1056,21 @@
           date: new Date().toLocaleDateString('de-DE')
         };
 
+        console.log('Result Data:', resultData);
+
         const key = currentMode === 'simple' ? 'irregularVerbsSimple' : 'irregularVerbsFull';
+        const path = `users/${currentUser.userKey}/${key}`;
         
-        await db.ref(`users/${currentUser.userKey}/${key}`).set(resultData);
-        console.log('Results saved to Firebase');
+        console.log('Saving to path:', path);
+        
+        await db.ref(path).set(resultData);
+        console.log('✓ Results saved to Firebase successfully');
 
         // Update dashboard stats
         await updateDashboardStats();
       } catch (error) {
-        console.error('Error saving to Firebase:', error);
+        console.error('❌ Error saving to Firebase:', error);
+        alert('Fehler beim Speichern der Ergebnisse: ' + error.message);
       }
     }
 
@@ -1064,6 +1089,12 @@
 
     // Load Dashboard Stats
     async function loadDashboardStats() {
+      if (!firebaseReady) {
+        console.warn('Firebase not ready, cannot load dashboard stats');
+        setDefaultStats();
+        return;
+      }
+
       try {
         console.log('=== Loading Dashboard Stats ===');
         console.log('UserKey:', currentUser.userKey);
