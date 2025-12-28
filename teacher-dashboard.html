@@ -412,8 +412,8 @@
         <option value="9d">9d</option>
         <option value="10a">10a</option>
         <option value="10b">10b</option>
-        <option value="10c">10c</option>
-        <option value="10d">10d</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
       </select>
     </div>
     
@@ -530,9 +530,11 @@
     }
   }
 
-  // Lade Klassen-Performance
-  async function loadClassPerformance() {
-    const selectedClass = document.getElementById('adminClassSelect').value;
+  // Show Status Message
+  function showStatus(msg, type) {
+    console.log(msg);
+  }
+
   async function loadClassPerformance() {
     const selectedClass = document.getElementById('adminClassSelect').value;
     if (!selectedClass) {
@@ -543,7 +545,6 @@
     try {
       showStatus("Lade Schüler von Klasse " + selectedClass + "...", 'info');
       
-      // Nur shallow read für Namen und Klasse - SPART BANDBREITE!
       const snap = await db.ref('users').get();
       if (!snap.exists()) {
         document.getElementById('studentList').innerHTML = '<p style="color: var(--text-secondary);">Keine Schüler gefunden.</p>';
@@ -597,9 +598,11 @@
     } catch (error) {
       showStatus("Fehler: " + error.message, 'error');
       console.error(error);
+    }
+  }
 
-  // Lazy Load Student Performance - NUR beim Klick!
-  const loadedStudents = {}; // Cache
+  // Lazy Load Student Performance
+  const loadedStudents = {};
   
   async function loadAndToggleStudentPerf(userKey, studentId) {
     const perfDiv = document.getElementById(studentId + '_perf');
@@ -608,21 +611,18 @@
     
     if (!perfDiv) return;
     
-    // Wenn schon offen, einfach schließen
     if (perfDiv.style.display === 'grid') {
       perfDiv.style.display = 'none';
       icon.style.transform = 'rotate(0deg)';
       return;
     }
     
-    // Wenn noch nicht geladen, jetzt laden
     if (!loadedStudents[userKey]) {
       try {
         perfDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Lade Daten...</div>';
         perfDiv.style.display = 'grid';
         icon.style.transform = 'rotate(180deg)';
         
-        // NUR DIESEN USER laden - spart Bandbreite!
         const userSnap = await db.ref('users/' + userKey).get();
         if (!userSnap.exists()) {
           perfDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary);">Keine Daten gefunden</div>';
@@ -632,7 +632,6 @@
         
         const userData = userSnap.val();
         
-        // Zähle Pages
         let pageCount = 0;
         let intervalCount = 0;
         const allPerformance = {};
@@ -647,20 +646,16 @@
           }
         }
         
-        // Irregular Verbs Daten
         const irregularSimple = userData.irregularVerbsSimple;
         const irregularFull = userData.irregularVerbsFull;
         
-        // Baue HTML
         let perfHtml = '';
         
-        // Irregular Verbs Section (falls vorhanden)
         if (irregularSimple || irregularFull) {
           perfHtml += '<div style="grid-column: 1 / -1; background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;">';
           perfHtml += '<div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">📚 Irregular Verbs</div>';
           perfHtml += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">';
           
-          // Overall Accuracy
           let overallAcc = '--';
           if (irregularSimple && irregularFull) {
             overallAcc = Math.round((irregularSimple.percent + irregularFull.percent) / 2);
@@ -675,7 +670,6 @@
             <div style="font-size: 24px; font-weight: bold;">${overallAcc}%</div>
           </div>`;
           
-          // Simple Past Accuracy
           let simplePastAcc = '--';
           const simplePastScores = [];
           if (irregularSimple && irregularSimple.simplePastAccuracy !== undefined) {
@@ -693,7 +687,6 @@
             <div style="font-size: 24px; font-weight: bold;">${simplePastAcc}%</div>
           </div>`;
           
-          // Past Participle Accuracy
           let pastPartAcc = '--';
           if (irregularFull && irregularFull.pastParticipleAccuracy !== undefined && irregularFull.pastParticipleAccuracy !== null) {
             pastPartAcc = irregularFull.pastParticipleAccuracy;
@@ -707,7 +700,6 @@
           perfHtml += '</div></div>';
         }
         
-        // Vocabulary Performance
         if (Object.keys(allPerformance).length > 0) {
           const sorted = Object.entries(allPerformance).sort((a, b) => {
             const pageA = parseInt(a[0].replace(/\D/g, ''));
@@ -739,7 +731,6 @@
         
         perfDiv.innerHTML = perfHtml;
         
-        // Update Summary
         const totalTests = pageCount + intervalCount;
         const irrVerbsText = (irregularSimple || irregularFull) ? ' • Irregular Verbs ✓' : '';
         summary.textContent = totalTests + ' Seite' + (totalTests !== 1 ? 'n' : '') + ' getestet' + irrVerbsText;
@@ -751,39 +742,17 @@
         perfDiv.innerHTML = '<div style="text-align: center; color: #e74c3c; padding: 20px;">Fehler beim Laden: ' + error.message + '</div>';
       }
     } else {
-      // Schon geladen, nur öffnen
       perfDiv.style.display = 'grid';
       icon.style.transform = 'rotate(180deg)';
     }
   }
 
-  // Toggle Student Performance
-  function toggleStudentPerf(studentId) {
-    const perfDiv = document.getElementById(studentId + '_perf');
-    const icon = document.getElementById(studentId + '_icon');
-    
-    if (!perfDiv) return;
-    
-    if (perfDiv.style.display === 'none') {
-      perfDiv.style.display = 'grid';
-      icon.style.transform = 'rotate(180deg)';
-    } else {
-      perfDiv.style.display = 'none';
-      icon.style.transform = 'rotate(0deg)';
-    }
-  }
-      icon.style.transform = 'rotate(0deg)';
-    }
-  }
-
-  // Logout
   function logout() {
     sessionStorage.removeItem('lmg_teacher_auth');
     sessionStorage.removeItem('lmg_teacher_name');
     window.location.href = 'index.html';
   }
 
-  // Dark Mode
   function initDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
     const isDarkMode = localStorage.getItem('darkMode') === 'true';
