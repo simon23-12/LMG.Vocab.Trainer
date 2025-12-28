@@ -663,8 +663,35 @@
         
         let perfHtml = '';
         
+        // ERST: Vocabulary Performance
+        if (Object.keys(allPerformance).length > 0) {
+          const sorted = Object.entries(allPerformance).sort((a, b) => {
+            const pageA = parseInt(a[0].replace(/\D/g, ''));
+            const pageB = parseInt(b[0].replace(/\D/g, ''));
+            return pageA - pageB;
+          });
+          
+          sorted.forEach(([key, data]) => {
+            const pageNum = key.replace('page_', '').replace('interval_', 'I: ');
+            let colorClass = '';
+            if (data.percent >= 80) colorClass = 'green';
+            else if (data.percent >= 50) colorClass = 'yellow';
+            else colorClass = 'red';
+            
+            perfHtml += `
+              <div class="perf-item ${colorClass}">
+                <div style="font-weight: bold; font-size: 16px;">${pageNum}</div>
+                <div style="font-size: 20px; margin: 5px 0;">${data.percent}%</div>
+                <div style="font-size: 12px;">${data.score}/${data.total}</div>
+                <div style="font-size: 11px; opacity: 0.7;">${data.date || ''}</div>
+              </div>
+            `;
+          });
+        }
+        
+        // DANN: Irregular Verbs (am Ende)
         if (irregularSimple || irregularFull) {
-          perfHtml += '<div style="grid-column: 1 / -1; background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;">';
+          perfHtml += '<div style="grid-column: 1 / -1; background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%); color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">';
           perfHtml += '<div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">📚 Irregular Verbs</div>';
           perfHtml += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">';
           
@@ -710,31 +737,6 @@
           </div>`;
           
           perfHtml += '</div></div>';
-        }
-        
-        if (Object.keys(allPerformance).length > 0) {
-          const sorted = Object.entries(allPerformance).sort((a, b) => {
-            const pageA = parseInt(a[0].replace(/\D/g, ''));
-            const pageB = parseInt(b[0].replace(/\D/g, ''));
-            return pageA - pageB;
-          });
-          
-          sorted.forEach(([key, data]) => {
-            const pageNum = key.replace('page_', '').replace('interval_', 'I: ');
-            let colorClass = '';
-            if (data.percent >= 80) colorClass = 'green';
-            else if (data.percent >= 50) colorClass = 'yellow';
-            else colorClass = 'red';
-            
-            perfHtml += `
-              <div class="perf-item ${colorClass}">
-                <div style="font-weight: bold; font-size: 16px;">${pageNum}</div>
-                <div style="font-size: 20px; margin: 5px 0;">${data.percent}%</div>
-                <div style="font-size: 12px;">${data.score}/${data.total}</div>
-                <div style="font-size: 11px; opacity: 0.7;">${data.date || ''}</div>
-              </div>
-            `;
-          });
         }
         
         if (perfHtml === '') {
