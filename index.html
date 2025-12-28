@@ -918,20 +918,21 @@
     const duration = baseDuration + (Math.random() * 10);
     wordElement.style.animationDuration = duration + 's';
     
+    // CRITICAL FIX: Use NEGATIVE delay to make animation already in progress!
+    // Random progress: 0.0 = just starting, 1.0 = almost finished
+    const progress = Math.random(); // 0% to 100% through animation
+    const negativeDelay = -(duration * progress); // Negative = already started
+    wordElement.style.animationDelay = negativeDelay + 's';
+    
     if (direction === 'ltr') {
-      // Left to right - start somewhere in the left half, moving right
-      const startPercent = -(20 + Math.random() * 100); // Start between -120% and -20%
-      wordElement.style.left = startPercent + '%';
+      // Left to right
+      wordElement.style.left = '-20%';
       wordElement.style.animationName = 'floatWordLTR';
     } else {
-      // Right to left - start somewhere in the right half, moving left
-      const startPercent = -(20 + Math.random() * 100); // Start between -120% and -20%
-      wordElement.style.right = startPercent + '%';
+      // Right to left
+      wordElement.style.right = '-20%';
       wordElement.style.animationName = 'floatWordRTL';
     }
-    
-    // NO animation delay - all words move immediately!
-    wordElement.style.animationDelay = '0s';
     
     wordElement.textContent = word;
     return wordElement;
@@ -945,8 +946,14 @@
     // Clear existing words
     background.innerHTML = '';
     
-    // Create 40 words for constant presence on screen
-    const wordCount = 40;
+    // Create 60 words for dense coverage
+    const wordCount = 60;
+    for (let i = 0; i < wordCount; i++) {
+      const word = createFloatingWord();
+      background.appendChild(word);
+    }
+    console.log('✅ Floating vocabulary:', wordCount, 'words instantly visible');
+  }
     for (let i = 0; i < wordCount; i++) {
       const word = createFloatingWord();
       background.appendChild(word);
