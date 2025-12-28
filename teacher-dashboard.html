@@ -632,19 +632,31 @@
         
         const userData = userSnap.val();
         
+        console.log('=== USER DATA DEBUG ===');
+        console.log('UserKey:', userKey);
+        console.log('Has performance object:', !!userData.performance);
+        
         let pageCount = 0;
         let intervalCount = 0;
         const allPerformance = {};
         
-        for (let key in userData) {
+        // Performance ist in einem Sub-Objekt!
+        const performanceData = userData.performance || {};
+        
+        for (let key in performanceData) {
           if (key.startsWith('page_')) {
+            console.log('Found page:', key);
             pageCount++;
-            allPerformance[key] = userData[key];
+            allPerformance[key] = performanceData[key];
           } else if (key.startsWith('interval_')) {
+            console.log('Found interval:', key);
             intervalCount++;
-            allPerformance[key] = userData[key];
+            allPerformance[key] = performanceData[key];
           }
         }
+        
+        console.log('Page count:', pageCount);
+        console.log('Interval count:', intervalCount);
         
         const irregularSimple = userData.irregularVerbsSimple;
         const irregularFull = userData.irregularVerbsFull;
