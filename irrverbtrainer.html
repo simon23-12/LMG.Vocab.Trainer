@@ -496,7 +496,7 @@
   <div class="container">
     <h1>Irregular Verbs Trainer</h1>
 
-    <!-- Dashboard Screen -->
+    <!-- Dashboard Screen mit integrierten Übungs-Buttons -->
     <div id="dashboardScreen" class="screen active">
       <h2 style="text-align: center; margin-bottom: 30px;">📊 Deine Statistiken</h2>
       
@@ -504,47 +504,35 @@
         <div class="stat-card">
           <div class="stat-label">Overall Accuracy</div>
           <div class="stat-value" id="overallAccuracy">--%</div>
-          <div class="stat-description">Alle Versuche kombiniert</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-label">Accuracy Simple Past</div>
           <div class="stat-value" id="simplePastAccuracy">--%</div>
-          <div class="stat-description">Nur Simple Past Formen</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-label">Accuracy Past Participle</div>
           <div class="stat-value" id="pastParticipleAccuracy">--%</div>
-          <div class="stat-description">Nur Past Participle Formen</div>
         </div>
       </div>
 
-      <div style="text-align: center; margin-top: 40px;">
-        <button onclick="showScreen('modeScreen')">📝 Jetzt üben</button>
-        <button onclick="window.location.href='display.html'">← Zurück zum Hauptmenü</button>
-      </div>
-    </div>
+      <h2 style="text-align: center; margin: 40px 0 20px 0;">📝 Wähle deinen Übungsmodus</h2>
 
-    <!-- Mode Selection Screen -->
-    <div id="modeScreen" class="screen">
       <div class="mode-selector">
         <div class="mode-card" onclick="startMode('simple')">
           <div class="mode-title">📝 Infinitive + Simple Past</div>
-          <div class="mode-description">
-            Du bekommst die deutsche Bedeutung und musst Infinitiv + Simple Past ergänzen
-          </div>
         </div>
 
         <div class="mode-card" onclick="startMode('full')">
           <div class="mode-title">📚 Alle drei Formen</div>
-          <div class="mode-description">
-            Du bekommst die deutsche Bedeutung und musst Infinitiv + Simple Past + Past Participle ergänzen
-          </div>
         </div>
       </div>
-    </div>
 
+      <div style="text-align: center; margin-top: 40px;">
+        <button onclick="window.location.href='display.html'">← Zurück zum Hauptmenü</button>
+      </div>
+    </div>
     <!-- Quiz Screen -->
     <div id="quizScreen" class="screen">
       <div class="quiz-header">
@@ -775,8 +763,15 @@
 
     // Timer Functions
     function startTimer() {
-      timeLeft = 15;
+      // Timer basierend auf Modus: Simple = 15 Sekunden, Full = 20 Sekunden
+      timeLeft = currentMode === 'simple' ? 15 : 20;
       updateTimerDisplay();
+      
+      // Clear any existing interval first
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
       
       timerInterval = setInterval(() => {
         timeLeft--;
@@ -787,6 +782,8 @@
         }
 
         if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
           handleTimeout();
         }
       }, 1000);
@@ -795,6 +792,7 @@
     function resetTimer() {
       if (timerInterval) {
         clearInterval(timerInterval);
+        timerInterval = null;
       }
       document.getElementById('timer').classList.remove('warning');
       startTimer();
@@ -805,7 +803,10 @@
     }
 
     function handleTimeout() {
-      clearInterval(timerInterval);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
       const verb = irregularVerbs[currentQuestionIndex];
       
       results.push({
@@ -832,7 +833,10 @@
 
     // Check Answer
     function checkAnswer() {
-      clearInterval(timerInterval);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
 
       const verb = irregularVerbs[currentQuestionIndex];
       const userInfinitive = document.getElementById('infinitiveInput').value.trim().toLowerCase();
@@ -926,7 +930,10 @@
 
     // Skip Question
     function skipQuestion() {
-      clearInterval(timerInterval);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
       
       const verb = irregularVerbs[currentQuestionIndex];
       results.push({
@@ -1058,17 +1065,26 @@
     // Load Dashboard Stats
     async function loadDashboardStats() {
       try {
+        console.log('=== Loading Dashboard Stats ===');
+        console.log('UserKey:', currentUser.userKey);
+        
         const userRef = db.ref(`users/${currentUser.userKey}`);
         const snapshot = await userRef.once('value');
         const userData = snapshot.val();
 
+        console.log('User Data from Firebase:', userData);
+
         if (!userData) {
+          console.log('No user data found, setting defaults');
           setDefaultStats();
           return;
         }
 
         const simpleData = userData.irregularVerbsSimple;
         const fullData = userData.irregularVerbsFull;
+
+        console.log('Simple Mode Data:', simpleData);
+        console.log('Full Mode Data:', fullData);
 
         let overallAccuracy = '--';
         let simplePastAccuracy = '--';
@@ -1100,10 +1116,17 @@
           pastParticipleAccuracy = fullData.pastParticipleAccuracy;
         }
 
+        console.log('Calculated Stats:');
+        console.log('- Overall Accuracy:', overallAccuracy);
+        console.log('- Simple Past Accuracy:', simplePastAccuracy);
+        console.log('- Past Participle Accuracy:', pastParticipleAccuracy);
+
         // Update dashboard
         document.getElementById('overallAccuracy').textContent = overallAccuracy !== '--' ? overallAccuracy + '%' : '--%';
         document.getElementById('simplePastAccuracy').textContent = simplePastAccuracy !== '--' ? simplePastAccuracy + '%' : '--%';
         document.getElementById('pastParticipleAccuracy').textContent = pastParticipleAccuracy !== '--' ? pastParticipleAccuracy + '%' : '--%';
+
+        console.log('=== Dashboard Stats Updated ===');
 
       } catch (error) {
         console.error('Error loading dashboard stats:', error);
