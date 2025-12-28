@@ -460,6 +460,14 @@
       .floating-word.large { font-size: 38px; }
       .floating-word.xlarge { font-size: 52px; }
 
+      /* Smaller sizes for laptop screens (13-15 inch) */
+      @media (min-width: 1024px) and (max-width: 1600px) {
+        .floating-word.small { font-size: 14px; }
+        .floating-word.medium { font-size: 22px; }
+        .floating-word.large { font-size: 30px; }
+        .floating-word.xlarge { font-size: 40px; }
+      }
+
       .container {
         position: relative;
         z-index: 1;
@@ -961,13 +969,21 @@
     // Clear existing words
     background.innerHTML = '';
     
-    // Create 70 words for dense, full coverage
-    const wordCount = 70;
+    // Adaptive word count based on screen size
+    let wordCount;
+    if (window.innerWidth >= 2000) {
+      wordCount = 80;  // Large monitors (27"+)
+    } else if (window.innerWidth >= 1600) {
+      wordCount = 70;  // Medium-large monitors (24-27")
+    } else {
+      wordCount = 45;  // Laptops (13-15")
+    }
+    
     for (let i = 0; i < wordCount; i++) {
       const word = createFloatingWord();
       background.appendChild(word);
     }
-    console.log('✅ Floating vocabulary initialized:', wordCount, 'words (bidirectional)');
+    console.log('✅ Floating vocabulary initialized:', wordCount, 'words (adaptive for', window.innerWidth + 'px)');
   }
 
   // Initialize on load
