@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -413,8 +414,6 @@
         <option value="10b">10b</option>
         <option value="10c">10c</option>
         <option value="10d">10d</option>
-        <option value="11">11</option>
-        <option value="12">12</option>
       </select>
     </div>
     
@@ -534,6 +533,8 @@
   // Lade Klassen-Performance
   async function loadClassPerformance() {
     const selectedClass = document.getElementById('adminClassSelect').value;
+  async function loadClassPerformance() {
+    const selectedClass = document.getElementById('adminClassSelect').value;
     if (!selectedClass) {
       document.getElementById('studentList').innerHTML = '';
       return;
@@ -542,6 +543,7 @@
     try {
       showStatus("Lade Schüler von Klasse " + selectedClass + "...", 'info');
       
+      // Nur shallow read für Namen und Klasse - SPART BANDBREITE!
       const snap = await db.ref('users').get();
       if (!snap.exists()) {
         document.getElementById('studentList').innerHTML = '<p style="color: var(--text-secondary);">Keine Schüler gefunden.</p>';
@@ -557,7 +559,7 @@
           studentsInClass.push({
             userKey: userKey,
             displayName: user.name || userKey,
-            performance: user.performance || {}
+            dataLoaded: false
           });
         }
       }
@@ -569,16 +571,145 @@
       
       let html = '<h3>Schüler in Klasse ' + selectedClass + ':</h3>';
       studentsInClass.forEach((student, index) => {
-        const perfCount = Object.keys(student.performance).length;
         const studentId = 'student_' + index;
         
-        // Baue Performance-Grid
+        html += `
+          <div class="student-card" onclick="loadAndToggleStudentPerf('${student.userKey}', '${studentId}')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div class="student-name">${student.displayName}</div>
+                <div id="${studentId}_summary" style="font-size: 14px; color: var(--text-secondary); margin-top: 5px;">
+                  Klicken zum Laden...
+                </div>
+              </div>
+              <div id="${studentId}_icon" style="font-size: 20px; transition: transform 0.3s;">▼</div>
+            </div>
+            <div id="${studentId}_perf" class="student-perf-grid" style="display: none; margin-top: 15px;">
+              <div style="text-align: center; color: var(--text-secondary);">Lade Daten...</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('studentList').innerHTML = html;
+      showStatus("✓ " + studentsInClass.length + " Schüler gefunden", 'success');
+      
+    } catch (error) {
+      showStatus("Fehler: " + error.message, 'error');
+      console.error(error);
+
+  // Lazy Load Student Performance - NUR beim Klick!
+  const loadedStudents = {}; // Cache
+  
+  async function loadAndToggleStudentPerf(userKey, studentId) {
+    const perfDiv = document.getElementById(studentId + '_perf');
+    const icon = document.getElementById(studentId + '_icon');
+    const summary = document.getElementById(studentId + '_summary');
+    
+    if (!perfDiv) return;
+    
+    // Wenn schon offen, einfach schließen
+    if (perfDiv.style.display === 'grid') {
+      perfDiv.style.display = 'none';
+      icon.style.transform = 'rotate(0deg)';
+      return;
+    }
+    
+    // Wenn noch nicht geladen, jetzt laden
+    if (!loadedStudents[userKey]) {
+      try {
+        perfDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Lade Daten...</div>';
+        perfDiv.style.display = 'grid';
+        icon.style.transform = 'rotate(180deg)';
+        
+        // NUR DIESEN USER laden - spart Bandbreite!
+        const userSnap = await db.ref('users/' + userKey).get();
+        if (!userSnap.exists()) {
+          perfDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary);">Keine Daten gefunden</div>';
+          summary.textContent = 'Keine Daten';
+          return;
+        }
+        
+        const userData = userSnap.val();
+        
+        // Zähle Pages
+        let pageCount = 0;
+        let intervalCount = 0;
+        const allPerformance = {};
+        
+        for (let key in userData) {
+          if (key.startsWith('page_')) {
+            pageCount++;
+            allPerformance[key] = userData[key];
+          } else if (key.startsWith('interval_')) {
+            intervalCount++;
+            allPerformance[key] = userData[key];
+          }
+        }
+        
+        // Irregular Verbs Daten
+        const irregularSimple = userData.irregularVerbsSimple;
+        const irregularFull = userData.irregularVerbsFull;
+        
+        // Baue HTML
         let perfHtml = '';
-        if (perfCount > 0) {
-          perfHtml = `<div id="${studentId}_perf" class="student-perf-grid" style="display: none; margin-top: 15px;">`;
+        
+        // Irregular Verbs Section (falls vorhanden)
+        if (irregularSimple || irregularFull) {
+          perfHtml += '<div style="grid-column: 1 / -1; background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;">';
+          perfHtml += '<div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">📚 Irregular Verbs</div>';
+          perfHtml += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">';
           
-          // Sortiere Performance nach Seitennummer
-          const sorted = Object.entries(student.performance).sort((a, b) => {
+          // Overall Accuracy
+          let overallAcc = '--';
+          if (irregularSimple && irregularFull) {
+            overallAcc = Math.round((irregularSimple.percent + irregularFull.percent) / 2);
+          } else if (irregularSimple) {
+            overallAcc = irregularSimple.percent;
+          } else if (irregularFull) {
+            overallAcc = irregularFull.percent;
+          }
+          
+          perfHtml += `<div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.9;">Overall</div>
+            <div style="font-size: 24px; font-weight: bold;">${overallAcc}%</div>
+          </div>`;
+          
+          // Simple Past Accuracy
+          let simplePastAcc = '--';
+          const simplePastScores = [];
+          if (irregularSimple && irregularSimple.simplePastAccuracy !== undefined) {
+            simplePastScores.push(irregularSimple.simplePastAccuracy);
+          }
+          if (irregularFull && irregularFull.simplePastAccuracy !== undefined) {
+            simplePastScores.push(irregularFull.simplePastAccuracy);
+          }
+          if (simplePastScores.length > 0) {
+            simplePastAcc = Math.round(simplePastScores.reduce((a, b) => a + b, 0) / simplePastScores.length);
+          }
+          
+          perfHtml += `<div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.9;">Simple Past</div>
+            <div style="font-size: 24px; font-weight: bold;">${simplePastAcc}%</div>
+          </div>`;
+          
+          // Past Participle Accuracy
+          let pastPartAcc = '--';
+          if (irregularFull && irregularFull.pastParticipleAccuracy !== undefined && irregularFull.pastParticipleAccuracy !== null) {
+            pastPartAcc = irregularFull.pastParticipleAccuracy;
+          }
+          
+          perfHtml += `<div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.9;">Past Participle</div>
+            <div style="font-size: 24px; font-weight: bold;">${pastPartAcc}%</div>
+          </div>`;
+          
+          perfHtml += '</div></div>';
+        }
+        
+        // Vocabulary Performance
+        if (Object.keys(allPerformance).length > 0) {
+          const sorted = Object.entries(allPerformance).sort((a, b) => {
             const pageA = parseInt(a[0].replace(/\D/g, ''));
             const pageB = parseInt(b[0].replace(/\D/g, ''));
             return pageA - pageB;
@@ -600,32 +731,29 @@
               </div>
             `;
           });
-          
-          perfHtml += '</div>';
         }
         
-        html += `
-          <div class="student-card" onclick="toggleStudentPerf('${studentId}')">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div class="student-name">${student.displayName}</div>
-                <div style="font-size: 14px; color: var(--text-secondary); margin-top: 5px;">
-                  ${perfCount} Seite${perfCount !== 1 ? 'n' : ''} getestet
-                </div>
-              </div>
-              <div id="${studentId}_icon" style="font-size: 20px; transition: transform 0.3s;">▼</div>
-            </div>
-            ${perfHtml}
-          </div>
-        `;
-      });
-      
-      document.getElementById('studentList').innerHTML = html;
-      showStatus("✓ " + studentsInClass.length + " Schüler gefunden", 'success');
-      
-    } catch (error) {
-      showStatus("Fehler: " + error.message, 'error');
-      console.error(error);
+        if (perfHtml === '') {
+          perfHtml = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Noch keine Tests absolviert</div>';
+        }
+        
+        perfDiv.innerHTML = perfHtml;
+        
+        // Update Summary
+        const totalTests = pageCount + intervalCount;
+        const irrVerbsText = (irregularSimple || irregularFull) ? ' • Irregular Verbs ✓' : '';
+        summary.textContent = totalTests + ' Seite' + (totalTests !== 1 ? 'n' : '') + ' getestet' + irrVerbsText;
+        
+        loadedStudents[userKey] = true;
+        
+      } catch (error) {
+        console.error('Error loading student data:', error);
+        perfDiv.innerHTML = '<div style="text-align: center; color: #e74c3c; padding: 20px;">Fehler beim Laden: ' + error.message + '</div>';
+      }
+    } else {
+      // Schon geladen, nur öffnen
+      perfDiv.style.display = 'grid';
+      icon.style.transform = 'rotate(180deg)';
     }
   }
 
@@ -641,6 +769,9 @@
       icon.style.transform = 'rotate(180deg)';
     } else {
       perfDiv.style.display = 'none';
+      icon.style.transform = 'rotate(0deg)';
+    }
+  }
       icon.style.transform = 'rotate(0deg)';
     }
   }
