@@ -1345,7 +1345,7 @@
       
       <!-- Interval Section -->
       <div class="interval-section">
-        <h3>📖 Intervall testen</h3>
+        <h3>📖 Alternativ: Übe ein Intervall</h3>
         <div class="interval-controls">
           <label>Von Seite:</label>
           <select id="pageFrom"></select>
@@ -1356,7 +1356,7 @@
       </div>
       
       <!-- Monti Game Button -->
-      <div style="text-align: center; margin: 30px 0;">
+      <div style="margin: 30px 0;">
         <button onclick="window.location.href='monti.html'" 
                 style="background: linear-gradient(135deg, #FFB700 0%, #FF8C00 100%); 
                        padding: 20px 40px; 
@@ -1390,9 +1390,6 @@
       </div>
       
       <div style="text-align: center;">
-        <button onclick="goToMontiGame()" style="background: linear-gradient(135deg, #FFB700 0%, #FF8C00 100%); margin-bottom: 10px;">
-          <span>🦅</span> Monti Flug spielen
-        </button>
         <button onclick="logout()" class="modern-logout">
           <span>🚪</span> Logout
         </button>
@@ -1999,7 +1996,7 @@
   }
   
   function startTimer() {
-    timeLeft = 15;
+    timeLeft = 20;
     document.getElementById('timer').textContent = timeLeft;
     document.getElementById('timer').classList.remove('warning');
     
@@ -3288,7 +3285,7 @@
         else if (index === 2) rankEmoji = '🥉';
         
         li.innerHTML = `
-          <span class="leaderboard-rank">${rankEmoji || (index + 1)}</span>
+          ${rankEmoji ? `<span class="leaderboard-rank">${rankEmoji}</span>` : ''}
           <span class="leaderboard-name">${user.name}</span>
           <span class="leaderboard-score">📚 ${user.score}</span>
         `;
