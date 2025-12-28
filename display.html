@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1355,16 +1356,28 @@
         </div>
       </div>
       
+      
+      <!-- Irregular Verbs Trainer Button (nur für Klasse 6-10) -->
+      <div id="irregularVerbsButton" style="margin: 30px 0; display: none;">
+        <button onclick="window.location.href='irrverbtrainer.html'" 
+                class="leaderboard-toggle"
+                style="background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%); 
+                       padding: 20px 40px; 
+                       font-size: 18px;
+                       box-shadow: 0 4px 15px rgba(157, 80, 187, 0.4);">
+          <span>📚</span>
+          <span>Irregular Verbs Trainer</span>
+        </button>
+      </div>
+
       <!-- Monti Game Button -->
       <div style="margin: 30px 0;">
         <button onclick="window.location.href='montigame.html'" 
+                class="leaderboard-toggle"
                 style="background: linear-gradient(135deg, #FFB700 0%, #FF8C00 100%); 
                        padding: 20px 40px; 
                        font-size: 18px;
-                       box-shadow: 0 4px 15px rgba(255, 183, 0, 0.4);
-                       display: inline-flex;
-                       align-items: center;
-                       gap: 15px;">
+                       box-shadow: 0 4px 15px rgba(255, 183, 0, 0.4);">
           <img src="https://github.com/simon23-12/LMG.Vocab.Trainer/raw/main/images/montismile.jpg" 
                alt="Monti" 
                style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
@@ -1799,6 +1812,18 @@
     calculateDashboardStats();
     
     // Leaderboard NICHT automatisch laden - nur bei Klick
+    
+    // Irregular Verbs Button nur für Klasse 6-10 anzeigen
+    const jahrgang = parseInt(currentUser.jahrgang);
+    const irregularVerbsBtn = document.getElementById('irregularVerbsButton');
+    if (irregularVerbsBtn) {
+      if (jahrgang >= 6 && jahrgang <= 10) {
+        irregularVerbsBtn.style.display = 'block';
+      } else {
+        irregularVerbsBtn.style.display = 'none';
+      }
+    }
+    
     // loadLeaderboard(); // ❌ Entfernt für Performance
     
     if (allVocabs.length === 0) {
