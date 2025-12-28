@@ -646,15 +646,15 @@
     async function loadIrregularVerbs() {
       try {
         const jahrgang = currentUser.jahrgang || '6';
-        let filename = 'irregular_verbs_6.json';
+        let filename = 'irrverbs6.json';
         
-        // Klasse 6 verwendet irregular_verbs_6.json
-        // Klasse 7-10 verwenden irregular_verbs_10.json
+        // Klasse 6 verwendet irrverbs6.json
+        // Klasse 7-10 verwenden irrverbs7to10.json
         if (parseInt(jahrgang) >= 7) {
-          filename = 'irregular_verbs_10.json';
+          filename = 'irrverbs7to10.json';
         }
 
-        const url = `https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/${filename}`;
+        const url = `https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/grammar/${filename}`;
         const response = await fetch(url);
         
         if (!response.ok) {
