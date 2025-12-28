@@ -896,7 +896,15 @@
     'knowledge', 'wisdom', 'education', 'vocabulary', 'language',
     'progress', 'success', 'effort', 'dedication', 'motivation', 'inspiration',
     'dream', 'hope', 'future', 'potential', 'opportunity', 'adventure',
-    'challenge', 'journey', 'discovery', 'growth', 'achievement'
+    'challenge', 'journey', 'discovery', 'growth', 'achievement',
+    // 40 additional positive words
+    'happy', 'joy', 'smile', 'love', 'peace', 'harmony', 'wonderful',
+    'beautiful', 'perfect', 'super', 'great', 'nice', 'kind', 'friendly',
+    'cheerful', 'brave', 'strong', 'talented', 'enthusiastic', 'passionate',
+    'caring', 'helpful', 'supportive', 'generous', 'honest', 'loyal',
+    'trustworthy', 'respectful', 'thoughtful', 'compassionate', 'empowering',
+    'inspiring', 'uplifting', 'encouraging', 'celebrate', 'enjoy', 'appreciate',
+    'gratitude', 'blessing', 'miracle', 'magical', 'spectacular', 'marvelous'
   ];
 
   function createFloatingWord() {
@@ -953,8 +961,8 @@
     // Clear existing words
     background.innerHTML = '';
     
-    // Create 25 words for better coverage
-    const wordCount = 25;
+    // Create 70 words for dense, full coverage
+    const wordCount = 70;
     for (let i = 0; i < wordCount; i++) {
       const word = createFloatingWord();
       background.appendChild(word);
