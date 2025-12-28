@@ -863,40 +863,35 @@
   // ========================================
   
   const vocabularyPool = [
-    'sorry', 'terminal', 'subject', 'pool', 'Aboriginal', 'April', 'Argument', 
-    'August', 'Aussie', 'British', 'Bye', 'Celsius', 'Colours', 'December', 
-    'English', 'Fahrenheit', 'February', 'Follow me', 'French', 'Friday', 
-    'Good luck', 'Good morning', 'Goodbye', 'Hello', 'Hindi', 'January', 
-    'July', 'June', 'March', 'Mardi Gras', 'May', 'Me too', 'Monday', 
-    'Māori', 'November', 'Numbers', 'October', 'Saturday', 'See you', 
-    'September', 'Sunday', 'Thank you', 'Thanksgiving', 'Thursday', 'Tuesday', 
-    'Watch out', 'Wednesday', 'Well', 'couple', 'little', 'ability', 
-    'abroad', 'abstract', 'academic', 'academy', 'accept', 'according to', 
-    'account', 'achieve', 'acquaintance', 'activist', 'activities', 'activity', 
-    'address', 'admire', 'adolescent', 'advanced', 'advertise', 'advertisement', 
-    'after', 'afterwards', 'again', 'age', 'aged', 'agreement', 'agriculture', 
-    'all right', 'alligator', 'alliteration', 'almost', 'alone', 'also', 
-    'always', 'ambitious', 'among', 'amount', 'ancestor', 'angel', 'angry', 
-    'animal', 'anniversary', 'answer', 'antonym', 'apart', 'appeal', 
-    'appearance', 'applicant', 'appointment', 'appropriate', 'area', 
-    'argumentative', 'armchair', 'arrange', 'arrest', 'arrive', 'art', 
-    'ask', 'assessment', 'assignment', 'at last', 'at night', 'at risk', 
-    'at school', 'atom bomb', 'attack', 'attention', 'attic', 'attract', 
-    'attractive', 'aunt', 'author', 'autograph', 'avenue', 'average', 
-    'away', 'awe-inspiring', 'awesome', 'awfully', 'back', 'backpack', 
-    'backyard', 'bake', 'balcony', 'ball', 'bandage', 'banner', 'bar chart', 
-    'bark', 'basic', 'basket', 'bat', 'bathroom', 'battery', 'battle', 
-    'beach', 'beans', 'bear', 'beauty', 'because', 'bed', 'bedroom', 
-    'beef', 'before', 'behaviour', 'behind', 'better', 'between', 'big', 
-    'big wheel', 'bike', 'bilingual', 'bill', 'billboard', 'billion', 'bird',
-    'learn', 'study', 'read', 'write', 'speak', 'listen', 'understand',
-    'practice', 'improve', 'remember', 'know', 'think', 'believe',
-    'smart', 'clever', 'creative', 'fantastic', 'amazing', 'excellent',
-    'brilliant', 'successful', 'confident', 'proud', 'determined',
-    'knowledge', 'wisdom', 'education', 'vocabulary', 'language',
-    'progress', 'success', 'effort', 'dedication', 'motivation', 'inspiration',
-    'dream', 'hope', 'future', 'potential', 'opportunity', 'adventure',
-    'challenge', 'journey', 'discovery', 'growth', 'achievement'
+    // Positive emotions & qualities
+    'happy', 'joy', 'smile', 'love', 'hope', 'dream', 'wonderful', 'amazing',
+    'awesome', 'fantastic', 'brilliant', 'excellent', 'beautiful', 'perfect',
+    'great', 'super', 'nice', 'kind', 'friendly', 'cheerful', 'proud',
+    'confident', 'brave', 'strong', 'smart', 'clever', 'creative', 'talented',
+    'successful', 'determined', 'motivated', 'inspired', 'enthusiastic',
+    
+    // Achievement & growth
+    'achieve', 'success', 'progress', 'improve', 'grow', 'learn', 'discover',
+    'explore', 'adventure', 'journey', 'challenge', 'opportunity', 'goal',
+    'win', 'victory', 'triumph', 'accomplish', 'master', 'excel',
+    
+    // Education & knowledge
+    'knowledge', 'wisdom', 'education', 'study', 'read', 'write', 'speak',
+    'listen', 'understand', 'think', 'believe', 'practice', 'remember',
+    'vocabulary', 'language', 'English', 'school', 'teacher', 'student',
+    
+    // Positive actions
+    'help', 'support', 'care', 'share', 'give', 'inspire', 'encourage',
+    'motivate', 'empower', 'celebrate', 'appreciate', 'thank', 'enjoy',
+    
+    // Future & potential
+    'future', 'tomorrow', 'potential', 'possible', 'ability', 'capability',
+    'talent', 'gift', 'strength', 'power', 'energy', 'passion', 'dedication',
+    'effort', 'commitment', 'perseverance', 'resilience', 'courage',
+    
+    // Community & connection
+    'friend', 'family', 'together', 'team', 'unity', 'harmony', 'peace',
+    'respect', 'trust', 'loyalty', 'honesty', 'integrity', 'kindness'
   ];
 
   function createFloatingWord() {
@@ -904,41 +899,39 @@
     const wordElement = document.createElement('div');
     wordElement.className = 'floating-word';
     
-    // Random size
-    const sizes = ['small', 'small', 'medium', 'medium', 'large', 'xlarge'];
+    // Random size (more medium/small for better readability)
+    const sizes = ['small', 'small', 'small', 'medium', 'medium', 'large', 'xlarge'];
     const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
     wordElement.classList.add(randomSize);
     
-    // Random vertical position (10% to 90%)
-    const topPosition = 10 + (Math.random() * 80);
+    // Random vertical position (5% to 95% for full coverage)
+    const topPosition = 5 + (Math.random() * 90);
     wordElement.style.top = topPosition + '%';
     
     // Random direction: 50% left-to-right, 50% right-to-left
     const direction = Math.random() < 0.5 ? 'ltr' : 'rtl';
     
-    // Random starting position (0% to 100% across screen)
-    const startPosition = Math.random() * 100;
-    
-    if (direction === 'ltr') {
-      // Left to right
-      wordElement.style.left = startPosition + '%';
-      wordElement.style.animationName = 'floatWordLTR';
-    } else {
-      // Right to left
-      wordElement.style.right = startPosition + '%';
-      wordElement.style.animationName = 'floatWordRTL';
-    }
-    
-    // Speed based on size (larger = slower)
-    const baseDuration = randomSize === 'xlarge' ? 50 : 
-                        randomSize === 'large' ? 40 :
+    // Speed based on size (larger = slower for depth effect)
+    const baseDuration = randomSize === 'xlarge' ? 45 : 
+                        randomSize === 'large' ? 38 :
                         randomSize === 'medium' ? 30 : 25;
     const duration = baseDuration + (Math.random() * 10);
     wordElement.style.animationDuration = duration + 's';
     
-    // Random delay (0-15 seconds) for staggered start
-    const delay = Math.random() * 15;
-    wordElement.style.animationDelay = delay + 's';
+    if (direction === 'ltr') {
+      // Left to right - start somewhere in the left half, moving right
+      const startPercent = -(20 + Math.random() * 100); // Start between -120% and -20%
+      wordElement.style.left = startPercent + '%';
+      wordElement.style.animationName = 'floatWordLTR';
+    } else {
+      // Right to left - start somewhere in the right half, moving left
+      const startPercent = -(20 + Math.random() * 100); // Start between -120% and -20%
+      wordElement.style.right = startPercent + '%';
+      wordElement.style.animationName = 'floatWordRTL';
+    }
+    
+    // NO animation delay - all words move immediately!
+    wordElement.style.animationDelay = '0s';
     
     wordElement.textContent = word;
     return wordElement;
@@ -952,13 +945,13 @@
     // Clear existing words
     background.innerHTML = '';
     
-    // Create 25 words for better coverage
-    const wordCount = 25;
+    // Create 40 words for constant presence on screen
+    const wordCount = 40;
     for (let i = 0; i < wordCount; i++) {
       const word = createFloatingWord();
       background.appendChild(word);
     }
-    console.log('✅ Floating vocabulary initialized:', wordCount, 'words (bidirectional)');
+    console.log('✅ Floating vocabulary initialized:', wordCount, 'positive words (bidirectional)');
   }
 
   // Initialize on load
