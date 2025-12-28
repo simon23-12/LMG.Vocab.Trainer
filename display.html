@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1336,6 +1337,12 @@
         </div>
       </div>
       
+      <!-- Pages Grid -->
+      <div class="pages-section">
+        <h3>📄 Seite zum Üben auswählen:</h3>
+        <div id="pageGrid" class="page-grid"></div>
+      </div>
+      
       <!-- Interval Section -->
       <div class="interval-section">
         <h3>📖 Intervall testen</h3>
@@ -1348,17 +1355,28 @@
         </div>
       </div>
       
-      <!-- Pages Grid -->
-      <div class="pages-section">
-        <h3>📄 Oder wähle eine einzelne Seite:</h3>
-        <div id="pageGrid" class="page-grid"></div>
+      <!-- Monti Game Button -->
+      <div style="text-align: center; margin: 30px 0;">
+        <button onclick="window.location.href='monti.html'" 
+                style="background: linear-gradient(135deg, #FFB700 0%, #FF8C00 100%); 
+                       padding: 20px 40px; 
+                       font-size: 18px;
+                       box-shadow: 0 4px 15px rgba(255, 183, 0, 0.4);
+                       display: inline-flex;
+                       align-items: center;
+                       gap: 15px;">
+          <img src="https://github.com/simon23-12/LMG.Vocab.Trainer/raw/main/images/montismile.jpg" 
+               alt="Monti" 
+               style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+          <span>Monti Game spielen</span>
+        </button>
       </div>
       
       <!-- Leaderboard Section -->
       <div id="leaderboardSection" class="leaderboard-section collapsed">
         <button class="leaderboard-toggle" onclick="toggleLeaderboard()">
           <span>🏆</span>
-          <span id="leaderboardButtonText">Top 10 Leaderboard anzeigen</span>
+          <span id="leaderboardButtonText">Monatliches Leaderboard anzeigen</span>
           <span class="leaderboard-toggle-icon">▼</span>
         </button>
         <div class="leaderboard-content">
@@ -1386,7 +1404,7 @@
         <div class="progress">
           Frage <span id="currentQuestion">1</span> von <span id="totalQuestions">10</span>
         </div>
-        <div class="timer" id="timer">15</div>
+        <div class="timer" id="timer">20</div>
       </div>
       
       <div class="question-card">
@@ -1472,7 +1490,7 @@
   let score = 0;
   let answers = [];
   let timer = null;
-  let timeLeft = 15;
+  let timeLeft = 20;
   let firebaseReady = false;
   
   // Synonym-Dictionary für häufige Vokabeln
@@ -3175,7 +3193,7 @@
       
       // Update Texte mit Klassenname
       const userClass = currentUser.class || '?';
-      document.getElementById('leaderboardButtonText').textContent = `Top 10 Leaderboard ${userClass} anzeigen`;
+      document.getElementById('leaderboardButtonText').textContent = `Monatliches Leaderboard ${userClass}`;
       document.getElementById('leaderboardTitle').innerHTML = `🏆 Top 10 Leaderboard ${userClass} <span class="leaderboard-month">${monthNames[currentMonth - 1]}</span>`;
       
       // Lade alle User der gleichen Klasse
