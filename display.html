@@ -2473,10 +2473,13 @@
       scoreValue: scoreIncrement
     });
     
+    // Bei Synonymen 4 Sekunden warten, sonst 2 Sekunden
+    const waitTime = isSynonym ? 4000 : 2000;
+    
     setTimeout(() => {
       currentQuestionIndex++;
       showQuestion();
-    }, 2000);
+    }, waitTime);
   }
   
   function showResults() {
