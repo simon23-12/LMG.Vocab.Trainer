@@ -3234,8 +3234,17 @@
       for (let userKey in allUsers) {
         const user = allUsers[userKey];
         
-        // Nur User der gleichen Klasse
-        if (user.class !== currentUser.class) continue;
+        // Nur User der gleichen Klasse (case-insensitive!)
+        const userClass = (user.class || '').toLowerCase().trim();
+        const currentClass = (currentUser.class || '').toLowerCase().trim();
+        
+        if (userClass !== currentClass) continue;
+        
+        // Überspringe User ohne Namen (fehlerhafte Einträge)
+        if (!user.name) {
+          console.log('Überspringe User ohne Namen:', userKey);
+          continue;
+        }
         
         // Exkludiere Test-Accounts
         const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
@@ -3273,13 +3282,16 @@
         // Score = Vokabeln * (Accuracy / 100)
         const score = Math.round(monthVocabs * (avgAccuracy / 100));
         
-        classUsers.push({
-          userKey: userKey,
-          name: user.name,
-          vocabs: monthVocabs,
-          accuracy: Math.round(avgAccuracy),
-          score: score
-        });
+        // Nur User mit Aktivität in diesem Monat hinzufügen (Score > 0)
+        if (score > 0) {
+          classUsers.push({
+            userKey: userKey,
+            name: user.name,
+            vocabs: monthVocabs,
+            accuracy: Math.round(avgAccuracy),
+            score: score
+          });
+        }
       }
       
       // Sortiere nach Score (absteigend)
