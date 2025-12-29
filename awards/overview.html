@@ -895,29 +895,93 @@
         // Prüfe ob User am Wochenende (Sa/So) geübt hat
         async function hasWeekendPractice() {
             try {
-                const logsRef = ref(db, 'usage_logs');
-                const snapshot = await get(logsRef);
+                console.log('🔍 Checking Weekend Practice for:', currentUser.name);
                 
-                if (!snapshot.exists()) return false;
+                // METHODE 1: Check performance timestamps (Vokabel-Tests)
+                const userRef = ref(db, 'users/' + currentUser.userKey);
+                const userSnapshot = await get(userRef);
                 
-                const logs = snapshot.val();
-                
-                // Durchsuche alle Logs nach diesem User
-                for (let logId in logs) {
-                    const log = logs[logId];
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.val();
+                    const performance = userData?.performance || {};
                     
-                    // Check ob dieser Log vom aktuellen User ist
-                    if (log.userName === currentUser.name && log.userClass === currentUser.class) {
-                        // Parse das Datum und prüfe ob Wochenende
-                        const logDate = new Date(log.timestamp);
-                        const dayOfWeek = logDate.getDay(); // 0 = Sonntag, 6 = Samstag
-                        
-                        if (dayOfWeek === 0 || dayOfWeek === 6) {
-                            return true; // Am Wochenende geübt!
+                    // Prüfe alle Performance-Einträge (Seiten + Intervalle)
+                    for (let key in performance) {
+                        const entry = performance[key];
+                        if (entry.timestamp) {
+                            const entryDate = new Date(entry.timestamp);
+                            const dayOfWeek = entryDate.getDay(); // 0 = Sonntag, 6 = Samstag
+                            
+                            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                                console.log('✅ Weekend practice found in performance:', key, entry.timestamp);
+                                return true;
+                            }
+                        }
+                    }
+                    
+                    // METHODE 2: Check Irregular Verbs timestamps
+                    if (userData.irregularVerbsSimple?.timestamp) {
+                        const date = new Date(userData.irregularVerbsSimple.timestamp);
+                        if (date.getDay() === 0 || date.getDay() === 6) {
+                            console.log('✅ Weekend practice found in irregularVerbsSimple');
+                            return true;
+                        }
+                    }
+                    
+                    if (userData.irregularVerbsFull?.timestamp) {
+                        const date = new Date(userData.irregularVerbsFull.timestamp);
+                        if (date.getDay() === 0 || date.getDay() === 6) {
+                            console.log('✅ Weekend practice found in irregularVerbsFull');
+                            return true;
                         }
                     }
                 }
                 
+                // METHODE 3: Check usage_logs (falls vorhanden)
+                const logsRef = ref(db, 'usage_logs');
+                const logsSnapshot = await get(logsRef);
+                
+                if (logsSnapshot.exists()) {
+                    const logs = logsSnapshot.val();
+                    
+                    for (let logId in logs) {
+                        const log = logs[logId];
+                        
+                        if (log.userName === currentUser.name && log.userClass === currentUser.class) {
+                            const logDate = new Date(log.timestamp);
+                            const dayOfWeek = logDate.getDay();
+                            
+                            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                                console.log('✅ Weekend practice found in usage_logs:', log.timestamp);
+                                return true;
+                            }
+                        }
+                    }
+                }
+                
+                // METHODE 4: Check Leaderboard entries
+                const leaderboardRef = ref(db, 'leaderboard');
+                const leaderboardSnapshot = await get(leaderboardRef);
+                
+                if (leaderboardSnapshot.exists()) {
+                    const leaderboard = leaderboardSnapshot.val();
+                    
+                    for (let entryId in leaderboard) {
+                        const entry = leaderboard[entryId];
+                        
+                        if (entry.userName === currentUser.name && entry.userClass === currentUser.class) {
+                            const entryDate = new Date(entry.timestamp);
+                            const dayOfWeek = entryDate.getDay();
+                            
+                            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                                console.log('✅ Weekend practice found in leaderboard:', entry.timestamp);
+                                return true;
+                            }
+                        }
+                    }
+                }
+                
+                console.log('❌ No weekend practice found');
                 return false;
             } catch (error) {
                 console.error('Fehler beim Weekend-Check:', error);
