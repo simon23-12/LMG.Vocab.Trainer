@@ -69,13 +69,13 @@
             position: relative;
             z-index: 10;
             text-align: center;
-            max-width: 800px;
-            padding: 40px;
+            max-width: 700px;
+            padding: 30px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 25px;
             border: 4px solid #FFB700;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideInUp 0.8s ease-out 1.2s both;
+            animation: slideInUp 0.8s ease-out 4.2s both;
         }
 
         @keyframes slideInUp {
@@ -439,8 +439,9 @@
             background-color: #87CEEB;
             display: none;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
+            padding-bottom: 80px;
             pointer-events: all;
         }
 
@@ -684,7 +685,6 @@
         <div id="intro-screen">
             <div class="content-wrapper">
                 <div class="game-title">MONTI GAME</div>
-                <div class="game-subtitle">Das große Vokabel-Abenteuer</div>
                 
                 <div class="rules">
                     <h2>🎮 Spielregeln:</h2>
@@ -750,7 +750,10 @@
         <div id="game-over-screen">
             <div class="content-overlay">
                 <div class="final-score">Dein Score: <span id="final-score-value">0</span></div>
-                <button onclick="location.reload()">Nochmal spielen</button>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button onclick="location.reload()">Nochmal spielen</button>
+                    <button onclick="window.location.href='display.html'" style="background: #0066CC; border-color: #FFB700;">Zurück</button>
+                </div>
             </div>
         </div>
     </div>
