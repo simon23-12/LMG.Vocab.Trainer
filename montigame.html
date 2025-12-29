@@ -69,8 +69,8 @@
             position: relative;
             z-index: 10;
             text-align: center;
-            max-width: 700px;
-            padding: 30px;
+            max-width: 650px;
+            padding: 25px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 25px;
             border: 4px solid #FFB700;
@@ -441,13 +441,13 @@
             flex-direction: column;
             justify-content: flex-end;
             align-items: center;
-            padding-bottom: 80px;
+            padding-bottom: 50px;
             pointer-events: all;
         }
 
         #game-over-screen .content-overlay {
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px 60px;
+            padding: 30px 45px;
             border-radius: 25px;
             border: 4px solid #FFB700;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
@@ -684,7 +684,6 @@
         <!-- Intro Screen -->
         <div id="intro-screen">
             <div class="content-wrapper">
-                <div class="game-title">MONTI GAME</div>
                 
                 <div class="rules">
                     <h2>🎮 Spielregeln:</h2>
@@ -752,7 +751,7 @@
                 <div class="final-score">Dein Score: <span id="final-score-value">0</span></div>
                 <div style="display: flex; gap: 15px; justify-content: center;">
                     <button onclick="location.reload()">Nochmal spielen</button>
-                    <button onclick="window.location.href='display.html'" style="background: #0066CC; border-color: #FFB700;">Zurück</button>
+                    <button onclick="window.location.href='display.html'" style="background: #0066CC; color: white; border-color: #FFB700;">Zurück</button>
                 </div>
             </div>
         </div>
