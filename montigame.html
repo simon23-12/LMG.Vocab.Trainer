@@ -1,10 +1,22 @@
 
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monti Game - LMG Vokabeltrainer</title>
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0066CC">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LMG Vocab">
+    <link rel="apple-touch-icon" href="/images/icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/icons/icon-192.png">
+    
     <style>
         * {
             margin: 0;
@@ -2000,5 +2012,8 @@
         
         init();
     </script>
+    
+    <!-- PWA Installation Script -->
+    <script src="/pwa-install.js"></script>
 </body>
 </html>
