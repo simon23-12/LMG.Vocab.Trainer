@@ -1270,6 +1270,67 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
     }
+    
+    /* Award Button Container */
+    .award-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+    
+    /* Share Award Button */
+    .share-award-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        animation: slideInFromLeft 0.5s ease-out;
+    }
+    
+    .share-award-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.5);
+    }
+    
+    .share-award-btn:active {
+        transform: translateY(0);
+    }
+    
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 480px) {
+        .award-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .share-award-btn,
+        .continue-btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+        }
+    }
+    
     #confetti-container {
         position: absolute;
         top: 0;
@@ -3154,7 +3215,13 @@
     }
   }
 
+  // Globale Variable für aktuellen Award
+  let currentAwardData = null;
+
   function showAwardAnimation(award) {
+    // Speichere Award-Daten für Share-Funktion
+    currentAwardData = award;
+    
     document.getElementById('animationBadge').src = award.image;
     document.getElementById('animationTitle').textContent = award.title;
     document.getElementById('animationDescription').textContent = award.description;
@@ -3162,14 +3229,75 @@
     const overlay = document.getElementById('animationOverlay');
     overlay.classList.add('active');
     
+    // Zeige Share-Button nur in installierter App
+    const shareBtn = document.getElementById('shareAwardBtn');
+    if (isInstalledApp() && navigator.share) {
+      shareBtn.style.display = 'block';
+    } else {
+      shareBtn.style.display = 'none';
+    }
+    
     createParticles();
     createStarBurst();
     createConfetti();
   }
 
+  // Prüft ob App installiert ist (nicht Browser)
+  function isInstalledApp() {
+    // iOS Standalone
+    if (window.navigator.standalone === true) {
+      return true;
+    }
+    
+    // Android/Desktop Standalone
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  // Share-Funktion für Awards
+  async function shareCurrentAward() {
+    if (!currentAwardData || !navigator.share) {
+      console.log('Share nicht verfügbar');
+      return;
+    }
+
+    const awardTexts = {
+      'getstarted': '🎯 Ich habe meinen ersten Vokabel-Test gemeistert!',
+      'first10': '📚 10 Vokabel-Seiten geschafft!',
+      'first50': '🚀 50 Vokabel-Seiten gemeistert!',
+      'first_100': '💯 Erste 100% erreicht!',
+      'streak_7': '🔥 7-Tage-Streak erreicht!',
+      'weekendwarrior': '💪 Weekend Warrior Award freigeschaltet!',
+      'megabrain': '🧠 Mega Brain - 10 Seiten mit 100%!',
+      'gigabrain': '🤯 Giga Brain - 20 Seiten mit 100%!',
+      'endurance': '⏰ 25 Wochen am Ball geblieben!',
+      'winmonthlyrace': '🏆 Champion of the Month!'
+    };
+
+    const shareText = awardTexts[currentAwardData.id] || `🏆 ${currentAwardData.title} freigeschaltet!`;
+    
+    try {
+      await navigator.share({
+        title: '🏆 Award freigeschaltet!',
+        text: `${shareText}\n\nLMG Vokabeltrainer - Englisch lernen macht Spaß! 🎓`,
+        url: window.location.origin
+      });
+      console.log('✅ Award erfolgreich geteilt!');
+    } catch (err) {
+      // User hat Share abgebrochen oder Fehler
+      if (err.name !== 'AbortError') {
+        console.error('❌ Share-Fehler:', err);
+      }
+    }
+  }
+
   function closeAwardAnimation() {
     const overlay = document.getElementById('animationOverlay');
     overlay.classList.remove('active');
+    currentAwardData = null; // Reset Award-Daten
   }
 
   function createParticles() {
@@ -3492,7 +3620,13 @@
           Großartige Arbeit! 🌟
         </div>
         
-        <button class="continue-btn" onclick="closeAwardAnimation()">Awesome! 🚀</button>
+        <!-- Button-Container für Share + Continue -->
+        <div class="award-buttons">
+          <button class="share-award-btn" id="shareAwardBtn" onclick="shareCurrentAward()" style="display: none;">
+            📤 Teilen
+          </button>
+          <button class="continue-btn" onclick="closeAwardAnimation()">Awesome! 🚀</button>
+        </div>
       </div>
     </div>
   </div>
