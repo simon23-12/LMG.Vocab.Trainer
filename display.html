@@ -8,7 +8,7 @@
   
   <!-- PWA Support -->
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0066CC">
+  <meta name="theme-color" content="#FFFFFF" id="theme-color">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -3443,6 +3443,7 @@
   // Dark Mode Funktionalität
   function initDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
+    const themeColor = document.querySelector('meta[name="theme-color"]');
     const body = document.body;
     
     // Lade gespeicherte Präferenz
@@ -3450,6 +3451,7 @@
     if (isDarkMode) {
       body.classList.add('dark-mode');
       darkModeToggle.checked = true;
+      themeColor.setAttribute('content', '#0f3460'); // Dark-Mode Farbe
     }
     
     // Toggle Event
@@ -3457,9 +3459,11 @@
       if (this.checked) {
         body.classList.add('dark-mode');
         localStorage.setItem('darkMode', 'true');
+        themeColor.setAttribute('content', '#0f3460'); // Dark-Mode Farbe
       } else {
         body.classList.remove('dark-mode');
         localStorage.setItem('darkMode', 'false');
+        themeColor.setAttribute('content', '#FFFFFF'); // Hell-Modus Farbe
       }
     });
   }
