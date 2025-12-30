@@ -470,60 +470,79 @@
     }, 4000);
   }
 
-  // Lade Admin-Statistiken
+  // Lade Admin-Statistiken (aus users/ aggregiert - keine usage_logs mehr)
   async function loadAdminStats() {
     try {
-      // Lade usage_logs und users parallel
-      const [logsSnapshot, usersSnapshot] = await Promise.all([
-        db.ref('usage_logs').get(),
-        db.ref('users').get()
-      ]);
+      const usersSnapshot = await db.ref('users').get();
       
-      // Zähle aktive Schüler
-      let activeStudents = 0;
-      if (usersSnapshot.exists()) {
-        const users = usersSnapshot.val();
-        activeStudents = Object.keys(users).length;
-      }
-      
-      // Wenn keine Logs existieren
-      if (!logsSnapshot.exists()) {
+      if (!usersSnapshot.exists()) {
         document.getElementById('adminTotalSessions').textContent = '0';
         document.getElementById('adminTotalVocabs').textContent = '0';
-        document.getElementById('adminActiveStudents').textContent = activeStudents;
+        document.getElementById('adminActiveStudents').textContent = '0';
         document.getElementById('adminAvgAccuracy').textContent = '-';
         return;
       }
       
-      const logs = logsSnapshot.val();
-      const logsArray = [];
+      const users = usersSnapshot.val();
       
-      // Konvertiere zu Array
-      for (let logId in logs) {
-        logsArray.push(logs[logId]);
+      let activeStudents = 0;
+      let totalVocabs = 0;
+      let totalSessions = 0;  // Zähle getestete Seiten als "Sessions"
+      let totalAccuracySum = 0;
+      let accuracyCount = 0;
+      
+      for (let userKey in users) {
+        const user = users[userKey];
+        
+        // Überspringe User ohne Namen (Test-Einträge)
+        if (!user.name) continue;
+        
+        activeStudents++;
+        
+        // lifetimeTotalVocabs = Gesamtzahl geübter Vokabeln
+        totalVocabs += (user.lifetimeTotalVocabs || 0);
+        
+        // Performance-Einträge durchgehen für Sessions und Accuracy
+        const performance = user.performance || {};
+        for (let perfKey in performance) {
+          const perf = performance[perfKey];
+          
+          // Jeder Performance-Eintrag = eine "Session"
+          totalSessions++;
+          
+          // Accuracy sammeln
+          if (perf.percent !== undefined && !isNaN(perf.percent)) {
+            totalAccuracySum += perf.percent;
+            accuracyCount++;
+          }
+        }
+        
+        // Irregular Verbs auch zählen (falls vorhanden)
+        if (user.irregularVerbsSimple) {
+          totalSessions++;
+          if (user.irregularVerbsSimple.percent !== undefined) {
+            totalAccuracySum += user.irregularVerbsSimple.percent;
+            accuracyCount++;
+          }
+        }
+        if (user.irregularVerbsFull) {
+          totalSessions++;
+          if (user.irregularVerbsFull.percent !== undefined) {
+            totalAccuracySum += user.irregularVerbsFull.percent;
+            accuracyCount++;
+          }
+        }
       }
       
-      // Berechne Stats
-      const totalSessions = logsArray.length;
-      const totalVocabs = logsArray.reduce((sum, log) => sum + (log.vocabularyCount || 0), 0);
-      
-      let totalAccuracy = 0;
-      let accuracyCount = 0;
-      logsArray.forEach(log => {
-        if (log.accuracy && !isNaN(log.accuracy)) {
-          totalAccuracy += log.accuracy;
-          accuracyCount++;
-        }
-      });
-      const avgAccuracy = accuracyCount > 0 ? Math.round(totalAccuracy / accuracyCount) : 0;
+      const avgAccuracy = accuracyCount > 0 ? Math.round(totalAccuracySum / accuracyCount) : 0;
       
       // Update UI
-      document.getElementById('adminTotalSessions').textContent = totalSessions;
+      document.getElementById('adminTotalSessions').textContent = totalSessions.toLocaleString('de-DE');
       document.getElementById('adminTotalVocabs').textContent = totalVocabs.toLocaleString('de-DE');
       document.getElementById('adminActiveStudents').textContent = activeStudents;
       document.getElementById('adminAvgAccuracy').textContent = avgAccuracy > 0 ? avgAccuracy + '%' : '-';
       
-      console.log('✓ Admin Stats geladen:', { totalSessions, totalVocabs, activeStudents, avgAccuracy });
+      console.log('✓ Admin Stats geladen (aus users/):', { totalSessions, totalVocabs, activeStudents, avgAccuracy });
       
     } catch (error) {
       console.error('Fehler beim Laden der Admin Stats:', error);
