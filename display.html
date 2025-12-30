@@ -3387,9 +3387,6 @@
   
   async function logout() {
     console.log('🔍 logout() aufgerufen');
-    console.log('🔍 currentUser:', currentUser);
-    console.log('🔍 sessionPerformance:', sessionPerformance);
-    console.log('🔍 sessionPerformance keys:', Object.keys(sessionPerformance || {}));
     
     // Zeige Lade-Feedback
     const logoutButtons = document.querySelectorAll('button[onclick*="logout"]');
@@ -3398,69 +3395,15 @@
       btn.textContent = btn.textContent.includes('Logout') ? '🔄 Logout...' : btn.textContent;
     });
     
-    // USAGE TRACKING: Logge Session-Daten vor dem Logout
-    if (currentUser) {
-      try {
-        // Berechne nur die Vokabeln die in DIESER SESSION geübt wurden
-        let sessionVocabs = 0;
-        let totalCorrect = 0;
-        let totalQuestions = 0;
-        
-        // Verwende sessionPerformance statt userPerformance!
-        if (sessionPerformance && Object.keys(sessionPerformance).length > 0) {
-          for (let key in sessionPerformance) {
-            const perf = sessionPerformance[key];
-            console.log('🔍 Logout - Processing key:', key, perf);
-            sessionVocabs += (perf.total || 0);
-            totalCorrect += (perf.score || 0);
-            totalQuestions += (perf.total || 0);
-          }
-        }
-        
-        console.log('🔍 Logout - Berechnete Werte:');
-        console.log('   sessionVocabs:', sessionVocabs);
-        console.log('   totalCorrect:', totalCorrect);
-        console.log('   totalQuestions:', totalQuestions);
-        
-        // Berechne durchschnittliche Accuracy der Session
-        const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
-        
-        // Erstelle Timestamp und unique Log-ID
-        const timestamp = new Date().toISOString();
-        const logId = Date.now() + '_' + currentUser.userKey;
-        
-        console.log('🔍 Logout - sessionVocabs:', sessionVocabs);
-        
-        // Schreibe Usage-Log in Firebase (nur wenn Vokabeln geübt wurden)
-        if (sessionVocabs > 0) {
-          const logData = {
-            timestamp: timestamp,
-            userName: currentUser.name,
-            userClass: currentUser.class || "unbekannt",
-            vocabularyCount: sessionVocabs,
-            accuracy: sessionAccuracy
-          };
-          
-          console.log('📊 Logout - Schreibe Log:', logData);
-          
-          await db.ref('usage_logs/' + logId).set(logData);
-          
-          console.log('✓ Usage-Log gespeichert:', sessionVocabs, 'Vokabeln,', sessionAccuracy + '% Accuracy');
-        } else {
-          console.log('⏭ Logout - Keine Vokabeln geübt, kein Log');
-        }
-      } catch (error) {
-        console.error('Usage-Log Fehler:', error);
-        // Fahre trotzdem mit Logout fort
-      }
-    }
+    // Standard Logout - keine usage_logs mehr nötig
+    // (Alle relevanten Daten werden bereits in users/{userKey}/ gespeichert:
+    //  - lifetimeTotalVocabs, performance, currentStreak, lastActivityDate, etc.)
     
-    // Standard Logout
     currentUser = null;
     userPerformance = {};
-    sessionPerformance = {}; // Reset auch Session-Tracking
+    sessionPerformance = {};
     allVocabs = [];
-    leaderboardCache = null; // Cache zurücksetzen
+    leaderboardCache = null;
     leaderboardCacheTime = null;
     
     // SESSION PERSISTENCE: Lösche gespeicherte Daten
@@ -3479,119 +3422,11 @@
     window.location.href = "index.html";
   }
   
-  // AUTO-LOGOUT bei Seite schließen/refresh
-  // Verwende sendBeacon mit korrektem Content-Type
-  
-  let windowCloseLogSent = false;
-  
-  function sendSessionLogViaBeacon() {
-    console.log('🔍 sendSessionLogViaBeacon() aufgerufen');
-    console.log('🔍 windowCloseLogSent:', windowCloseLogSent);
-    console.log('🔍 currentUser:', currentUser);
-    console.log('🔍 sessionPerformance:', sessionPerformance);
-    console.log('🔍 sessionPerformance keys:', Object.keys(sessionPerformance || {}));
-    
-    // Verhindere doppelte Logs
-    if (windowCloseLogSent) {
-      console.log('⏭ Window-Close-Log bereits gesendet');
-      return;
-    }
-    
-    // Nur loggen wenn User eingeloggt ist UND Session-Daten existieren
-    if (!currentUser || !sessionPerformance || Object.keys(sessionPerformance).length === 0) {
-      console.log('⏭ Kein User oder keine Session-Daten für Window-Close-Log');
-      console.log('   currentUser:', !!currentUser);
-      console.log('   sessionPerformance:', !!sessionPerformance);
-      console.log('   keys length:', Object.keys(sessionPerformance || {}).length);
-      return;
-    }
-    
-    windowCloseLogSent = true;
-    
-    // Berechne Session-Stats
-    let sessionVocabs = 0;
-    let totalCorrect = 0;
-    let totalQuestions = 0;
-    
-    for (let key in sessionPerformance) {
-      const perf = sessionPerformance[key];
-      console.log('🔍 Processing key:', key, perf);
-      sessionVocabs += (perf.total || 0);
-      totalCorrect += (perf.score || 0);
-      totalQuestions += (perf.total || 0);
-    }
-    
-    console.log('🔍 Berechnete Werte:');
-    console.log('   sessionVocabs:', sessionVocabs);
-    console.log('   totalCorrect:', totalCorrect);
-    console.log('   totalQuestions:', totalQuestions);
-    
-    const sessionAccuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
-    
-    if (sessionVocabs > 0) {
-      const timestamp = new Date().toISOString();
-      const logId = Date.now() + '_' + currentUser.userKey;
-      
-      const logData = {
-        timestamp: timestamp,
-        userName: currentUser.name,
-        userClass: currentUser.class || "unbekannt",
-        vocabularyCount: sessionVocabs,
-        accuracy: sessionAccuracy
-      };
-      
-      console.log('📊 Sende Window-Close-Log via Beacon:', sessionVocabs, 'Vokabeln');
-      console.log('📊 Log-Daten:', logData);
-      
-      // Firebase REST API URL - WICHTIG: Mit .json am Ende!
-      const url = `https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app/usage_logs/${logId}.json`;
-      
-      // sendBeacon mit Blob für korrekten Content-Type
-      const blob = new Blob([JSON.stringify(logData)], { type: 'application/json' });
-      
-      if (navigator.sendBeacon) {
-        const success = navigator.sendBeacon(url, blob);
-        console.log('✓ sendBeacon Status:', success ? 'gesendet' : 'fehlgeschlagen');
-      } else {
-        // Fallback: synchroner XMLHttpRequest (veraltet aber funktioniert in beforeunload)
-        try {
-          const xhr = new XMLHttpRequest();
-          xhr.open('PUT', url, false); // false = synchron
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.send(JSON.stringify(logData));
-          console.log('✓ Synchroner XHR gesendet');
-        } catch (e) {
-          console.error('XHR Fehler:', e);
-        }
-      }
-    } else {
-      console.log('⏭ Keine Vokabeln geübt, kein Window-Close-Log');
-    }
-  }
-  
-  // Event 1: beforeunload (primär - funktioniert auf Desktop)
-  window.addEventListener('beforeunload', function(e) {
-    if (!windowCloseLogSent) {
-      console.log('📊 beforeunload triggered');
-      sendSessionLogViaBeacon();
-    }
-  });
-  
-  // Event 2: visibilitychange (funktioniert auch auf Mobile)
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'hidden' && !windowCloseLogSent) {
-      console.log('📊 visibilitychange triggered');
-      sendSessionLogViaBeacon();
-    }
-  });
-  
-  // Event 3: pagehide (iOS/Safari)
-  window.addEventListener('pagehide', function(e) {
-    if (!windowCloseLogSent) {
-      console.log('📊 pagehide triggered');
-      sendSessionLogViaBeacon();
-    }
-  });
+  // HINWEIS: usage_logs wurden entfernt (30.12.2025)
+  // Alle relevanten Statistiken werden jetzt direkt aus users/{userKey}/ aggregiert:
+  // - lifetimeTotalVocabs für Gesamtvokabeln
+  // - performance für Accuracy und Sessions
+  // - lastActivityDate für Aktivitätstracking
   
   // Dark Mode Funktionalität
   function initDarkMode() {
