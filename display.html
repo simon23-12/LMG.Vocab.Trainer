@@ -3393,15 +3393,22 @@
           continue;
         }
         
-        // Berechne Score: Vokabeln * Accuracy
+        // Berechne Score: Monatliche Vokabeln * Overall Accuracy
         let monthVocabs = 0;
-        let totalPercent = 0;
-        let perfCount = 0;
+        let overallTotalPercent = 0;
+        let overallPerfCount = 0;
         
         if (user.performance) {
           for (let perfKey in user.performance) {
             const perf = user.performance[perfKey];
-            // Prüfe ob Timestamp in diesem Monat liegt
+            
+            // Zähle ALLE Performance-Einträge für Overall Accuracy
+            if (perf.percent !== undefined && !isNaN(perf.percent)) {
+              overallTotalPercent += perf.percent;
+              overallPerfCount++;
+            }
+            
+            // Zähle nur Vokabeln von Tests in diesem Monat
             if (perf.timestamp) {
               const perfDate = new Date(perf.timestamp);
               const perfMonth = perfDate.getMonth() + 1;
@@ -3409,18 +3416,16 @@
               
               if (perfMonth === currentMonth && perfYear === currentYear) {
                 monthVocabs += (perf.total || 0);
-                totalPercent += (perf.percent || 0);
-                perfCount++;
               }
             }
           }
         }
         
-        // Berechne durchschnittliche Accuracy
-        const avgAccuracy = perfCount > 0 ? (totalPercent / perfCount) : 0;
+        // Berechne Overall Accuracy (aus ALLEN Tests, nicht nur diesem Monat)
+        const overallAccuracy = overallPerfCount > 0 ? (overallTotalPercent / overallPerfCount) : 0;
         
-        // Score = Vokabeln * (Accuracy / 100)
-        const score = Math.round(monthVocabs * (avgAccuracy / 100));
+        // Score = Monatliche Vokabeln * (Overall Accuracy / 100)
+        const score = Math.round(monthVocabs * (overallAccuracy / 100));
         
         // Nur User mit Aktivität in diesem Monat hinzufügen (Score > 0)
         if (score > 0) {
@@ -3428,7 +3433,7 @@
             userKey: userKey,
             name: user.name,
             vocabs: monthVocabs,
-            accuracy: Math.round(avgAccuracy),
+            accuracy: Math.round(overallAccuracy),
             score: score
           });
         }
