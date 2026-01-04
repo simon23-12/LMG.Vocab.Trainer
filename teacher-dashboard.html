@@ -522,8 +522,8 @@
           // Jeder Performance-Eintrag = eine "Session"
           totalSessions++;
           
-          // Accuracy sammeln
-          if (perf.percent !== undefined && !isNaN(perf.percent)) {
+          // Accuracy sammeln - mit strikter Validierung
+          if (perf && typeof perf.percent === 'number' && !isNaN(perf.percent) && perf.percent >= 0 && perf.percent <= 100) {
             totalAccuracySum += perf.percent;
             accuracyCount++;
           }
@@ -547,6 +547,14 @@
       }
       
       const avgAccuracy = accuracyCount > 0 ? Math.round(totalAccuracySum / accuracyCount) : 0;
+      
+      // DEBUG Logging
+      console.log('=== ACCURACY DEBUG ===');
+      console.log('Total Accuracy Sum:', totalAccuracySum);
+      console.log('Accuracy Count:', accuracyCount);
+      console.log('Average Accuracy:', avgAccuracy);
+      console.log('Total Sessions:', totalSessions);
+      console.log('Active Students:', activeStudents);
       
       // Update UI
       document.getElementById('adminTotalSessions').textContent = totalSessions.toLocaleString('de-DE');
