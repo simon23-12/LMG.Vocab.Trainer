@@ -19,9 +19,9 @@
   
   <style>
     :root {
-      --bg-gradient-start: #667eea;
-      --bg-gradient-end: #764ba2;
-      --container-bg: white;
+      --bg-gradient-start: #0066CC;
+      --bg-gradient-end: #F5D020;
+      --container-bg: rgba(255, 255, 255, 0.15);
       --text-primary: #333;
       --text-secondary: #666;
       --text-tertiary: #999;
@@ -37,7 +37,7 @@
     body.dark-mode {
       --bg-gradient-start: #1a1a2e;
       --bg-gradient-end: #16213e;
-      --container-bg: #0f3460;
+      --container-bg: rgba(15, 52, 96, 0.4);
       --text-primary: #e0e0e0;
       --text-secondary: #b0b0b0;
       --text-tertiary: #808080;
@@ -121,6 +121,9 @@
       max-width: 600px;
       margin: 0 auto;
       background: var(--container-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 20px;
       padding: 40px;
       box-shadow: 0 20px 60px var(--shadow-color);
