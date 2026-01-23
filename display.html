@@ -1547,7 +1547,28 @@
     messagingSenderId: "743231387214",
     appId: "1:743231387214:web:166169b25f72616280351f"
   };
-  
+
+  // Einmaliger Cache-Fix für Klasse 6 (Seite 215 hinzugefügt)
+  (function() {
+    const selectedClass = localStorage.getItem('selectedClass');
+    const fixApplied = localStorage.getItem('class6_page215_fixed');
+
+    if (selectedClass?.startsWith('6') && !fixApplied) {
+      console.log('[Cache Fix] Klasse 6: Lade neue Seiten-Liste...');
+
+      if ('caches' in window) {
+        caches.open('lmg-vocab-v1').then(cache => {
+          cache.delete('/display.html').then(() => {
+            localStorage.setItem('class6_page215_fixed', 'true');
+            window.location.reload(true);
+          });
+        });
+      } else {
+        localStorage.setItem('class6_page215_fixed', 'true');
+        window.location.reload(true);
+      }
+    }
+  })();
 
   // ============================================
   // SHA-256 HASH FUNKTION (Einweg!)
