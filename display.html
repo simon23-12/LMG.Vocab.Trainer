@@ -1548,56 +1548,6 @@
     appId: "1:743231387214:web:166169b25f72616280351f"
   };
 
-  // Intelligenter Cache-Fix für Klasse 6 (Seite 215 hinzugefügt)
-  (async function() {
-    const selectedClass = localStorage.getItem('selectedClass');
-
-    if (selectedClass?.startsWith('6')) {
-      const vocabCache = localStorage.getItem('vocabs_6');
-
-      if (vocabCache) {
-        try {
-          const cachedVocabs = JSON.parse(vocabCache);
-          const has215 = cachedVocabs.some(v => parseInt(v.Page) === 215);
-
-          if (!has215) {
-            console.log('[Cache Fix] Seite 215 fehlt im Cache, lösche und lade neu...');
-
-            // Lösche Vokabel-Cache für Jahrgang 6
-            localStorage.removeItem('vocabs_6');
-            localStorage.removeItem('vocabs_version_6');
-            localStorage.removeItem('vocabs_time_6');
-
-            // Lösche auch Service Worker Cache für die Vokabel-Datei
-            if ('caches' in window) {
-              try {
-                const cacheNames = await caches.keys();
-                const vocabUrl = 'https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/voc6_4.json';
-
-                for (const cacheName of cacheNames) {
-                  const cache = await caches.open(cacheName);
-                  const deleted = await cache.delete(vocabUrl);
-                  if (deleted) {
-                    console.log('[Cache Fix] Service Worker Cache für voc6_4.json gelöscht');
-                  }
-                }
-              } catch (e) {
-                console.error('[Cache Fix] Fehler beim Löschen des SW Cache:', e);
-              }
-            }
-
-            // Reload ohne Cache
-            location.reload();
-          } else {
-            console.log('[Cache Fix] Seite 215 bereits im Cache vorhanden ✓');
-          }
-        } catch (e) {
-          console.error('[Cache Fix] Fehler beim Parsen:', e);
-        }
-      }
-    }
-  })();
-
   // ============================================
   // SHA-256 HASH FUNKTION (Einweg!)
   // ============================================
@@ -1826,8 +1776,8 @@
       
       // GitHub Configuration
       const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/';
-      // Version 1.0.1 für Klasse 6: Seite 215 hinzugefügt
-      const VOCAB_VERSION = currentUser.jahrgang === '6' ? '1.0.1' : '1.0.0';
+      // Version 1.0.2 für Klasse 6: Seite 215 Cache-Bust
+      const VOCAB_VERSION = currentUser.jahrgang === '6' ? '1.0.2' : '1.0.0';
       
       // Map Jahrgang zu Dateinamen (alle lowercase: voc5_4.json, voc6_4.json etc.)
       const vocabFileName = `voc${currentUser.jahrgang}_4.json`;
