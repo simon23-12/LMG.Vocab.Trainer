@@ -1826,7 +1826,8 @@
       
       // GitHub Configuration
       const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/';
-      const VOCAB_VERSION = '1.0.0'; // Bei Änderungen an Vokabeln hochzählen um Cache zu invalidieren
+      // Version 1.0.1 für Klasse 6: Seite 215 hinzugefügt
+      const VOCAB_VERSION = currentUser.jahrgang === '6' ? '1.0.1' : '1.0.0';
       
       // Map Jahrgang zu Dateinamen (alle lowercase: voc5_4.json, voc6_4.json etc.)
       const vocabFileName = `voc${currentUser.jahrgang}_4.json`;
@@ -1861,11 +1862,14 @@
       const vocabURL = `${GITHUB_BASE_URL}${vocabFileName}?v=${VOCAB_VERSION}`;
       console.log("GitHub URL:", vocabURL);
       
-      const response = await fetch(vocabURL, {
-        headers: {
-          'Accept': 'application/json; charset=UTF-8'
-        }
-      });
+      // Für Klasse 6: cache: 'reload' umgeht Service Worker Cache (Seite 215 Fix)
+      const fetchOptions = {
+        headers: { 'Accept': 'application/json; charset=UTF-8' }
+      };
+      if (currentUser.jahrgang === '6') {
+        fetchOptions.cache = 'reload';
+      }
+      const response = await fetch(vocabURL, fetchOptions);
       
       if (!response.ok) {
         throw new Error(`GitHub HTTP ${response.status}: ${response.statusText}`);
