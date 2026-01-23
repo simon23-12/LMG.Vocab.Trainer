@@ -2,8 +2,8 @@
 // Leibniz Montessori Gymnasium Düsseldorf
 // Version 1.0 - PWA Support
 
-const CACHE_NAME = 'lmg-vocab-v1';
-const RUNTIME_CACHE = 'lmg-vocab-runtime';
+const CACHE_NAME = 'lmg-vocab-v2';
+const RUNTIME_CACHE = 'lmg-vocab-runtime-v2';
 
 // Dateien die beim Install gecacht werden sollen
 const PRECACHE_URLS = [
