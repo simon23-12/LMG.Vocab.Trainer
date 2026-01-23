@@ -2876,10 +2876,194 @@
   {
     "English": "packet",
     "German": "Packung, Päckchen",
-    "Page": "214",
+    "Page": "215",
     "synonyms": [
       "pack",
       "package"
+    ]
+  },
+  {
+    "English": "tin",
+    "German": "Dose",
+    "Page": "215",
+    "synonyms": [
+      "can"
+    ]
+  },
+  {
+    "English": "a bottle of ...",
+    "German": "eine Flasche ...",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "a packet of ...",
+    "German": "eine Packung ..., ein Päckchen ...",
+    "Page": "215",
+    "synonyms": [
+      "a pack of ..."
+    ]
+  },
+  {
+    "English": "a plate of ...",
+    "German": "ein Teller ...",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "a tin of ...",
+    "German": "eine Dose ...",
+    "Page": "215",
+    "synonyms": [
+      "a can of ..."
+    ]
+  },
+  {
+    "English": "a basket of ...",
+    "German": "ein Korb ...",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "a kilo of ...",
+    "German": "ein Kilo ...",
+    "Page": "215",
+    "synonyms": [
+      "a kilogram of ..."
+    ]
+  },
+  {
+    "English": "juice",
+    "German": "Saft",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "tomato, pl tomatoes",
+    "German": "Tomate",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "sock",
+    "German": "Socke",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "(to) scan a text",
+    "German": "einen Text schnell nach bestimmten Wörtern/Informationen absuchen",
+    "Page": "215",
+    "synonyms": [
+      "skim a text"
+    ]
+  },
+  {
+    "English": "skill",
+    "German": "Fertigkeit",
+    "Page": "215",
+    "synonyms": [
+      "ability",
+      "talent",
+      "competence"
+    ]
+  },
+  {
+    "English": "souvenir",
+    "German": "Andenken, Souvenir",
+    "Page": "215",
+    "synonyms": [
+      "keepsake",
+      "memento"
+    ]
+  },
+  {
+    "English": "magic",
+    "German": "magisch, Zauber-",
+    "Page": "215",
+    "synonyms": [
+      "magical"
+    ]
+  },
+  {
+    "English": "(to) make sb. sth.",
+    "German": "jn. zu etwas machen",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "(to) fight sb.",
+    "German": "jn. bekämpfen; gegen jn. kämpfen",
+    "Page": "215",
+    "synonyms": [
+      "battle sb.",
+      "combat sb."
+    ]
+  },
+  {
+    "English": "prize",
+    "German": "Preis, Gewinn",
+    "Page": "215",
+    "synonyms": [
+      "award",
+      "reward",
+      "trophy"
+    ]
+  },
+  {
+    "English": "just then",
+    "German": "genau in dem Moment; gerade dann",
+    "Page": "215",
+    "synonyms": [
+      "at that moment",
+      "right then"
+    ]
+  },
+  {
+    "English": "slowly",
+    "German": "langsam",
+    "Page": "215",
+    "synonyms": [
+      "gradually",
+      "unhurriedly"
+    ]
+  },
+  {
+    "English": "wall",
+    "German": "Mauer; Wand",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "role",
+    "German": "Rolle (in einem Theaterstück, Film)",
+    "Page": "215",
+    "synonyms": [
+      "part",
+      "character"
+    ]
+  },
+  {
+    "English": "as kung fu master",
+    "German": "als Kung Fu-Master(in der Funktion von)",
+    "Page": "215",
+    "synonyms": []
+  },
+  {
+    "English": "in a loud voice",
+    "German": "mit lauter Stimme",
+    "Page": "215",
+    "synonyms": [
+      "loudly"
+    ]
+  },
+  {
+    "English": "in a soft voice",
+    "German": "mit sanfter Stimme",
+    "Page": "215",
+    "synonyms": [
+      "softly",
+      "quietly"
     ]
   },
   {
