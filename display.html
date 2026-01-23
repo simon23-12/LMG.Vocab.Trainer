@@ -1549,7 +1549,7 @@
   };
 
   // Intelligenter Cache-Fix für Klasse 6 (Seite 215 hinzugefügt)
-  (function() {
+  (async function() {
     const selectedClass = localStorage.getItem('selectedClass');
 
     if (selectedClass?.startsWith('6')) {
@@ -1568,8 +1568,26 @@
             localStorage.removeItem('vocabs_version_6');
             localStorage.removeItem('vocabs_time_6');
 
+            // Lösche auch Service Worker Cache für die Vokabel-Datei
+            if ('caches' in window) {
+              try {
+                const cacheNames = await caches.keys();
+                const vocabUrl = 'https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/voc6_4.json';
+
+                for (const cacheName of cacheNames) {
+                  const cache = await caches.open(cacheName);
+                  const deleted = await cache.delete(vocabUrl);
+                  if (deleted) {
+                    console.log('[Cache Fix] Service Worker Cache für voc6_4.json gelöscht');
+                  }
+                }
+              } catch (e) {
+                console.error('[Cache Fix] Fehler beim Löschen des SW Cache:', e);
+              }
+            }
+
             // Reload ohne Cache
-            window.location.reload(true);
+            location.reload();
           } else {
             console.log('[Cache Fix] Seite 215 bereits im Cache vorhanden ✓');
           }
