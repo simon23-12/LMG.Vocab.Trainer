@@ -1554,19 +1554,18 @@
     const fixApplied = localStorage.getItem('class6_page215_fixed');
 
     if (selectedClass?.startsWith('6') && !fixApplied) {
-      console.log('[Cache Fix] Klasse 6: Lade neue Seiten-Liste...');
+      console.log('[Cache Fix] Klasse 6: Lösche Vokabel-Cache und lade neu...');
 
-      if ('caches' in window) {
-        caches.open('lmg-vocab-v1').then(cache => {
-          cache.delete('/display.html').then(() => {
-            localStorage.setItem('class6_page215_fixed', 'true');
-            window.location.reload(true);
-          });
-        });
-      } else {
-        localStorage.setItem('class6_page215_fixed', 'true');
-        window.location.reload(true);
-      }
+      // Lösche Vokabel-Cache für Jahrgang 6
+      localStorage.removeItem('vocabs_6');
+      localStorage.removeItem('vocabs_version_6');
+      localStorage.removeItem('vocabs_time_6');
+
+      // Setze Fix-Flag
+      localStorage.setItem('class6_page215_fixed', 'true');
+
+      // Reload ohne Cache
+      window.location.reload(true);
     }
   })();
 
