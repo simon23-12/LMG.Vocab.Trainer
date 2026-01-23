@@ -617,28 +617,6 @@
     appId: "1:522457998676:web:5b9450fa93e12fc3bdc722"
   };
 
-  // Einmaliger Cache-Fix für Klasse 6 (Seite 215 hinzugefügt)
-  (function() {
-    const selectedClass = localStorage.getItem('selectedClass');
-    const fixApplied = localStorage.getItem('class6_page215_fixed');
-
-    if (selectedClass?.startsWith('6') && !fixApplied) {
-      console.log('[Cache Fix] Klasse 6: Lade neue Seiten-Liste...');
-
-      if ('caches' in window) {
-        caches.open('lmg-vocab-v1').then(cache => {
-          cache.delete('/index.html').then(() => {
-            localStorage.setItem('class6_page215_fixed', 'true');
-            window.location.reload(true);
-          });
-        });
-      } else {
-        localStorage.setItem('class6_page215_fixed', 'true');
-        window.location.reload(true);
-      }
-    }
-  })();
-
   // Firebase initialisieren
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
