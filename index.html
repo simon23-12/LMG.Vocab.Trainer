@@ -622,7 +622,7 @@
     const selectedClass = localStorage.getItem('selectedClass');
     const fixApplied = localStorage.getItem('class6_page215_fixed');
 
-    if (selectedClass === '6' && !fixApplied) {
+    if (selectedClass?.startsWith('6') && !fixApplied) {
       console.log('[Cache Fix] Klasse 6: Lade neue Seiten-Liste...');
 
       if ('caches' in window) {
