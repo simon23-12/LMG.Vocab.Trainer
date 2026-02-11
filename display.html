@@ -3211,10 +3211,115 @@
     };
     
     console.log('Checking awards:', data);
-    
+
     for (const award of AWARDS) {
       const wasUnlocked = await checkAndUnlockAward(award, data);
       if (wasUnlocked) break;
+    }
+
+    // Leaderboard-Awards: Prüfe Vormonat
+    await checkLeaderboardAwards();
+  }
+
+  async function checkLeaderboardAwards() {
+    if (!currentUser || !currentUser.class) return;
+
+    // Vormonat berechnen
+    const now = new Date();
+    let prevMonth = now.getMonth(); // 0-11, aktueller Monat -1 = Vormonat
+    let prevYear = now.getFullYear();
+    if (prevMonth === 0) { prevMonth = 12; prevYear--; }
+    // prevMonth ist jetzt 1-12
+
+    const monthKey = `${prevYear}-${String(prevMonth).padStart(2, '0')}`;
+
+    // Prüfe ob Awards für diesen Monat schon vergeben wurden
+    const winnerAwardId = 'winmonthlyrace';
+    const podiumAwardId = 'podiummontlyrace';
+
+    try {
+      const winRef = db.ref('users/' + currentUser.userKey + '/awards/' + winnerAwardId);
+      const podRef = db.ref('users/' + currentUser.userKey + '/awards/' + podiumAwardId);
+      const [winSnap, podSnap] = await Promise.all([winRef.get(), podRef.get()]);
+
+      // Wenn bereits ein Award für diesen Monat existiert, skip
+      if (winSnap.exists() && winSnap.val().month === monthKey) return;
+      if (podSnap.exists() && podSnap.val().month === monthKey) return;
+
+      // Lade alle User und berechne Leaderboard für Vormonat
+      const usersSnap = await db.ref('users').get();
+      if (!usersSnap.exists()) return;
+
+      const allUsers = usersSnap.val();
+      const classUsers = [];
+      const currentClass = (currentUser.class || '').toLowerCase().trim();
+      const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
+
+      for (let userKey in allUsers) {
+        const user = allUsers[userKey];
+        const userClass = (user.class || '').toLowerCase().trim();
+        if (userClass !== currentClass) continue;
+        if (!user.name || testAccounts.includes(user.name.toLowerCase())) continue;
+
+        let monthVocabs = 0;
+        let overallTotalPercent = 0;
+        let overallPerfCount = 0;
+
+        if (user.performance) {
+          for (let perfKey in user.performance) {
+            const perf = user.performance[perfKey];
+            if (perf.percent !== undefined && !isNaN(perf.percent)) {
+              overallTotalPercent += perf.percent;
+              overallPerfCount++;
+            }
+            if (perf.timestamp) {
+              const perfDate = new Date(perf.timestamp);
+              if (perfDate.getMonth() + 1 === prevMonth && perfDate.getFullYear() === prevYear) {
+                monthVocabs += (perf.total || 0);
+              }
+            }
+          }
+        }
+
+        const overallAccuracy = overallPerfCount > 0 ? (overallTotalPercent / overallPerfCount) : 0;
+        const score = Math.round(monthVocabs * (overallAccuracy / 100));
+
+        if (score > 0) {
+          classUsers.push({ userKey, name: user.name, score });
+        }
+      }
+
+      if (classUsers.length === 0) return;
+
+      classUsers.sort((a, b) => b.score - a.score);
+
+      // Finde Position des aktuellen Users
+      const userIndex = classUsers.findIndex(u => u.userKey === currentUser.userKey);
+      if (userIndex === -1) return;
+
+      const rank = userIndex + 1; // 1-basiert
+
+      if (rank === 1) {
+        const award = AWARDS.find(a => a.id === winnerAwardId);
+        await db.ref('users/' + currentUser.userKey + '/awards/' + winnerAwardId).set({
+          unlockedAt: new Date().toISOString(),
+          month: monthKey,
+          requirement: 1
+        });
+        console.log('🏆 Leaderboard Award: Champion of the Month!', monthKey);
+        setTimeout(() => showAwardAnimation(award), 500);
+      } else if (rank <= 3) {
+        const award = AWARDS.find(a => a.id === podiumAwardId);
+        await db.ref('users/' + currentUser.userKey + '/awards/' + podiumAwardId).set({
+          unlockedAt: new Date().toISOString(),
+          month: monthKey,
+          requirement: 2
+        });
+        console.log('🥈 Leaderboard Award: Masters of the Month!', monthKey);
+        setTimeout(() => showAwardAnimation(award), 500);
+      }
+    } catch (error) {
+      console.error('Leaderboard award check error:', error);
     }
   }
 
