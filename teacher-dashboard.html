@@ -1,3 +1,868 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMG Vokabeltrainer - Lehrer Dashboard</title>
+  
+  <!-- PWA Support -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FFFFFF" id="theme-color">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="LMG Vocab">
+  <link rel="apple-touch-icon" href="/images/icons/icon-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/icons/icon-192.png">
+  
+  <style>
+    :root {
+      --bg-gradient-start: #667eea;
+      --bg-gradient-end: #764ba2;
+      --container-bg: white;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --border-color: #ddd;
+      --input-bg: white;
+      --input-border: #ddd;
+      --button-primary: #667eea;
+      --button-hover: #5568d3;
+      --card-bg: white;
+      --shadow-color: rgba(0,0,0,0.1);
+    }
+
+    body.dark-mode {
+      --bg-gradient-start: #1a1a2e;
+      --bg-gradient-end: #16213e;
+      --container-bg: #0f3460;
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --text-tertiary: #808080;
+      --border-color: #2a2a3e;
+      --input-bg: #1a1a2e;
+      --input-border: #2a2a3e;
+      --button-primary: #667eea;
+      --button-hover: #5568d3;
+      --card-bg: #16213e;
+      --shadow-color: rgba(0,0,0,0.5);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+      min-height: 100vh;
+      padding: 20px;
+      transition: background 0.3s ease;
+    }
+    
+    .dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255,255,255,0.3);
+      transition: 0.3s;
+      border-radius: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "☀️";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #667eea;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(30px);
+      content: "🌙";
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--container-bg);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px var(--shadow-color);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    h1 { 
+      color: var(--button-primary); 
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    h2 {
+      color: var(--text-primary);
+      margin: 30px 0 20px 0;
+      font-size: 1.8em;
+    }
+    
+    h3 {
+      color: var(--button-primary);
+      margin-bottom: 20px;
+    }
+    
+    .logo {
+      height: 60px;
+      width: auto;
+    }
+    
+    .form-group {
+      margin: 20px 0;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    select {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      border: 2px solid var(--input-border);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border 0.3s, background 0.3s;
+      background: var(--input-bg);
+      color: var(--text-primary);
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: var(--button-primary);
+    }
+    
+    button {
+      padding: 12px 30px;
+      background: var(--button-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 5px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      background: var(--button-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+    
+    button.logout-btn {
+      background: #e74c3c;
+    }
+    
+    button.logout-btn:hover {
+      background: #c0392b;
+    }
+    
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .summary-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .summary-card div:first-child {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+    
+    .summary-card div:last-child {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    
+    .student-card {
+      padding: 15px;
+      margin: 10px 0;
+      background: var(--card-bg);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid var(--button-primary);
+      box-shadow: 0 2px 8px var(--shadow-color);
+    }
+    
+    .student-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px var(--shadow-color);
+    }
+    
+    .student-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .student-perf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .perf-item {
+      padding: 10px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid var(--border-color);
+      transition: background 0.3s ease;
+    }
+    
+    .perf-item.green { 
+      border-color: #56ab2f; 
+      background: #d4edda; 
+      color: #155724;
+    }
+    
+    .perf-item.yellow { 
+      border-color: #f09819; 
+      background: #fff3cd; 
+      color: #856404;
+    }
+    
+    .perf-item.red { 
+      border-color: #eb3349; 
+      background: #f8d7da; 
+      color: #721c24;
+    }
+    
+    .status {
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+      display: none;
+    }
+    
+    .status.error {
+      background: #fee;
+      color: #c33;
+      border: 1px solid #fcc;
+      display: block;
+    }
+    
+    .status.success {
+      background: #efe;
+      color: #3a3;
+      border: 1px solid #cfc;
+      display: block;
+    }
+    
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      display: block;
+    }
+    
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    
+    .welcome-text {
+      font-size: 1.1em;
+      color: var(--text-secondary);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 20px;
+      color: var(--button-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dark Mode Toggle -->
+  <div class="dark-mode-toggle">
+    <label class="toggle-switch">
+      <input type="checkbox" id="darkModeToggle">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <h1>
+      <img src="images/schoollogo.png" alt="LMG Logo" class="logo">
+      Lehrer Dashboard
+    </h1>
+    
+    <div class="header-section">
+      <p class="welcome-text">👨‍🏫 Willkommen im Lehrerbereich!</p>
+      <button onclick="logout()" class="logout-btn">Zurück zum Login</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <!-- Nutzungsstatistiken -->
+    <div style="margin-bottom: 40px;">
+      <h3>📊 Nutzungsstatistik</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div>Gesamt Sessions</div>
+          <div id="adminTotalSessions">-</div>
+        </div>
+        <div class="summary-card">
+          <div>Geübte Vokabeln</div>
+          <div id="adminTotalVocabs">-</div>
+        </div>
+        <div class="summary-card">
+          <div>Aktive Schüler</div>
+          <div id="adminActiveStudents">-</div>
+        </div>
+        <div class="summary-card">
+          <div>Ø Accuracy</div>
+          <div id="adminAvgAccuracy">-</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Klassen-Auswahl -->
+    <div class="form-group">
+      <label>Klasse auswählen:</label>
+      <select id="adminClassSelect" onchange="loadClassPerformance()">
+        <option value="">-- Klasse wählen --</option>
+        <option value="5a">5a</option>
+        <option value="5b">5b</option>
+        <option value="5c">5c</option>
+        <option value="5d">5d</option>
+        <option value="6a">6a</option>
+        <option value="6b">6b</option>
+        <option value="6c">6c</option>
+        <option value="6d">6d</option>
+        <option value="7a">7a</option>
+        <option value="7b">7b</option>
+        <option value="7c">7c</option>
+        <option value="7d">7d</option>
+        <option value="8a">8a</option>
+        <option value="8b">8b</option>
+        <option value="8c">8c</option>
+        <option value="8d">8d</option>
+        <option value="9a">9a</option>
+        <option value="9b">9b</option>
+        <option value="9c">9c</option>
+        <option value="9d">9d</option>
+        <option value="10a">10a</option>
+        <option value="10b">10b</option>
+        <option value="10c">10c</option>
+        <option value="10d">10d</option>
+      </select>
+    </div>
+    
+    <!-- Sortierung -->
+    <div id="sortControls" style="display:none; margin: 15px 0 5px;">
+      <label style="font-size: 14px; color: var(--text-secondary);">Sortieren nach: </label>
+      <select id="studentSortSelect" onchange="renderStudentList()" style="font-size: 14px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text);">
+        <option value="name">Name A–Z</option>
+        <option value="vocab">Meiste Vokabeln geübt</option>
+      </select>
+    </div>
+
+    <!-- Schüler-Liste -->
+    <div id="studentList" style="margin: 15px 0;"></div>
+
+    <div class="footer">
+      From Simon with love ❤️
+    </div>
+  </div>
+
+  <!-- Firebase Configuration -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <script>
+  // Firebase Konfiguration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJoc3KI6mElR3Xb0MKl5BNd5bJThO8m-8",
+    authDomain: "testdatabase-4daf4.firebaseapp.com",
+    databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "testdatabase-4daf4",
+    storageBucket: "testdatabase-4daf4.firebasestorage.app",
+    messagingSenderId: "522457998676",
+    appId: "1:522457998676:web:5b9450fa93e12fc3bdc722"
+  };
+
+  // Firebase initialisieren
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Auth-Check beim Laden
+  window.addEventListener('DOMContentLoaded', () => {
+    // Prüfe ob Lehrer authentifiziert ist
+    const isAuth = sessionStorage.getItem('lmg_teacher_auth');
+    if (isAuth !== 'true') {
+      // Nicht authentifiziert -> zurück zum Login
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    // Authentifiziert -> lade Daten
+    loadAdminStats();
+    initDarkMode();
+  });
+
+  // Status-Anzeige
+  function showStatus(message, type) {
+    const statusEl = document.getElementById('status');
+    statusEl.textContent = message;
+    statusEl.className = 'status ' + type;
+    setTimeout(() => {
+      statusEl.className = 'status';
+    }, 4000);
+  }
+
+  // Lade Admin-Statistiken (aus users/ aggregiert - keine usage_logs mehr)
+  async function loadAdminStats() {
+    try {
+      const usersSnapshot = await db.ref('users').get();
+      
+      if (!usersSnapshot.exists()) {
+        document.getElementById('adminTotalSessions').textContent = '0';
+        document.getElementById('adminTotalVocabs').textContent = '0';
+        document.getElementById('adminActiveStudents').textContent = '0';
+        document.getElementById('adminAvgAccuracy').textContent = '-';
+        return;
+      }
+      
+      const users = usersSnapshot.val();
+      
+      let activeStudents = 0;
+      let totalVocabs = 0;
+      let totalSessions = 0;  // Zähle getestete Seiten als "Sessions"
+      let totalAccuracySum = 0;
+      let accuracyCount = 0;
+      
+      for (let userKey in users) {
+        const user = users[userKey];
+        
+        // Überspringe User ohne Namen (Test-Einträge)
+        if (!user.name) continue;
+        
+        activeStudents++;
+        
+        // lifetimeTotalVocabs = Gesamtzahl geübter Vokabeln
+        totalVocabs += (user.lifetimeTotalVocabs || 0);
+        
+        // Performance-Einträge durchgehen für Sessions und Accuracy
+        const performance = user.performance || {};
+        for (let perfKey in performance) {
+          const perf = performance[perfKey];
+          
+          // Jeder Performance-Eintrag = eine "Session"
+          totalSessions++;
+          
+          // Accuracy sammeln - mit strikter Validierung
+          if (perf && typeof perf.percent === 'number' && !isNaN(perf.percent) && perf.percent >= 0 && perf.percent <= 100) {
+            totalAccuracySum += perf.percent;
+            accuracyCount++;
+          }
+        }
+        
+        // Irregular Verbs auch zählen (falls vorhanden)
+        if (user.irregularVerbsSimple) {
+          totalSessions++;
+          if (user.irregularVerbsSimple.percent !== undefined) {
+            totalAccuracySum += user.irregularVerbsSimple.percent;
+            accuracyCount++;
+          }
+        }
+        if (user.irregularVerbsFull) {
+          totalSessions++;
+          if (user.irregularVerbsFull.percent !== undefined) {
+            totalAccuracySum += user.irregularVerbsFull.percent;
+            accuracyCount++;
+          }
+        }
+      }
+      
+      const avgAccuracy = accuracyCount > 0 ? Math.round(totalAccuracySum / accuracyCount) : 0;
+      
+      // DEBUG Logging
+      console.log('=== ACCURACY DEBUG ===');
+      console.log('Total Accuracy Sum:', totalAccuracySum);
+      console.log('Accuracy Count:', accuracyCount);
+      console.log('Average Accuracy:', avgAccuracy);
+      console.log('Total Sessions:', totalSessions);
+      console.log('Active Students:', activeStudents);
+      
+      // Update UI
+      document.getElementById('adminTotalSessions').textContent = totalSessions.toLocaleString('de-DE');
+      document.getElementById('adminTotalVocabs').textContent = totalVocabs.toLocaleString('de-DE');
+      document.getElementById('adminActiveStudents').textContent = activeStudents;
+      document.getElementById('adminAvgAccuracy').textContent = avgAccuracy > 0 ? avgAccuracy + '%' : '-';
+      
+      console.log('✓ Admin Stats geladen (aus users/):', { totalSessions, totalVocabs, activeStudents, avgAccuracy });
+      
+    } catch (error) {
+      console.error('Fehler beim Laden der Admin Stats:', error);
+    }
+  }
+
+  // Show Status Message
+  function showStatus(msg, type) {
+    console.log(msg);
+  }
+
+  async function loadClassPerformance() {
+    const selectedClass = document.getElementById('adminClassSelect').value;
+    if (!selectedClass) {
+      document.getElementById('studentList').innerHTML = '';
+      document.getElementById('sortControls').style.display = 'none';
+      return;
+    }
+    
+    try {
+      showStatus("Lade Schüler von Klasse " + selectedClass + "...", 'info');
+      
+      const snap = await db.ref('users').get();
+      if (!snap.exists()) {
+        document.getElementById('studentList').innerHTML = '<p style="color: var(--text-secondary);">Keine Schüler gefunden.</p>';
+        return;
+      }
+      
+      const allUsers = snap.val();
+      const studentsInClass = [];
+      
+      for (let userKey in allUsers) {
+        const user = allUsers[userKey];
+        if (user.class === selectedClass) {
+          const perf = user.performance || {};
+          const vocabCount = Object.keys(perf).filter(k => k.startsWith('page_') || k.startsWith('interval_')).length;
+          studentsInClass.push({
+            userKey: userKey,
+            displayName: user.name || userKey,
+            vocabCount: vocabCount,
+            dataLoaded: false
+          });
+        }
+      }
+
+      if (studentsInClass.length === 0) {
+        document.getElementById('studentList').innerHTML = '<p style="color: var(--text-secondary);">Keine Schüler in dieser Klasse gefunden.</p>';
+        document.getElementById('sortControls').style.display = 'none';
+        return;
+      }
+
+      currentStudents = studentsInClass;
+      document.getElementById('sortControls').style.display = 'block';
+      document.getElementById('studentSortSelect').value = 'name';
+      renderStudentList();
+      showStatus("✓ " + studentsInClass.length + " Schüler gefunden", 'success');
+      
+    } catch (error) {
+      showStatus("Fehler: " + error.message, 'error');
+      console.error(error);
+    }
+  }
+
+  function renderStudentList() {
+    const sortBy = document.getElementById('studentSortSelect').value;
+    const sorted = [...currentStudents].sort((a, b) => {
+      if (sortBy === 'vocab') return b.vocabCount - a.vocabCount;
+      return a.displayName.localeCompare(b.displayName);
+    });
+    const selectedClass = document.getElementById('adminClassSelect').value;
+    let html = '<h3>Schüler in Klasse ' + selectedClass + ':</h3>';
+    sorted.forEach((student, index) => {
+      const studentId = 'student_' + index;
+      const vocabHint = sortBy === 'vocab' ? ` · ${student.vocabCount} Einheiten geübt` : '';
+      html += `
+        <div class="student-card" onclick="loadAndToggleStudentPerf('${student.userKey}', '${studentId}')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div class="student-name">${student.displayName}</div>
+              <div id="${studentId}_summary" style="font-size: 14px; color: var(--text-secondary); margin-top: 5px;">
+                Klicken zum Laden...${vocabHint}
+              </div>
+            </div>
+            <div id="${studentId}_icon" style="font-size: 20px; transition: transform 0.3s;">▼</div>
+          </div>
+          <div id="${studentId}_perf" class="student-perf-grid" style="display: none; margin-top: 15px;">
+            <div style="text-align: center; color: var(--text-secondary);">Lade Daten...</div>
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById('studentList').innerHTML = html;
+  }
+
+  // Lazy Load Student Performance
+  const loadedStudents = {};
+  let currentStudents = [];
+  
+  async function loadAndToggleStudentPerf(userKey, studentId) {
+    const perfDiv = document.getElementById(studentId + '_perf');
+    const icon = document.getElementById(studentId + '_icon');
+    const summary = document.getElementById(studentId + '_summary');
+    
+    if (!perfDiv) return;
+    
+    if (perfDiv.style.display === 'grid') {
+      perfDiv.style.display = 'none';
+      icon.style.transform = 'rotate(0deg)';
+      return;
+    }
+    
+    if (!loadedStudents[userKey]) {
+      try {
+        perfDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Lade Daten...</div>';
+        perfDiv.style.display = 'grid';
+        icon.style.transform = 'rotate(180deg)';
+        
+        const userSnap = await db.ref('users/' + userKey).get();
+        if (!userSnap.exists()) {
+          perfDiv.innerHTML = '<div style="text-align: center; color: var(--text-secondary);">Keine Daten gefunden</div>';
+          summary.textContent = 'Keine Daten';
+          return;
+        }
+        
+        const userData = userSnap.val();
+        
+        console.log('=== USER DATA DEBUG ===');
+        console.log('UserKey:', userKey);
+        console.log('Has performance object:', !!userData.performance);
+        
+        let pageCount = 0;
+        let intervalCount = 0;
+        const allPerformance = {};
+        
+        // Performance ist in einem Sub-Objekt!
+        const performanceData = userData.performance || {};
+        
+        for (let key in performanceData) {
+          if (key.startsWith('page_')) {
+            console.log('Found page:', key);
+            pageCount++;
+            allPerformance[key] = performanceData[key];
+          } else if (key.startsWith('interval_')) {
+            console.log('Found interval:', key);
+            intervalCount++;
+            allPerformance[key] = performanceData[key];
+          }
+        }
+        
+        console.log('Page count:', pageCount);
+        console.log('Interval count:', intervalCount);
+        
+        const irregularSimple = userData.irregularVerbsSimple;
+        const irregularFull = userData.irregularVerbsFull;
+        
+        let perfHtml = '';
+        
+        // ERST: Vocabulary Performance
+        if (Object.keys(allPerformance).length > 0) {
+          const sorted = Object.entries(allPerformance).sort((a, b) => {
+            const pageA = parseInt(a[0].replace(/\D/g, ''));
+            const pageB = parseInt(b[0].replace(/\D/g, ''));
+            return pageA - pageB;
+          });
+          
+          sorted.forEach(([key, data]) => {
+            const pageNum = key.replace('page_', '').replace('interval_', 'I: ');
+            let colorClass = '';
+            if (data.percent >= 80) colorClass = 'green';
+            else if (data.percent >= 50) colorClass = 'yellow';
+            else colorClass = 'red';
+            
+            perfHtml += `
+              <div class="perf-item ${colorClass}">
+                <div style="font-weight: bold; font-size: 16px;">${pageNum}</div>
+                <div style="font-size: 20px; margin: 5px 0;">${data.percent}%</div>
+                <div style="font-size: 12px;">${data.score}/${data.total}</div>
+                <div style="font-size: 11px; opacity: 0.7;">${data.date || ''}</div>
+              </div>
+            `;
+          });
+        }
+        
+        // DANN: Irregular Verbs (am Ende)
+        if (irregularSimple || irregularFull) {
+          perfHtml += '<div style="grid-column: 1 / -1; background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%); color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">';
+          perfHtml += '<div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">📚 Irregular Verbs</div>';
+          perfHtml += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">';
+          
+          let overallAcc = '--';
+          if (irregularSimple && irregularFull) {
+            overallAcc = Math.round((irregularSimple.percent + irregularFull.percent) / 2);
+          } else if (irregularSimple) {
+            overallAcc = irregularSimple.percent;
+          } else if (irregularFull) {
+            overallAcc = irregularFull.percent;
+          }
+          
+          perfHtml += `<div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.9;">Overall</div>
+            <div style="font-size: 24px; font-weight: bold;">${overallAcc}%</div>
+          </div>`;
+          
+          let simplePastAcc = '--';
+          const simplePastScores = [];
+          if (irregularSimple && irregularSimple.simplePastAccuracy !== undefined) {
+            simplePastScores.push(irregularSimple.simplePastAccuracy);
+          }
+          if (irregularFull && irregularFull.simplePastAccuracy !== undefined) {
+            simplePastScores.push(irregularFull.simplePastAccuracy);
+          }
+          if (simplePastScores.length > 0) {
+            simplePastAcc = Math.round(simplePastScores.reduce((a, b) => a + b, 0) / simplePastScores.length);
+          }
+          
+          perfHtml += `<div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.9;">Simple Past</div>
+            <div style="font-size: 24px; font-weight: bold;">${simplePastAcc}%</div>
+          </div>`;
+          
+          let pastPartAcc = '--';
+          if (irregularFull && irregularFull.pastParticipleAccuracy !== undefined && irregularFull.pastParticipleAccuracy !== null) {
+            pastPartAcc = irregularFull.pastParticipleAccuracy;
+          }
+          
+          perfHtml += `<div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.9;">Past Participle</div>
+            <div style="font-size: 24px; font-weight: bold;">${pastPartAcc}%</div>
+          </div>`;
+          
+          perfHtml += '</div></div>';
+        }
+        
+        if (perfHtml === '') {
+          perfHtml = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Noch keine Tests absolviert</div>';
+        }
+        
+        perfDiv.innerHTML = perfHtml;
+        
+        const totalTests = pageCount + intervalCount;
+        const irrVerbsText = (irregularSimple || irregularFull) ? ' • Irregular Verbs ✓' : '';
+        summary.textContent = totalTests + ' Seite' + (totalTests !== 1 ? 'n' : '') + ' getestet' + irrVerbsText;
+        
+        loadedStudents[userKey] = true;
+        
+      } catch (error) {
+        console.error('Error loading student data:', error);
+        perfDiv.innerHTML = '<div style="text-align: center; color: #e74c3c; padding: 20px;">Fehler beim Laden: ' + error.message + '</div>';
+      }
+    } else {
+      perfDiv.style.display = 'grid';
+      icon.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  function logout() {
+    sessionStorage.removeItem('lmg_teacher_auth');
+    sessionStorage.removeItem('lmg_teacher_name');
+    window.location.href = 'index.html';
+  }
+
+  function initDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+      darkModeToggle.checked = true;
+      themeColor.setAttribute('content', '#0f3460'); // Dark-Mode Farbe
+    }
+    
+    darkModeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'true');
+        themeColor.setAttribute('content', '#0f3460'); // Dark-Mode Farbe
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'false');
+        themeColor.setAttribute('content', '#FFFFFF'); // Hell-Modus Farbe
+      }
+    });
+  }
+  </script>
+
+  <!-- PWA Installation Script -->
+  <script src="/pwa-install.js"></script>
+
+</body>
+</html>
 # LMG Vokabeltrainer
 
 **Typ:** PWA (HTML/CSS/JS), kein Build-Prozess
