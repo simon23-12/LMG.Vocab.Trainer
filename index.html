@@ -695,7 +695,13 @@
       showStatus("Bitte alle Felder ausfüllen!", 'error');
       return;
     }
-    
+
+    // Nur Buchstaben und Leerzeichen erlaubt (keine Zahlen, keine Emojis)
+    if (!/^[A-Za-zÄÖÜäöüß\s]+$/.test(name)) {
+      showStatus("Name darf nur Buchstaben und Leerzeichen enthalten – keine Zahlen oder Emojis!", 'error');
+      return;
+    }
+
     // Extrahiere Jahrgang aus Klasse (z.B. "7b" -> "7")
     const jahrgang = cls.charAt(0);
     if (!['5','6','7','8','9'].includes(jahrgang) && !cls.startsWith('10')) {
