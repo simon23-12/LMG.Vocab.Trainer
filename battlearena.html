@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LMG Battlearena ⚔️</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/icons/icon-192.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg1: #4a2b8c; --bg2: #6d28d9; --bg3: #2563eb;
+      --card: rgba(255,255,255,0.08); --cardSolid: #ffffff;
+      --accent: #fbbf24; --good: #22c55e; --half: #f59e0b; --bad: #ef4444;
+      --text: #ffffff; --muted: rgba(255,255,255,0.7);
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+      background-attachment: fixed; color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+      padding: 16px; overflow-x: hidden;
+    }
+    .wrap { width: 100%; max-width: 760px; margin: auto; }
+    h1 { font-size: clamp(28px, 7vw, 44px); text-align: center; margin-bottom: 4px; letter-spacing: -1px; }
+    .sub { text-align: center; color: var(--muted); margin-bottom: 24px; font-size: 15px; }
+    .panel {
+      background: var(--card); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+      padding: 22px; margin-bottom: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    }
+    label { display: block; font-weight: 600; margin: 14px 0 6px; font-size: 14px; }
+    input, select {
+      width: 100%; padding: 14px 16px; border-radius: 14px; border: none;
+      font-size: 16px; background: rgba(255,255,255,0.95); color: #1a1a2e; outline: none;
+    }
+    input:focus, select:focus { box-shadow: 0 0 0 3px var(--accent); }
+    button {
+      font-family: inherit; cursor: pointer; border: none; border-radius: 14px;
+      font-size: 16px; font-weight: 700; padding: 15px 22px; transition: transform .08s, filter .15s;
+    }
+    button:active { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a1a2e; width: 100%; }
+    .btn-primary:hover { filter: brightness(1.05); }
+    .btn-ghost { background: rgba(255,255,255,0.15); color: #fff; }
+    .btn-block { width: 100%; margin-top: 14px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .row > * { flex: 1; min-width: 120px; }
+    .hidden { display: none !important; }
+    .center { text-align: center; }
+    .muted { color: var(--muted); }
+
+    /* Role landing */
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .role-card { background: var(--card); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 30px 18px; text-align: center; cursor: pointer; transition: transform .12s, background .15s; }
+    .role-card:hover { background: rgba(255,255,255,0.16); transform: translateY(-3px); }
+    .role-card .emoji { font-size: 48px; display: block; margin-bottom: 10px; }
+    .role-card h3 { font-size: 20px; margin-bottom: 6px; }
+    .role-card p { color: var(--muted); font-size: 13px; }
+    @media (max-width: 480px) { .role-grid { grid-template-columns: 1fr; } }
+
+    /* Room code */
+    .code-display { text-align: center; padding: 10px 0 20px; }
+    .code-display .label { color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+    .code-display .code { font-size: clamp(44px, 13vw, 80px); font-weight: 900; letter-spacing: 8px; color: var(--accent); text-shadow: 0 4px 20px rgba(251,191,36,0.4); }
+
+    /* Players */
+    .players { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+    .player-chip { background: rgba(255,255,255,0.15); padding: 10px 16px; border-radius: 30px; font-weight: 600; font-size: 15px; animation: pop .3s ease; }
+    @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .count-badge { background: var(--accent); color: #1a1a2e; border-radius: 30px; padding: 4px 14px; font-weight: 800; font-size: 15px; }
+
+    /* Page checkboxes */
+    .pages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; max-height: 240px; overflow-y: auto; padding: 4px; }
+    .page-chk { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); padding: 8px 10px; border-radius: 10px; font-size: 13px; cursor: pointer; }
+    .page-chk input { width: auto; }
+    .page-chk.on { background: rgba(251,191,36,0.3); }
+
+    /* Question */
+    .timer-bar { height: 10px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; margin-bottom: 18px; }
+    .timer-fill { height: 100%; background: linear-gradient(90deg, var(--good), var(--accent)); border-radius: 10px; transition: width .2s linear, background .3s; }
+    .round-meta { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+    .prompt-box { background: var(--cardSolid); color: #1a1a2e; border-radius: 18px; padding: 28px 20px; text-align: center; margin-bottom: 18px; }
+    .prompt-box .de { font-size: clamp(24px, 6vw, 36px); font-weight: 800; }
+    .prompt-box .hint { color: #64748b; font-size: 13px; margin-top: 6px; }
+    .big-input { font-size: 20px; text-align: center; padding: 18px; }
+
+    /* Result */
+    .verdict { text-align: center; padding: 22px; border-radius: 18px; margin-bottom: 16px; font-weight: 800; font-size: 22px; }
+    .verdict.correct { background: rgba(34,197,94,0.25); border: 2px solid var(--good); }
+    .verdict.half { background: rgba(245,158,11,0.25); border: 2px solid var(--half); }
+    .verdict.wrong { background: rgba(239,68,68,0.22); border: 2px solid var(--bad); }
+    .verdict .pts { font-size: 32px; display: block; margin-top: 6px; }
+    .reveal-answer { text-align: center; font-size: 18px; margin-bottom: 16px; }
+    .reveal-answer b { color: var(--accent); }
+
+    /* Leaderboard */
+    .lb { list-style: none; }
+    .lb li { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.1); padding: 12px 16px; border-radius: 14px; margin-bottom: 8px; animation: slideIn .35s ease; }
+    @keyframes slideIn { from { transform: translateX(-12px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .lb .rank { font-weight: 900; font-size: 18px; width: 30px; color: var(--accent); }
+    .lb .nm { flex: 1; font-weight: 600; }
+    .lb .sc { font-weight: 800; font-size: 18px; }
+    .lb .delta { color: var(--good); font-size: 13px; font-weight: 700; }
+    .lb li.me { outline: 2px solid var(--accent); }
+
+    /* Podium */
+    .podium { display: flex; justify-content: center; align-items: flex-end; gap: 10px; margin: 24px 0; }
+    .pod { background: rgba(255,255,255,0.12); border-radius: 16px 16px 0 0; padding: 14px 10px; text-align: center; width: 30%; }
+    .pod.p1 { height: 180px; background: linear-gradient(180deg, rgba(251,191,36,0.5), rgba(251,191,36,0.1)); }
+    .pod.p2 { height: 140px; }
+    .pod.p3 { height: 110px; }
+    .pod .medal { font-size: 34px; }
+    .pod .pname { font-weight: 800; margin-top: 6px; font-size: 15px; word-break: break-word; }
+    .pod .pscore { color: var(--accent); font-weight: 800; }
+
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); padding: 12px 22px; border-radius: 30px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity .25s; }
+    .toast.show { opacity: 1; }
+    .spinner { width: 38px; height: 38px; border: 4px solid rgba(255,255,255,0.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 20px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .back-link { color: var(--muted); text-decoration: none; font-size: 14px; display: inline-block; margin-top: 16px; }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>⚔️ Battlearena</h1>
+    <div class="sub">LMG Vokabel-Duell · Live im Klassenraum</div>
+    <div id="app"></div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <!-- Firebase SDK (compat, wie im restlichen Projekt) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+
+  <script>
+  // ============================================================
+  // FIREBASE INIT (Config identisch zum restlichen Projekt)
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
+    authDomain: "testdatabase-4daf4.firebaseapp.com",
+    databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "testdatabase-4daf4",
+    storageBucket: "testdatabase-4daf4.firebasestorage.app",
+    messagingSenderId: "743231387214",
+    appId: "1:743231387214:web:166169b25f72616280351f"
+  };
+
+  let db = null, serverOffset = 0;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    try {
+      const appCheck = firebase.appCheck();
+      appCheck.activate('6LcyqzEsAAAAADdyoXYe8Nz0RNXg0JF--msTJuSY', true);
+    } catch (e) { console.warn('App Check nicht aktiv (lokal?):', e.message); }
+    db = firebase.database();
+    db.ref('.info/serverTimeOffset').on('value', s => { serverOffset = s.val() || 0; });
+  } catch (e) {
+    console.error('Firebase Init Fehler:', e);
+  }
+  const serverNow = () => Date.now() + serverOffset;
+
+  const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/simon23-12/LMG.Vocab.Trainer/main/vocab/english/';
+
+  // ============================================================
+  // BEWERTUNGSLOGIK – pure Spiegelung aus display.html
+  // (checkAnswer → gibt {verdict} zurück statt UI anzufassen)
+  // ============================================================
+  const synonyms = {
+    'house': ['home', 'dwelling', 'residence'],
+    'home': ['house', 'dwelling', 'residence'],
+    'religious': ['faithful', 'devout', 'pious', 'godly'],
+    'faithful': ['religious', 'devout', 'loyal', 'pious'],
+    'athletic': ['sporty', 'fit', 'active'],
+    'sporty': ['athletic', 'fit', 'active'],
+    'beautiful': ['pretty', 'lovely', 'gorgeous', 'attractive'],
+    'especially': ['particularly', 'specially'],
+    'particularly': ['especially', 'specially'],
+    'learn': ['to learn', 'study'],
+    'to learn': ['learn', 'study'],
+    'fast': ['quick', 'rapid', 'swift', 'speedy'],
+    'quick': ['fast', 'rapid', 'swift', 'speedy'],
+    'big': ['large', 'huge', 'enormous', 'giant'],
+    'small': ['little', 'tiny', 'mini'],
+    'happy': ['glad', 'joyful', 'cheerful', 'pleased'],
+    'sad': ['unhappy', 'sorrowful', 'depressed'],
+    'good': ['nice', 'fine', 'great', 'excellent'],
+    'bad': ['poor', 'terrible', 'awful'],
+    'start': ['begin', 'commence', 'to start', 'to begin'],
+    'end': ['finish', 'conclude', 'to end', 'to finish'],
+    'see': ['to see', 'look at', 'watch', 'view'],
+    'look': ['see', 'watch', 'gaze'],
+    'talk': ['speak', 'chat', 'converse', 'to talk', 'to speak'],
+    'walk': ['go', 'stroll', 'to walk'],
+    'run': ['jog', 'sprint', 'to run'],
+    'eat': ['to eat', 'consume', 'dine'],
+    'drink': ['to drink', 'sip'],
+    'give': ['to give', 'provide', 'offer'],
+    'take': ['to take', 'grab', 'get'],
+    'make': ['to make', 'create', 'produce', 'build'],
+    'do': ['to do', 'perform', 'execute'],
+    'say': ['to say', 'tell', 'state'],
+    'think': ['to think', 'believe', 'consider'],
+    'know': ['to know', 'understand'],
+    'want': ['to want', 'wish', 'desire'],
+    'need': ['to need', 'require'],
+    'help': ['to help', 'assist', 'aid', 'support'],
+    'work': ['to work', 'labor', 'job'],
+    'play': ['to play', 'game'],
+    'stop': ['to stop', 'halt', 'cease'],
+    'wait': ['to wait', 'hold on'],
+    'like': ['to like', 'enjoy', 'love'],
+    'love': ['to love', 'adore'],
+    'hate': ['to hate', 'dislike'],
+    'try': ['to try', 'attempt'],
+    'use': ['to use', 'utilize', 'employ'],
+    'find': ['to find', 'discover', 'locate'],
+    'get': ['to get', 'obtain', 'receive'],
+    'come': ['to come', 'arrive'],
+    'go': ['to go', 'travel', 'move'],
+    'buy': ['to buy', 'purchase'],
+    'sell': ['to sell', 'vend']
+  };
+
+  function findTransposition(a, b) {
+    if (a.length !== b.length) return -1;
+    let diffs = [];
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) diffs.push(i);
+    if (diffs.length !== 2) return -1;
+    const [p1, p2] = diffs;
+    if (a[p1] === b[p2] && a[p2] === b[p1]) return Math.min(p1, p2);
+    return -1;
+  }
+
+  function getLevenshteinDistance(a, b) {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    const m = [];
+    for (let i = 0; i <= b.length; i++) m[i] = [i];
+    for (let j = 0; j <= a.length; j++) m[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) m[i][j] = m[i - 1][j - 1];
+        else m[i][j] = Math.min(m[i - 1][j - 1] + 1, m[i][j - 1] + 1, m[i - 1][j] + 1);
+      }
+    }
+    return m[b.length][a.length];
+  }
+
+  // Pure: gibt { verdict:'correct'|'half'|'wrong', reason, isSynonym } zurück
+  function evaluateAnswer(userAnswer, vocab) {
+    if (!userAnswer || !userAnswer.trim()) return { verdict: 'wrong', reason: 'empty' };
+    const correctAnswer = vocab.English;
+    let userNorm = userAnswer.toLowerCase().trim();
+    let correctNorm = (correctAnswer || '').toLowerCase().trim();
+
+    const removePunctuation = (t) => t.replace(/[.!?,;:…]+$/g, '').trim();
+    userNorm = removePunctuation(userNorm);
+    correctNorm = removePunctuation(correctNorm);
+
+    const normalizeContractions = (text) => text
+      .replace(/\bisn't\b/gi, 'is not').replace(/\baren't\b/gi, 'are not')
+      .replace(/\bwasn't\b/gi, 'was not').replace(/\bweren't\b/gi, 'were not')
+      .replace(/\bhasn't\b/gi, 'has not').replace(/\bhaven't\b/gi, 'have not')
+      .replace(/\bhadn't\b/gi, 'had not').replace(/\bwon't\b/gi, 'will not')
+      .replace(/\bwouldn't\b/gi, 'would not').replace(/\bshan't\b/gi, 'shall not')
+      .replace(/\bshouldn't\b/gi, 'should not').replace(/\bcan't\b/gi, 'can not')
+      .replace(/\bcannot\b/gi, 'can not').replace(/\bcouldn't\b/gi, 'could not')
+      .replace(/\bmightn't\b/gi, 'might not').replace(/\bmustn't\b/gi, 'must not')
+      .replace(/\bneedn't\b/gi, 'need not').replace(/\bdon't\b/gi, 'do not')
+      .replace(/\bdoesn't\b/gi, 'does not').replace(/\bdidn't\b/gi, 'did not')
+      .replace(/\bi'm\b/gi, 'i am').replace(/\byou're\b/gi, 'you are')
+      .replace(/\bhe's\b/gi, 'he is').replace(/\bshe's\b/gi, 'she is')
+      .replace(/\bit's\b/gi, 'it is').replace(/\bwe're\b/gi, 'we are')
+      .replace(/\bthey're\b/gi, 'they are').replace(/\bthat's\b/gi, 'that is')
+      .replace(/\bwho's\b/gi, 'who is').replace(/\bwhat's\b/gi, 'what is')
+      .replace(/\bwhere's\b/gi, 'where is').replace(/\bwhen's\b/gi, 'when is')
+      .replace(/\bwhy's\b/gi, 'why is').replace(/\bhow's\b/gi, 'how is')
+      .replace(/\bthere's\b/gi, 'there is').replace(/\bhere's\b/gi, 'here is')
+      .replace(/\bi've\b/gi, 'i have').replace(/\byou've\b/gi, 'you have')
+      .replace(/\bwe've\b/gi, 'we have').replace(/\bthey've\b/gi, 'they have')
+      .replace(/\bi'd\b/gi, 'i would').replace(/\byou'd\b/gi, 'you would')
+      .replace(/\bhe'd\b/gi, 'he would').replace(/\bshe'd\b/gi, 'she would')
+      .replace(/\bwe'd\b/gi, 'we would').replace(/\bthey'd\b/gi, 'they would')
+      .replace(/\bi'll\b/gi, 'i will').replace(/\byou'll\b/gi, 'you will')
+      .replace(/\bhe'll\b/gi, 'he will').replace(/\bshe'll\b/gi, 'she will')
+      .replace(/\bit'll\b/gi, 'it will').replace(/\bwe'll\b/gi, 'we will')
+      .replace(/\bthey'll\b/gi, 'they will').replace(/\bthat'll\b/gi, 'that will')
+      .trim();
+    userNorm = normalizeContractions(userNorm);
+    correctNorm = normalizeContractions(correctNorm);
+
+    const expandAbbreviations = (t) => t
+      .replace(/\bsb\./gi, 'somebody').replace(/\bsb\b/gi, 'somebody')
+      .replace(/\bsth\./gi, 'something').replace(/\bsth\b/gi, 'something').trim();
+    userNorm = expandAbbreviations(userNorm);
+    correctNorm = expandAbbreviations(correctNorm);
+
+    const correctNoBrackets = correctNorm.replace(/\s*\([^)]*\)/g, '').trim();
+    const userNoBrackets = userNorm;
+
+    // 1. Exakt
+    if (userNoBrackets === correctNoBrackets) return { verdict: 'correct' };
+    if (userNorm === correctNorm) return { verdict: 'correct' };
+
+    // 1b. Komma-Toleranz → halb
+    const userNoCommas = userNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+    const correctNoCommas = correctNoBrackets.replace(/,/g, '').replace(/\s+/g, ' ').trim();
+    if (userNoCommas === correctNoCommas && userNoBrackets !== correctNoBrackets)
+      return { verdict: 'half', reason: 'comma' };
+
+    // 1c. Substring (min 4 Zeichen)
+    const userNoSpaces = userNoBrackets.replace(/\s+/g, '');
+    const correctNoSpaces = correctNoBrackets.replace(/\s+/g, '');
+    if (userNoSpaces.length >= 4) {
+      if (correctNoSpaces.includes(userNoSpaces)) return { verdict: 'correct' };
+      if (userNoSpaces.includes(correctNoSpaces)) return { verdict: 'correct' };
+    }
+
+    // 2. Verb-Varianten ((to)/to)
+    const cleanVerb = (t) => t.toLowerCase().replace(/^\(to\)\s*/i, '').replace(/^to\s+/i, '').trim();
+    const userVerbClean = cleanVerb(userNoBrackets);
+    const correctVerbClean = cleanVerb(correctNoBrackets);
+    if (userVerbClean === correctVerbClean) return { verdict: 'correct' };
+
+    // 3. Synonyme aus Dictionary
+    const dictSyn = synonyms[correctNorm] || [];
+    if (dictSyn.includes(userNorm)) return { verdict: 'correct', isSynonym: true };
+
+    // 4. Synonyme aus Vokabel-Daten (PRIMÄR – jedes Wort hat eigene Liste)
+    if (vocab.synonyms && Array.isArray(vocab.synonyms)) {
+      const vs = vocab.synonyms.map(s => (s || '').toLowerCase().trim());
+      if (vs.includes(userNorm)) return { verdict: 'correct', isSynonym: true };
+      const vsClean = vs.map(s => cleanVerb(s));
+      if (vsClean.includes(userVerbClean)) return { verdict: 'correct', isSynonym: true };
+    }
+
+    // 5. Cross-Synonyme im Dictionary
+    for (let key in synonyms) {
+      if (synonyms[key].includes(correctNorm) && synonyms[key].includes(userNorm))
+        return { verdict: 'correct', isSynonym: true };
+      const keyClean = cleanVerb(key);
+      const synClean = synonyms[key].map(s => cleanVerb(s));
+      const correctClean = cleanVerb(correctNorm);
+      if ((keyClean === correctClean || synClean.includes(correctClean)) &&
+          (keyClean === userVerbClean || synClean.includes(userVerbClean)))
+        return { verdict: 'correct', isSynonym: true };
+    }
+
+    // Nonsense
+    if (/(.)\1{3,}/.test(userNorm)) return { verdict: 'wrong', reason: 'nonsense' };
+
+    // 6. Buchstabendreher → halb
+    if (userNoBrackets.length >= 3 && correctNoBrackets.length >= 3 &&
+        userNoBrackets.length === correctNoBrackets.length) {
+      if (findTransposition(userNoBrackets, correctNoBrackets) >= 0)
+        return { verdict: 'half', reason: 'transposition' };
+    }
+
+    // 7. Levenshtein 1-2 = Tippfehler (falsch, kein Synonym)
+    const dist = getLevenshteinDistance(userNoBrackets, correctNoBrackets);
+    if (dist >= 1 && dist <= 2) return { verdict: 'wrong', reason: 'typo' };
+
+    return { verdict: 'wrong', reason: 'unknown' };
+  }
+
+  function computePoints(verdict, answeredAt, startTime, deadline) {
+    if (verdict === 'wrong' || answeredAt == null) return 0;
+    const dur = Math.max(1, deadline - startTime);
+    const frac = Math.max(0, Math.min(1, (deadline - answeredAt) / dur));
+    let pts = 500 + Math.round(500 * frac);
+    if (verdict === 'half') pts = Math.round(pts / 2);
+    return pts;
+  }
+
+  // ============================================================
+  // HELFER
+  // ============================================================
+  const app = document.getElementById('app');
+  function h(html) { app.innerHTML = html; }
+  function el(id) { return document.getElementById(id); }
+  let toastTimer;
+  function toast(msg) {
+    const t = el('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+  function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function genCode() { return String(Math.floor(100000 + Math.random() * 900000)); }
+  function shuffle(arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function getCurrentUser() { try { return JSON.parse(localStorage.getItem('lmg_currentUser')); } catch (e) { return null; } }
+
+  async function loadVocabForYear(jahrgang) {
+    const url = `${GITHUB_BASE_URL}voc${jahrgang}_4.json?v=${Date.now()}`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json; charset=UTF-8' }, cache: 'reload' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = JSON.parse(await res.text());
+    const arr = Array.isArray(data) ? data : Object.values(data);
+    return arr.filter(v => v && v.English && v.German);
+  }
+
+  // ============================================================
+  // ROUTING
+  // ============================================================
+  const params = new URLSearchParams(location.search);
+  let role = params.get('role');
+
+  function start() {
+    if (!db) { h('<div class="panel center"><p>❌ Firebase nicht erreichbar. Bitte online & über die echte Domain öffnen.</p></div>'); return; }
+    if (role === 'host') HOST.setup();
+    else if (role === 'student') STU.join();
+    else renderLanding();
+  }
+
+  function renderLanding() {
+    h(`
+      <div class="role-grid">
+        <div class="role-card" onclick="window.__pick('host')">
+          <span class="emoji">🧑‍🏫</span><h3>Lehrkraft</h3>
+          <p>Raum eröffnen & Quiz leiten</p>
+        </div>
+        <div class="role-card" onclick="window.__pick('student')">
+          <span class="emoji">🎮</span><h3>Schüler:in</h3>
+          <p>Mit Raum-Code beitreten</p>
+        </div>
+      </div>
+    `);
+  }
+  window.__pick = (r) => { role = r; start(); };
+
+  // HOST und STU werden in den folgenden Script-Blöcken befüllt.
+  const HOST = {}, STU = {};
+  window.addEventListener('load', start);
+  </script>
+
+  <!-- ============================================================ -->
+  <!-- HOST-MODUL (Lehrkraft)                                       -->
+  <!-- ============================================================ -->
+  <script>
+  (function () {
+    let cfg = { jahrgang: null, pages: [], numRounds: 10, roundSeconds: 20, hostName: 'Lehrkraft' };
+    let allVocabs = [];      // geladene Vokabeln des Jahrgangs
+    let pool = [];           // gefiltert nach gewählten Seiten
+    let rounds = [];         // Antwort-Key (nur Host-RAM, NIE in DB)
+    let code = null, roomRef = null, playersRef = null, playersListener = null;
+    let players = {};        // {id: {name, score}}
+    let roundIdx = -1, roundTimer = null;
+
+    // ---- 1. SETUP ----
+    HOST.setup = function () {
+      const u = getCurrentUser();
+      if (u && u.name) cfg.hostName = u.name;
+      h(`
+        <div class="panel">
+          <label>Dein Name (für die Anzeige)</label>
+          <input id="hostName" value="${esc(cfg.hostName)}" />
+          <label>Jahrgang</label>
+          <select id="jahrgang">
+            <option value="">– wählen –</option>
+            ${[5,6,7,8,9,10].map(j => `<option value="${j}">Klasse ${j}</option>`).join('')}
+          </select>
+          <div id="pagesWrap" class="hidden">
+            <label>Vokabelseiten <span id="pageHint" class="muted"></span></label>
+            <div class="row" style="margin-bottom:8px">
+              <button type="button" class="btn-ghost" onclick="HOST._allPages(true)">Alle</button>
+              <button type="button" class="btn-ghost" onclick="HOST._allPages(false)">Keine</button>
+            </div>
+            <div id="pagesGrid" class="pages-grid"></div>
+          </div>
+          <div class="row">
+            <div><label>Runden</label><input id="numRounds" type="number" min="1" max="50" value="10" /></div>
+            <div><label>Sekunden/Runde</label><input id="roundSeconds" type="number" min="5" max="120" value="20" /></div>
+          </div>
+          <button class="btn-primary btn-block" onclick="HOST._createRoom()">Raum eröffnen 🚀</button>
+          <div class="center"><a class="back-link" href="?">← zurück</a></div>
+        </div>
+      `);
+      el('jahrgang').addEventListener('change', HOST._loadPages);
+    };
+
+    HOST._loadPages = async function () {
+      const j = el('jahrgang').value;
+      if (!j) { el('pagesWrap').classList.add('hidden'); return; }
+      el('pagesWrap').classList.remove('hidden');
+      el('pagesGrid').innerHTML = '<div class="spinner"></div>';
+      try {
+        allVocabs = await loadVocabForYear(j);
+        cfg.jahrgang = j;
+        const pageSet = {};
+        allVocabs.forEach(v => { const p = String(v.Page || '?'); pageSet[p] = (pageSet[p] || 0) + 1; });
+        const pages = Object.keys(pageSet).sort((a, b) => (parseInt(a) || 0) - (parseInt(b) || 0));
+        el('pageHint').textContent = `(${allVocabs.length} Vokabeln, ${pages.length} Seiten)`;
+        el('pagesGrid').innerHTML = pages.map(p =>
+          `<label class="page-chk" data-page="${esc(p)}">
+             <input type="checkbox" value="${esc(p)}" onchange="HOST._togglePage(this)"> S.${esc(p)} <span class="muted">(${pageSet[p]})</span>
+           </label>`).join('');
+      } catch (e) {
+        el('pagesGrid').innerHTML = `<p>❌ Vokabeln konnten nicht geladen werden (${esc(e.message)}).</p>`;
+      }
+    };
+
+    HOST._togglePage = function (input) {
+      input.closest('.page-chk').classList.toggle('on', input.checked);
+    };
+    HOST._allPages = function (on) {
+      document.querySelectorAll('#pagesGrid input').forEach(c => { c.checked = on; HOST._togglePage(c); });
+    };
+
+    // ---- 2. RAUM ERSTELLEN ----
+    HOST._createRoom = async function () {
+      cfg.hostName = (el('hostName').value || 'Lehrkraft').trim();
+      cfg.numRounds = Math.max(1, parseInt(el('numRounds').value) || 10);
+      cfg.roundSeconds = Math.max(5, parseInt(el('roundSeconds').value) || 20);
+      cfg.pages = [...document.querySelectorAll('#pagesGrid input:checked')].map(c => c.value);
+      if (!cfg.jahrgang) { toast('Bitte Jahrgang wählen'); return; }
+      if (cfg.pages.length === 0) { toast('Bitte mindestens eine Seite wählen'); return; }
+
+      pool = allVocabs.filter(v => cfg.pages.includes(String(v.Page || '?')));
+      if (pool.length < 1) { toast('Keine Vokabeln auf den gewählten Seiten'); return; }
+      cfg.numRounds = Math.min(cfg.numRounds, pool.length);
+
+      await HOST._cleanupOldRooms();
+
+      code = genCode();
+      roomRef = db.ref('rooms/' + code);
+      playersRef = roomRef.child('players');
+      await roomRef.set({
+        status: 'lobby',
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        host: { name: cfg.hostName },
+        config: { jahrgang: cfg.jahrgang, pages: cfg.pages, numRounds: cfg.numRounds, roundSeconds: cfg.roundSeconds }
+      });
+      roomRef.onDisconnect().remove();
+      HOST._lobby();
+    };
+
+    HOST._cleanupOldRooms = async function () {
+      try {
+        const snap = await db.ref('rooms').once('value');
+        const all = snap.val() || {};
+        const cutoff = serverNow() - 30 * 60 * 1000; // 30 Min
+        const dead = [];
+        Object.keys(all).forEach(k => { const c = all[k] && all[k].createdAt; if (typeof c === 'number' && c < cutoff) dead.push(k); });
+        await Promise.all(dead.map(k => db.ref('rooms/' + k).remove()));
+        if (dead.length) console.log('Cleanup: ' + dead.length + ' alte Räume entfernt');
+      } catch (e) { console.warn('Cleanup übersprungen:', e.message); }
+    };
+
+    // ---- 3. LOBBY ----
+    HOST._lobby = function () {
+      h(`
+        <div class="panel">
+          <div class="code-display">
+            <div class="label">Raum-Code</div>
+            <div class="code">${code}</div>
+          </div>
+          <div class="center muted">Schüler öffnen <b>battlearena</b> und geben den Code ein.</div>
+          <div style="margin:18px 0 6px" class="center">
+            <span class="count-badge" id="pcount">0</span> Spieler:innen
+          </div>
+          <div class="players" id="players"></div>
+          <button class="btn-primary btn-block" onclick="HOST._startGame()">Spiel starten ▶</button>
+          <div class="center"><a class="back-link" href="#" onclick="HOST._abort();return false">Raum schließen</a></div>
+        </div>
+      `);
+      if (playersListener) playersRef.off('value', playersListener);
+      playersListener = playersRef.on('value', snap => {
+        players = snap.val() || {};
+        const ids = Object.keys(players);
+        el('pcount').textContent = ids.length;
+        const pl = el('players');
+        if (pl) pl.innerHTML = ids.map(id => `<span class="player-chip">${esc(players[id].name)}</span>`).join('') || '<span class="muted">Noch niemand…</span>';
+      });
+    };
+
+    HOST._abort = async function () {
+      try { roomRef && await roomRef.remove(); } catch (e) {}
+      role = null; start();
+    };
+
+    // ---- 4. SPIEL ----
+    HOST._startGame = function () {
+      const ids = Object.keys(players);
+      if (ids.length === 0) { toast('Noch keine Spieler im Raum'); return; }
+      rounds = shuffle(pool).slice(0, cfg.numRounds);
+      roundIdx = -1;
+      roomRef.update({ status: 'running' });
+      HOST._nextRound();
+    };
+
+    HOST._nextRound = function () {
+      roundIdx++;
+      if (roundIdx >= rounds.length) { HOST._finish(); return; }
+      const v = rounds[roundIdx];
+      const startTime = serverNow();
+      const deadline = startTime + cfg.roundSeconds * 1000;
+      roomRef.child('currentRound').set({
+        nr: roundIdx + 1, total: rounds.length, phase: 'question',
+        prompt: v.German, page: v.Page || '', startTime, deadline
+        // Lösung (English/synonyms) bleibt NUR im Host-RAM
+      });
+      roomRef.update({ createdAt: firebase.database.ServerValue.TIMESTAMP }); // "letzte Aktivität"
+      HOST._renderQuestion(v, startTime, deadline);
+      clearTimeout(roundTimer);
+      roundTimer = setTimeout(() => HOST._endRound(), cfg.roundSeconds * 1000 + 1500); // +Grace
+    };
+
+    HOST._renderQuestion = function (v, startTime, deadline) {
+      h(`
+        <div class="panel">
+          <div class="round-meta"><span>Runde ${roundIdx + 1} / ${rounds.length}</span><span id="answeredCount">0 Antworten</span></div>
+          <div class="timer-bar"><div class="timer-fill" id="tfill" style="width:100%"></div></div>
+          <div class="prompt-box"><div class="de">${esc(v.German)}</div><div class="hint">Schüler tippen die englische Vokabel…</div></div>
+          <div class="center muted">Lösung: <b>${esc(v.English)}</b></div>
+        </div>
+      `);
+      const tick = setInterval(() => {
+        const rem = deadline - serverNow();
+        const fill = el('tfill');
+        if (!fill) { clearInterval(tick); return; }
+        const pct = Math.max(0, Math.min(100, (rem / (deadline - startTime)) * 100));
+        fill.style.width = pct + '%';
+        if (pct < 30) fill.style.background = 'var(--bad)';
+        else if (pct < 60) fill.style.background = 'var(--half)';
+        if (rem <= 0) clearInterval(tick);
+      }, 200);
+      // Live-Antwortzähler
+      const ansRef = playersRef;
+      const liveCount = () => {
+        ansRef.once('value', s => {
+          const p = s.val() || {};
+          const n = Object.keys(p).filter(id => p[id].answers && p[id].answers[roundIdx + 1]).length;
+          const elc = el('answeredCount'); if (elc) elc.textContent = n + ' Antworten';
+        });
+      };
+      const ci = setInterval(liveCount, 800);
+      setTimeout(() => clearInterval(ci), cfg.roundSeconds * 1000 + 2000);
+    };
+
+    // ---- 5. AUSWERTUNG ----
+    HOST._endRound = async function () {
+      const v = rounds[roundIdx];
+      const snap = await playersRef.once('value');
+      const p = snap.val() || {};
+      const cur = (await roomRef.child('currentRound').once('value')).val() || {};
+      const startTime = cur.startTime, deadline = cur.deadline;
+      const updates = {};
+      const results = [];
+      Object.keys(p).forEach(id => {
+        const ans = p[id].answers && p[id].answers[roundIdx + 1];
+        let verdict = 'wrong', pts = 0;
+        if (ans && ans.given != null) {
+          const r = evaluateAnswer(ans.given, v);
+          verdict = r.verdict;
+          pts = computePoints(verdict, ans.answeredAt, startTime, deadline);
+        }
+        const newScore = (p[id].score || 0) + pts;
+        updates['players/' + id + '/score'] = newScore;
+        results.push({ id, name: p[id].name, points: pts, verdict, totalScore: newScore });
+      });
+      results.sort((a, b) => b.totalScore - a.totalScore);
+      updates['currentRound/phase'] = 'reveal';
+      updates['currentRound/answer'] = v.English;
+      updates['currentRound/results'] = results;
+      await roomRef.update(updates);
+      HOST._renderReveal(v, results);
+    };
+
+    HOST._renderReveal = function (v, results) {
+      const last = roundIdx + 1 >= rounds.length;
+      h(`
+        <div class="panel">
+          <div class="round-meta"><span>Runde ${roundIdx + 1} / ${rounds.length}</span><span>Auflösung</span></div>
+          <div class="reveal-answer">Richtig: <b>${esc(v.English)}</b>${v.synonyms && v.synonyms.length ? `<div class="muted" style="font-size:13px;margin-top:4px">auch: ${esc(v.synonyms.join(', '))}</div>` : ''}</div>
+          <ol class="lb">${HOST._lbHtml(results)}</ol>
+          <button class="btn-primary btn-block" onclick="HOST._nextRound()">${last ? 'Endergebnis 🏆' : 'Nächste Runde ▶'}</button>
+        </div>
+      `);
+    };
+
+    HOST._lbHtml = function (results) {
+      return results.slice(0, 8).map((r, i) => `
+        <li>
+          <span class="rank">${i + 1}</span>
+          <span class="nm">${esc(r.name)}</span>
+          ${r.points > 0 ? `<span class="delta">+${r.points}</span>` : `<span class="delta" style="color:var(--bad)">+0</span>`}
+          <span class="sc">${r.totalScore}</span>
+        </li>`).join('');
+    };
+
+    // ---- 6. SIEGEREHRUNG ----
+    HOST._finish = async function () {
+      clearTimeout(roundTimer);
+      const snap = await playersRef.once('value');
+      const p = snap.val() || {};
+      const final = Object.keys(p).map(id => ({ id, name: p[id].name, score: p[id].score || 0 })).sort((a, b) => b.score - a.score);
+      await roomRef.update({ status: 'finished', 'currentRound/phase': 'finished', 'currentRound/results': final.map(f => ({ id: f.id, name: f.name, totalScore: f.score, points: 0, verdict: 'final' })) });
+      const [p1, p2, p3] = final;
+      h(`
+        <div class="panel center">
+          <h2 style="margin-bottom:6px">🏆 Siegerehrung</h2>
+          <div class="podium">
+            <div class="pod p2">${p2 ? `<div class="medal">🥈</div><div class="pname">${esc(p2.name)}</div><div class="pscore">${p2.score}</div>` : ''}</div>
+            <div class="pod p1">${p1 ? `<div class="medal">🥇</div><div class="pname">${esc(p1.name)}</div><div class="pscore">${p1.score}</div>` : ''}</div>
+            <div class="pod p3">${p3 ? `<div class="medal">🥉</div><div class="pname">${esc(p3.name)}</div><div class="pscore">${p3.score}</div>` : ''}</div>
+          </div>
+          <ol class="lb" style="text-align:left">${final.slice(3, 12).map((r, i) => `<li><span class="rank">${i + 4}</span><span class="nm">${esc(r.name)}</span><span class="sc">${r.score}</span></li>`).join('')}</ol>
+          <button class="btn-primary btn-block" onclick="HOST._abort()">Raum schließen ✓</button>
+        </div>
+      `);
+    };
+  })();
+  </script>
+
+  <!-- ============================================================ -->
+  <!-- STUDENT-MODUL (Schüler:in)                                   -->
+  <!-- ============================================================ -->
+  <script>
+  (function () {
+    let code = null, myId = null, myName = null;
+    let roomRef = null, roomListener = null;
+    let answeredRound = 0;      // letzte beantwortete Rundennummer
+    let renderedPhaseKey = '';  // verhindert Re-Render desselben Zustands
+    let timerInt = null;
+
+    STU.join = function () {
+      const u = getCurrentUser();
+      myName = (u && u.name) || '';
+      myId = (u && u.userKey) || ('guest_' + Math.random().toString(36).slice(2, 9));
+      const preCode = params.get('code') || '';
+      h(`
+        <div class="panel">
+          <label>Raum-Code</label>
+          <input id="joinCode" inputmode="numeric" maxlength="6" placeholder="z. B. 123456" value="${esc(preCode)}" style="font-size:24px;text-align:center;letter-spacing:6px" />
+          <label>Dein Name</label>
+          <input id="joinName" value="${esc(myName)}" placeholder="Vorname" />
+          <button class="btn-primary btn-block" onclick="STU._doJoin()">Beitreten 🎮</button>
+          <div class="center"><a class="back-link" href="?">← zurück</a></div>
+        </div>
+      `);
+    };
+
+    STU._doJoin = async function () {
+      const c = (el('joinCode').value || '').trim();
+      const nm = (el('joinName').value || '').trim();
+      if (!/^\d{4,6}$/.test(c)) { toast('Bitte gültigen Code eingeben'); return; }
+      if (!nm) { toast('Bitte Namen eingeben'); return; }
+      myName = nm; code = c;
+      const ref = db.ref('rooms/' + code);
+      const snap = await ref.once('value');
+      if (!snap.exists()) { toast('Raum nicht gefunden'); return; }
+      const room = snap.val();
+      if (room.status === 'finished') { toast('Spiel ist bereits vorbei'); return; }
+      roomRef = ref;
+      // Spieler eintragen (Score NICHT überschreiben falls Reconnect)
+      const pSnap = await ref.child('players/' + myId).once('value');
+      if (!pSnap.exists()) {
+        await ref.child('players/' + myId).set({ name: myName, score: 0, joinedAt: firebase.database.ServerValue.TIMESTAMP });
+      } else {
+        await ref.child('players/' + myId + '/name').set(myName);
+      }
+      STU._listen();
+    };
+
+    STU._listen = function () {
+      if (roomListener) roomRef.off('value', roomListener);
+      roomListener = roomRef.on('value', snap => {
+        if (!snap.exists()) { STU._roomClosed(); return; }
+        STU._render(snap.val());
+      });
+    };
+
+    STU._roomClosed = function () {
+      if (roomListener) { roomRef.off('value', roomListener); roomListener = null; }
+      h(`<div class="panel center"><h2>👋 Raum geschlossen</h2><p class="muted" style="margin-top:8px">Die Lehrkraft hat den Raum beendet.</p><a class="back-link" href="?">← zurück</a></div>`);
+    };
+
+    STU._render = function (room) {
+      if (room.status === 'lobby') return STU._lobby(room);
+      if (room.status === 'finished') return STU._podium(room);
+      // running
+      const cr = room.currentRound;
+      if (!cr) return STU._lobby(room);
+      if (cr.phase === 'question') return STU._question(cr);
+      if (cr.phase === 'reveal') return STU._reveal(cr);
+      if (cr.phase === 'finished') return STU._podium(room);
+    };
+
+    STU._lobby = function (room) {
+      const key = 'lobby';
+      if (renderedPhaseKey === key) { const c = el('lobCount'); if (c) c.textContent = Object.keys(room.players || {}).length; return; }
+      renderedPhaseKey = key;
+      h(`
+        <div class="panel center">
+          <h2>✅ Du bist drin!</h2>
+          <p style="margin:10px 0" class="muted">Warte, bis die Lehrkraft startet…</p>
+          <div class="spinner"></div>
+          <p><span class="count-badge"><span id="lobCount">${Object.keys(room.players || {}).length}</span></span> Spieler:innen warten</p>
+        </div>
+      `);
+    };
+
+    STU._question = function (cr) {
+      const key = 'q' + cr.nr;
+      const already = answeredRound >= cr.nr;
+      // Schon im Frage- oder Warte-Screen dieser Runde? Nicht neu rendern (Eingabe/Flicker schützen)
+      if (renderedPhaseKey === key || renderedPhaseKey === 'wait' + cr.nr) return;
+      if (already) { STU._waiting(cr); return; }
+      renderedPhaseKey = key;
+      h(`
+        <div class="panel">
+          <div class="round-meta"><span>Runde ${cr.nr} / ${cr.total}</span><span id="rem"></span></div>
+          <div class="timer-bar"><div class="timer-fill" id="tfill" style="width:100%"></div></div>
+          <div class="prompt-box"><div class="de">${esc(cr.prompt)}</div><div class="hint">englische Vokabel eingeben</div></div>
+          <input id="answer" class="big-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="…" />
+          <button class="btn-primary btn-block" onclick="STU._submit()">Abschicken ✓</button>
+        </div>
+      `);
+      const inp = el('answer');
+      inp.focus();
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') STU._submit(); });
+      STU._runTimer(cr, () => STU._submit(true));
+    };
+
+    STU._runTimer = function (cr, onExpire) {
+      clearInterval(timerInt);
+      timerInt = setInterval(() => {
+        const rem = cr.deadline - serverNow();
+        const fill = el('tfill');
+        if (!fill) { clearInterval(timerInt); return; }
+        const pct = Math.max(0, Math.min(100, (rem / (cr.deadline - cr.startTime)) * 100));
+        fill.style.width = pct + '%';
+        if (pct < 30) fill.style.background = 'var(--bad)'; else if (pct < 60) fill.style.background = 'var(--half)';
+        const r = el('rem'); if (r) r.textContent = Math.max(0, Math.ceil(rem / 1000)) + 's';
+        if (rem <= 0) { clearInterval(timerInt); if (onExpire) onExpire(); }
+      }, 200);
+    };
+
+    STU._submit = async function (auto) {
+      const inp = el('answer');
+      const cr = (await roomRef.child('currentRound').once('value')).val();
+      if (!cr || cr.phase !== 'question') return;
+      if (answeredRound >= cr.nr) return;
+      const given = inp ? inp.value.trim() : '';
+      if (!auto && !given) { toast('Bitte etwas eingeben'); return; }
+      answeredRound = cr.nr;
+      clearInterval(timerInt);
+      await roomRef.child('players/' + myId + '/answers/' + cr.nr).set({ given: given, answeredAt: serverNow() });
+      STU._waiting(cr);
+    };
+
+    STU._waiting = function (cr) {
+      renderedPhaseKey = 'wait' + cr.nr;
+      h(`
+        <div class="panel center">
+          <h2>📤 Antwort abgegeben!</h2>
+          <p class="muted" style="margin:10px 0">Warte auf die anderen…</p>
+          <div class="spinner"></div>
+          <div class="round-meta" style="justify-content:center"><span>Runde ${cr.nr} / ${cr.total}</span></div>
+        </div>
+      `);
+    };
+
+    STU._reveal = function (cr) {
+      const key = 'r' + cr.nr;
+      if (renderedPhaseKey === key) return;
+      renderedPhaseKey = key;
+      const results = cr.results || [];
+      const me = results.find(r => r.id === myId);
+      let vClass = 'wrong', vText = '❌ Leider falsch', pts = 0;
+      if (me) {
+        pts = me.points || 0;
+        if (me.verdict === 'correct') { vClass = 'correct'; vText = '✅ Richtig!'; }
+        else if (me.verdict === 'half') { vClass = 'half'; vText = '➗ Fast! (halbe Punkte)'; }
+      }
+      const myRank = me ? (results.findIndex(r => r.id === myId) + 1) : null;
+      h(`
+        <div class="panel">
+          <div class="verdict ${vClass}">${vText}<span class="pts">+${pts}</span></div>
+          <div class="reveal-answer">Richtig war: <b>${esc(cr.answer)}</b></div>
+          ${myRank ? `<div class="center muted" style="margin-bottom:12px">Dein Platz: <b>${myRank}.</b></div>` : ''}
+          <ol class="lb">${results.slice(0, 8).map((r, i) => `<li class="${r.id === myId ? 'me' : ''}"><span class="rank">${i + 1}</span><span class="nm">${esc(r.name)}</span><span class="sc">${r.totalScore}</span></li>`).join('')}</ol>
+          <p class="center muted" style="margin-top:8px">Warte auf die nächste Runde…</p>
+        </div>
+      `);
+    };
+
+    STU._podium = function (room) {
+      if (renderedPhaseKey === 'final') return;
+      renderedPhaseKey = 'final';
+      clearInterval(timerInt);
+      const results = (room.currentRound && room.currentRound.results) ||
+        Object.keys(room.players || {}).map(id => ({ id, name: room.players[id].name, totalScore: room.players[id].score || 0 }));
+      results.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+      const [p1, p2, p3] = results;
+      const myRank = results.findIndex(r => r.id === myId) + 1;
+      h(`
+        <div class="panel center">
+          <h2>🏆 Endergebnis</h2>
+          <div class="podium">
+            <div class="pod p2">${p2 ? `<div class="medal">🥈</div><div class="pname">${esc(p2.name)}</div><div class="pscore">${p2.totalScore}</div>` : ''}</div>
+            <div class="pod p1">${p1 ? `<div class="medal">🥇</div><div class="pname">${esc(p1.name)}</div><div class="pscore">${p1.totalScore}</div>` : ''}</div>
+            <div class="pod p3">${p3 ? `<div class="medal">🥉</div><div class="pname">${esc(p3.name)}</div><div class="pscore">${p3.totalScore}</div>` : ''}</div>
+          </div>
+          ${myRank ? `<p style="font-size:18px;font-weight:700">Dein Platz: ${myRank}. 🎉</p>` : ''}
+          <ol class="lb" style="text-align:left;margin-top:14px">${results.slice(3, 12).map((r, i) => `<li class="${r.id === myId ? 'me' : ''}"><span class="rank">${i + 4}</span><span class="nm">${esc(r.name)}</span><span class="sc">${r.totalScore}</span></li>`).join('')}</ol>
+          <a class="back-link" href="?">← zurück</a>
+        </div>
+      `);
+    };
+  })();
+  </script>
+</body>
+</html>
