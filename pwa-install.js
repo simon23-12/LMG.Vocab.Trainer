@@ -13,17 +13,30 @@
       navigator.serviceWorker.register('/service-worker.js')
         .then(registration => {
           console.log('[PWA] Service Worker registered:', registration.scope);
-          
+
+          // Auto-Update: still neu laden, sobald ein neuer SW die Kontrolle übernimmt.
+          // updateArmed wird nur bei einem ECHTEN Update gesetzt (nie beim Erst-Install),
+          // refreshing verhindert eine Reload-Schleife.
+          let updateArmed = false;
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!updateArmed || refreshing) return;
+            refreshing = true;
+            console.log('[PWA] Neue Version aktiv – lade automatisch neu');
+            window.location.reload();
+          });
+
           // Check for updates
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
             console.log('[PWA] New Service Worker found');
-            
+
             newWorker.addEventListener('statechange', () => {
+              // controller existiert nur, wenn bereits eine alte Version lief → echtes Update.
+              // Der SW ruft skipWaiting()+clients.claim() → controllerchange feuert → Auto-Reload.
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Neue Version verfügbar
-                console.log('[PWA] New version available - refresh to update');
-                showUpdateNotification();
+                console.log('[PWA] Update installiert – aktiviere Auto-Reload');
+                updateArmed = true;
               }
             });
           });
@@ -168,51 +181,6 @@
 
     deferredPrompt = null;
     hideInstallButton();
-  }
-
-  // Update-Benachrichtigung
-  function showUpdateNotification() {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #0066CC;
-      color: white;
-      padding: 16px 24px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      animation: slideDown 0.3s ease-out;
-    `;
-    
-    notification.innerHTML = `
-      <span>Neue Version verfügbar!</span>
-      <button id="pwa-update-btn" style="
-        background: white;
-        color: #0066CC;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-      ">Aktualisieren</button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    document.getElementById('pwa-update-btn').onclick = () => {
-      window.location.reload();
-    };
-    
-    // Auto-dismiss nach 10 Sekunden
-    setTimeout(() => {
-      notification.remove();
-    }, 10000);
   }
 
   // iOS Installations-Hinweis

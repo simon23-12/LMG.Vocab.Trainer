@@ -2,8 +2,10 @@
 // Leibniz Montessori Gymnasium Düsseldorf
 // Version 1.0 - PWA Support
 
-const CACHE_NAME = 'lmg-vocab-v2';
-const RUNTIME_CACHE = 'lmg-vocab-runtime-v2';
+// ⚠️ BEI JEDEM DEPLOY HOCHZÄHLEN (v3 → v4 → …). Löst den Auto-Reload bei allen Usern aus.
+const VERSION = 'v3';
+const CACHE_NAME = 'lmg-vocab-' + VERSION;
+const RUNTIME_CACHE = 'lmg-vocab-runtime-' + VERSION;
 
 // Dateien die beim Install gecacht werden sollen
 const PRECACHE_URLS = [
@@ -14,6 +16,8 @@ const PRECACHE_URLS = [
   '/irrverbtrainer.html',
   '/teacher-dashboard.html',
   '/overview.html',
+  '/battlearena.html',
+  '/pwa-install.js',
   '/images/montiwhite.png',
   '/images/montigame.jpg',
   '/images/montilanded.jpg',
