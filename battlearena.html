@@ -120,12 +120,17 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .back-link { color: var(--muted); text-decoration: none; font-size: 14px; display: inline-block; margin-top: 16px; }
     .back-link:hover { color: #fff; }
+    .top-controls { display: flex; justify-content: center; margin-bottom: 12px; }
+    .music-toggle { min-width: 180px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>⚔️ Battlearena</h1>
     <div class="sub">LMG Vokabel-Duell · Live im Klassenraum</div>
+    <div class="top-controls">
+      <button id="musicToggle" class="btn-ghost music-toggle" type="button" onclick="toggleBattleMusic()">🎵 Musik starten</button>
+    </div>
     <div id="app"></div>
   </div>
   <div id="toast" class="toast"></div>
@@ -392,6 +397,71 @@
   function shuffle(arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function getCurrentUser() { try { return JSON.parse(localStorage.getItem('lmg_currentUser')); } catch (e) { return null; } }
 
+  const BATTLE_MUSIC_KEY = 'lmg_battlearena_music';
+  const battleMusic = new Audio('musicbattle.mp3');
+  battleMusic.loop = true;
+  battleMusic.preload = 'auto';
+  let battleMusicOn = false;
+
+  function updateMusicButton() {
+    const btn = el('musicToggle');
+    if (!btn) return;
+    btn.textContent = battleMusicOn ? '🔇 Musik stoppen' : '🎵 Musik starten';
+    btn.setAttribute('aria-pressed', battleMusicOn ? 'true' : 'false');
+  }
+
+  async function toggleBattleMusic() {
+    try {
+      if (!battleMusicOn) {
+        await battleMusic.play();
+        battleMusicOn = true;
+      } else {
+        battleMusic.pause();
+        battleMusicOn = false;
+      }
+      localStorage.setItem(BATTLE_MUSIC_KEY, battleMusicOn ? '1' : '0');
+      updateMusicButton();
+    } catch (e) {
+      battleMusicOn = false;
+      updateMusicButton();
+      toast('Musik konnte nicht gestartet werden');
+    }
+  }
+  window.toggleBattleMusic = toggleBattleMusic;
+
+  function initBattleMusic() {
+    battleMusicOn = localStorage.getItem(BATTLE_MUSIC_KEY) === '1';
+    updateMusicButton();
+  }
+
+  function animateCounters(scope) {
+    const root = scope || document;
+    const nodes = root.querySelectorAll('[data-count-to]');
+    nodes.forEach((node, i) => {
+      const to = parseInt(node.getAttribute('data-count-to') || '0', 10) || 0;
+      const from = parseInt(node.getAttribute('data-count-from') || '0', 10) || 0;
+      const prefix = node.getAttribute('data-count-prefix') || '';
+      const delta = Math.abs(to - from);
+      const autoDuration = Math.max(420, Math.min(1500, 420 + Math.sqrt(delta) * 28));
+      const durationAttr = parseInt(node.getAttribute('data-count-duration') || '', 10);
+      const duration = Number.isFinite(durationAttr) ? Math.max(380, durationAttr) : autoDuration;
+      const delay = i * 70;
+      const startAt = performance.now() + delay;
+
+      const tick = (now) => {
+        if (now < startAt) { requestAnimationFrame(tick); return; }
+        const p = Math.min(1, (now - startAt) / duration);
+        const eased = 1 - Math.pow(1 - p, 2.4);
+        const value = Math.round(from + (to - from) * eased);
+        node.textContent = prefix + value;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+
+      node.textContent = prefix + from;
+      requestAnimationFrame(tick);
+    });
+  }
+
   async function loadVocabForYear(jahrgang) {
     const url = `${GITHUB_BASE_URL}voc${jahrgang}_4.json?v=${Date.now()}`;
     const res = await fetch(url, { headers: { 'Accept': 'application/json; charset=UTF-8' }, cache: 'reload' });
@@ -432,7 +502,10 @@
 
   // HOST und STU werden in den folgenden Script-Blöcken befüllt.
   const HOST = {}, STU = {};
-  window.addEventListener('load', start);
+  window.addEventListener('load', () => {
+    initBattleMusic();
+    start();
+  });
   </script>
 
   <!-- ============================================================ -->
@@ -613,7 +686,6 @@
           <div class="round-meta"><span>Runde ${roundIdx + 1} / ${rounds.length}</span><span id="answeredCount">0 Antworten</span></div>
           <div class="timer-bar"><div class="timer-fill" id="tfill" style="width:100%"></div></div>
           <div class="prompt-box"><div class="de">${esc(v.German)}</div><div class="hint">Schüler tippen die englische Vokabel…</div></div>
-          <div class="center muted">Lösung: <b>${esc(v.English)}</b></div>
         </div>
       `);
       const tick = setInterval(() => {
@@ -678,6 +750,7 @@
           <button class="btn-primary btn-block" onclick="HOST._nextRound()">${last ? 'Endergebnis 🏆' : 'Nächste Runde ▶'}</button>
         </div>
       `);
+      animateCounters(app);
     };
 
     HOST._lbHtml = function (results) {
@@ -685,8 +758,10 @@
         <li>
           <span class="rank">${i + 1}</span>
           <span class="nm">${esc(r.name)}</span>
-          ${r.points > 0 ? `<span class="delta">+${r.points}</span>` : `<span class="delta" style="color:var(--bad)">+0</span>`}
-          <span class="sc">${r.totalScore}</span>
+          ${r.points > 0
+            ? `<span class="delta" data-count-from="0" data-count-to="${r.points}" data-count-prefix="+">+0</span>`
+            : `<span class="delta" style="color:var(--bad)" data-count-from="0" data-count-to="0" data-count-prefix="+">+0</span>`}
+          <span class="sc" data-count-from="${Math.max(0, r.totalScore - (r.points || 0))}" data-count-to="${r.totalScore}">${Math.max(0, r.totalScore - (r.points || 0))}</span>
         </li>`).join('');
     };
 
@@ -702,14 +777,15 @@
         <div class="panel center">
           <h2 style="margin-bottom:6px">🏆 Siegerehrung</h2>
           <div class="podium">
-            <div class="pod p2">${p2 ? `<div class="medal">🥈</div><div class="pname">${esc(p2.name)}</div><div class="pscore">${p2.score}</div>` : ''}</div>
-            <div class="pod p1">${p1 ? `<div class="medal">🥇</div><div class="pname">${esc(p1.name)}</div><div class="pscore">${p1.score}</div>` : ''}</div>
-            <div class="pod p3">${p3 ? `<div class="medal">🥉</div><div class="pname">${esc(p3.name)}</div><div class="pscore">${p3.score}</div>` : ''}</div>
+            <div class="pod p2">${p2 ? `<div class="medal">🥈</div><div class="pname">${esc(p2.name)}</div><div class="pscore" data-count-from="0" data-count-to="${p2.score}">0</div>` : ''}</div>
+            <div class="pod p1">${p1 ? `<div class="medal">🥇</div><div class="pname">${esc(p1.name)}</div><div class="pscore" data-count-from="0" data-count-to="${p1.score}">0</div>` : ''}</div>
+            <div class="pod p3">${p3 ? `<div class="medal">🥉</div><div class="pname">${esc(p3.name)}</div><div class="pscore" data-count-from="0" data-count-to="${p3.score}">0</div>` : ''}</div>
           </div>
-          <ol class="lb" style="text-align:left">${final.slice(3, 12).map((r, i) => `<li><span class="rank">${i + 4}</span><span class="nm">${esc(r.name)}</span><span class="sc">${r.score}</span></li>`).join('')}</ol>
+          <ol class="lb" style="text-align:left">${final.slice(3, 12).map((r, i) => `<li><span class="rank">${i + 4}</span><span class="nm">${esc(r.name)}</span><span class="sc" data-count-from="0" data-count-to="${r.score}">0</span></li>`).join('')}</ol>
           <button class="btn-primary btn-block" onclick="HOST._abort()">Raum schließen ✓</button>
         </div>
       `);
+      animateCounters(app);
     };
   })();
   </script>
@@ -878,13 +954,14 @@
       const myRank = me ? (results.findIndex(r => r.id === myId) + 1) : null;
       h(`
         <div class="panel">
-          <div class="verdict ${vClass}">${vText}<span class="pts">+${pts}</span></div>
+          <div class="verdict ${vClass}">${vText}<span class="pts" data-count-from="0" data-count-to="${pts}" data-count-prefix="+">+0</span></div>
           <div class="reveal-answer">Richtig war: <b>${esc(cr.answer)}</b></div>
           ${myRank ? `<div class="center muted" style="margin-bottom:12px">Dein Platz: <b>${myRank}.</b></div>` : ''}
-          <ol class="lb">${results.slice(0, 8).map((r, i) => `<li class="${r.id === myId ? 'me' : ''}"><span class="rank">${i + 1}</span><span class="nm">${esc(r.name)}</span><span class="sc">${r.totalScore}</span></li>`).join('')}</ol>
+          <ol class="lb">${results.slice(0, 8).map((r, i) => `<li class="${r.id === myId ? 'me' : ''}"><span class="rank">${i + 1}</span><span class="nm">${esc(r.name)}</span><span class="sc" data-count-from="${Math.max(0, r.totalScore - (r.points || 0))}" data-count-to="${r.totalScore}">${Math.max(0, r.totalScore - (r.points || 0))}</span></li>`).join('')}</ol>
           <p class="center muted" style="margin-top:8px">Warte auf die nächste Runde…</p>
         </div>
       `);
+      animateCounters(app);
     };
 
     STU._podium = function (room) {
@@ -900,15 +977,16 @@
         <div class="panel center">
           <h2>🏆 Endergebnis</h2>
           <div class="podium">
-            <div class="pod p2">${p2 ? `<div class="medal">🥈</div><div class="pname">${esc(p2.name)}</div><div class="pscore">${p2.totalScore}</div>` : ''}</div>
-            <div class="pod p1">${p1 ? `<div class="medal">🥇</div><div class="pname">${esc(p1.name)}</div><div class="pscore">${p1.totalScore}</div>` : ''}</div>
-            <div class="pod p3">${p3 ? `<div class="medal">🥉</div><div class="pname">${esc(p3.name)}</div><div class="pscore">${p3.totalScore}</div>` : ''}</div>
+            <div class="pod p2">${p2 ? `<div class="medal">🥈</div><div class="pname">${esc(p2.name)}</div><div class="pscore" data-count-from="0" data-count-to="${p2.totalScore}">0</div>` : ''}</div>
+            <div class="pod p1">${p1 ? `<div class="medal">🥇</div><div class="pname">${esc(p1.name)}</div><div class="pscore" data-count-from="0" data-count-to="${p1.totalScore}">0</div>` : ''}</div>
+            <div class="pod p3">${p3 ? `<div class="medal">🥉</div><div class="pname">${esc(p3.name)}</div><div class="pscore" data-count-from="0" data-count-to="${p3.totalScore}">0</div>` : ''}</div>
           </div>
           ${myRank ? `<p style="font-size:18px;font-weight:700">Dein Platz: ${myRank}. 🎉</p>` : ''}
-          <ol class="lb" style="text-align:left;margin-top:14px">${results.slice(3, 12).map((r, i) => `<li class="${r.id === myId ? 'me' : ''}"><span class="rank">${i + 4}</span><span class="nm">${esc(r.name)}</span><span class="sc">${r.totalScore}</span></li>`).join('')}</ol>
+          <ol class="lb" style="text-align:left;margin-top:14px">${results.slice(3, 12).map((r, i) => `<li class="${r.id === myId ? 'me' : ''}"><span class="rank">${i + 4}</span><span class="nm">${esc(r.name)}</span><span class="sc" data-count-from="0" data-count-to="${r.totalScore}">0</span></li>`).join('')}</ol>
           <a class="back-link" href="?">← zurück</a>
         </div>
       `);
+      animateCounters(app);
     };
   })();
   </script>
