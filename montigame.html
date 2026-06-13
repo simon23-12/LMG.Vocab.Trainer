@@ -166,21 +166,24 @@
 
         #intro-screen .start-hint {
             font-size: 28px;
-            animation: pulse 1.5s infinite;
-            color: #0066CC;
-            font-weight: bold;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #FFB700;
-            padding: 15px 40px;
+            animation: pulse 1.8s ease-in-out infinite;
+            color: #0a3a7a;
+            font-weight: 800;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(180deg, #FFD86B, #FFB700);
+            padding: 16px 46px;
             border-radius: 50px;
             display: inline-block;
-            border: 3px solid #0066CC;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 10px 30px rgba(255, 170, 30, 0.5), inset 0 1px 0 rgba(255,255,255,0.7);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
         }
 
         #intro-screen .start-hint:hover {
-            transform: scale(1.1);
+            transform: translateY(-2px) scale(1.08);
+            filter: brightness(1.05);
+            box-shadow: 0 16px 38px rgba(255, 170, 30, 0.6), inset 0 1px 0 rgba(255,255,255,0.8);
         }
 
         @keyframes pulse {
@@ -194,7 +197,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 100, 200, 0.8);
+            background: rgba(10, 60, 130, 0.35);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -202,11 +207,11 @@
         }
 
         #countdown-screen .countdown-number {
-            font-size: 150px;
-            font-weight: bold;
-            color: #FFB700;
-            text-shadow: 5px 5px 0px #0066CC;
-            animation: countdownPop 0.5s ease-out;
+            font-size: 170px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 50px rgba(255, 200, 90, 0.9), 0 10px 30px rgba(0,0,0,0.35);
+            animation: countdownPop 0.5s cubic-bezier(.2,.9,.2,1.3);
         }
 
         @keyframes countdownPop {
@@ -217,83 +222,117 @@
 
         #game-ui {
             display: none;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        /* ---- Glassmorphism HUD ---- */
+        .hud-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.16);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(15, 40, 80, 0.25),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+            color: #fff;
+            text-align: center;
         }
 
         #altitude-meter {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 100, 200, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            border: 3px solid #FFB700;
-            min-width: 150px;
+            top: 18px;
+            right: 18px;
+            padding: 14px 20px 16px;
+            min-width: 132px;
+            background: rgba(20, 70, 130, 0.28);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(15, 40, 80, 0.28), inset 0 1px 0 rgba(255,255,255,0.45);
+            color: #fff;
             text-align: center;
         }
 
         #altitude-meter .label {
-            font-size: 14px;
-            margin-bottom: 5px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            opacity: 0.85;
+            margin-bottom: 2px;
         }
 
         #altitude-meter .value {
-            font-size: 36px;
-            font-weight: bold;
-            color: #FFB700;
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(255, 200, 90, 0.7);
         }
 
         #altitude-meter .unit {
-            font-size: 18px;
+            font-size: 15px;
+            opacity: 0.8;
+            font-weight: 600;
         }
 
         #streak-counter {
             position: absolute;
-            top: 150px;
-            right: 20px;
-            background: rgba(255, 183, 0, 0.9);
-            color: white;
+            top: 132px;
+            right: 18px;
             padding: 12px 18px;
-            border-radius: 15px;
-            border: 3px solid #0066CC;
-            min-width: 150px;
+            min-width: 132px;
+            background: rgba(255, 165, 0, 0.26);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(120, 70, 0, 0.25), inset 0 1px 0 rgba(255,255,255,0.5);
+            color: #fff;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.35s cubic-bezier(.2,.8,.2,1);
         }
 
         #streak-counter.boost-active {
-            background: rgba(0, 255, 0, 0.9);
-            border-color: #FFB700;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
-            animation: boostPulse 0.5s infinite;
+            background: rgba(56, 230, 160, 0.32);
+            border-color: rgba(200, 255, 230, 0.8);
+            box-shadow: 0 0 40px rgba(60, 240, 170, 0.7), inset 0 1px 0 rgba(255,255,255,0.6);
+            animation: boostPulse 0.6s ease-in-out infinite;
         }
 
         @keyframes boostPulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.08); }
         }
 
         #streak-counter .label {
-            font-size: 12px;
-            margin-bottom: 3px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            opacity: 0.9;
+            margin-bottom: 2px;
         }
 
         #streak-counter .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #0066CC;
+            font-size: 30px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.25);
         }
 
         #streak-counter.boost-active .value {
-            color: white;
+            color: #fff;
         }
 
         #boost-indicator {
             display: none;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 5px;
-            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            color: #fff;
+            text-shadow: 0 0 12px rgba(60, 240, 170, 0.9);
         }
 
         #streak-counter.boost-active #boost-indicator {
@@ -302,140 +341,172 @@
 
         #highscore-display {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 18px;
+            left: 18px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 20px;
-            border-radius: 15px;
-            border: 3px solid #FFB700;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.18);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 18px;
+            box-shadow: 0 8px 26px rgba(15, 40, 80, 0.22), inset 0 1px 0 rgba(255,255,255,0.5);
         }
 
         #highscore-display .label {
-            font-size: 14px;
-            color: #0066CC;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 700;
+            margin-bottom: 1px;
         }
 
         #highscore-display .value {
-            font-size: 36px;
-            font-weight: bold;
-            color: #FFB700;
-            text-shadow: 2px 2px 0px #0066CC;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: #FFD86B;
+            text-shadow: 0 2px 10px rgba(255, 180, 40, 0.6);
         }
 
         #score-display {
             position: absolute;
-            top: 120px;
-            left: 20px;
+            top: 100px;
+            left: 18px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 20px;
-            border-radius: 15px;
-            border: 3px solid #0066CC;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 12px 20px;
+            background: rgba(40, 110, 200, 0.26);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 18px;
+            box-shadow: 0 8px 26px rgba(15, 40, 80, 0.25), inset 0 1px 0 rgba(255,255,255,0.5);
         }
 
         #score-display .label {
-            font-size: 14px;
-            color: #0066CC;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 700;
+            margin-bottom: 1px;
         }
 
         #score-display .value {
-            font-size: 48px;
-            font-weight: bold;
-            color: #0066CC;
-            text-shadow: 2px 2px 0px #FFB700;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 46px;
+            font-weight: 800;
+            line-height: 1;
+            color: #fff;
+            text-shadow: 0 3px 14px rgba(0, 0, 0, 0.3);
+        }
+
+        /* sanftes "Pop" für animierte Zahlen */
+        .value.tick {
+            animation: numberTick 0.3s cubic-bezier(.2,.9,.2,1.4);
+        }
+        @keyframes numberTick {
+            0% { transform: scale(1); }
+            45% { transform: scale(1.28); }
+            100% { transform: scale(1); }
         }
 
         #vocab-input-container {
             position: absolute;
-            bottom: 50px;
+            bottom: 42px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px 30px;
-            border-radius: 15px;
-            border: 3px solid #0066CC;
-            min-width: 400px;
+            padding: 22px 28px 20px;
+            min-width: 420px;
+            background: rgba(255, 255, 255, 0.2);
+            -webkit-backdrop-filter: blur(22px) saturate(170%);
+            backdrop-filter: blur(22px) saturate(170%);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            border-radius: 26px;
+            box-shadow: 0 18px 50px rgba(10, 30, 70, 0.35), inset 0 1px 0 rgba(255,255,255,0.6);
             pointer-events: all;
         }
 
         #vocab-question {
-            font-size: 24px;
-            color: #0066CC;
-            margin-bottom: 10px;
+            font-size: 26px;
+            color: #fff;
+            margin-bottom: 14px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 14px rgba(10, 40, 90, 0.55);
         }
 
         #vocab-input {
             width: 100%;
-            padding: 15px;
-            font-size: 20px;
-            border: 2px solid #0066CC;
-            border-radius: 10px;
+            padding: 16px;
+            font-size: 21px;
+            font-weight: 600;
+            color: #0a2a55;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.82);
+            border-radius: 16px;
             text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin-bottom: 10px;
+            font-family: inherit;
+            margin-bottom: 14px;
+            transition: box-shadow 0.25s, border-color 0.25s, background 0.25s;
         }
+
+        #vocab-input::placeholder { color: #6b86a8; font-weight: 500; }
 
         #vocab-input:focus {
             outline: none;
-            border-color: #FFB700;
-            box-shadow: 0 0 10px rgba(255, 183, 0, 0.5);
+            border-color: #FFD86B;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 4px rgba(255, 200, 90, 0.35), 0 6px 20px rgba(255, 180, 40, 0.3);
         }
 
         #timer-bar-container {
             width: 100%;
             height: 8px;
-            background: #ddd;
-            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
             overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
         }
 
         #timer-bar {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, #FF0000, #FFB700, #00FF00);
+            background: linear-gradient(90deg, #ff5e5e, #FFB700 50%, #38e6a0);
+            border-radius: 6px;
             transition: width 0.1s linear;
             transform-origin: left;
+            box-shadow: 0 0 10px rgba(255, 200, 90, 0.7);
         }
 
         #feedback {
             position: absolute;
-            top: 50%;
+            top: 46%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 48px;
-            font-weight: bold;
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: 1px;
             display: none;
-            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
-            animation: feedbackPop 0.5s ease-out;
+            animation: feedbackPop 0.5s cubic-bezier(.2,.9,.2,1.3);
         }
 
         #feedback.correct {
-            color: #00FF00;
+            color: #38e6a0;
+            text-shadow: 0 0 30px rgba(56, 230, 160, 0.9), 0 4px 10px rgba(0,0,0,0.25);
         }
 
         #feedback.wrong {
-            color: #FF0000;
+            color: #ff6b6b;
+            text-shadow: 0 0 30px rgba(255, 90, 90, 0.9), 0 4px 10px rgba(0,0,0,0.25);
         }
 
         @keyframes feedbackPop {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -55%) scale(1.25); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
         #game-over-screen {
@@ -458,44 +529,50 @@
         }
 
         #game-over-screen .content-overlay {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px 45px;
-            border-radius: 25px;
-            border: 4px solid #FFB700;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.22);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            backdrop-filter: blur(24px) saturate(160%);
+            padding: 30px 48px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 24px 70px rgba(10, 30, 70, 0.5), inset 0 1px 0 rgba(255,255,255,0.6);
             text-align: center;
         }
 
         #game-over-screen .final-score {
-            font-size: 36px;
-            margin-bottom: 30px;
-            color: #0066CC;
-            font-weight: bold;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 34px;
+            margin-bottom: 26px;
+            color: #fff;
+            font-weight: 800;
+            text-shadow: 0 2px 14px rgba(10, 40, 90, 0.6);
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
         }
 
         #game-over-screen .final-score span {
-            color: #FFB700;
-            font-size: 48px;
-            text-shadow: 2px 2px 0px #0066CC;
+            color: #FFD86B;
+            font-size: 50px;
+            font-weight: 900;
+            text-shadow: 0 3px 16px rgba(255, 180, 40, 0.7);
         }
 
         #game-over-screen button {
-            padding: 15px 40px;
-            font-size: 24px;
-            background: #FFB700;
-            color: #0066CC;
-            border: 3px solid #0066CC;
-            border-radius: 15px;
+            padding: 15px 38px;
+            font-size: 22px;
+            background: linear-gradient(180deg, #FFD86B, #FFB700);
+            color: #0a3a7a;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 18px;
             cursor: pointer;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(255, 170, 30, 0.45), inset 0 1px 0 rgba(255,255,255,0.7);
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
         }
 
         #game-over-screen button:hover {
-            background: #FFC700;
-            transform: scale(1.05);
+            transform: translateY(-2px) scale(1.04);
+            filter: brightness(1.06);
+            box-shadow: 0 12px 30px rgba(255, 170, 30, 0.55), inset 0 1px 0 rgba(255,255,255,0.8);
         }
         @keyframes popupBurst {
             0% { 
@@ -950,29 +1027,73 @@
 
         function initThreeJS() {
             const canvas = document.getElementById('gameCanvas');
+
+            // Geräte-Erkennung für Performance-Skalierung (Handy/Tablet schonen)
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+                || Math.min(window.innerWidth, window.innerHeight) < 720;
+            window.__lowPerf = isMobile;
+
             scene = new THREE.Scene();
-            
-            // Atmosphärischer Nebel für Tiefe
-            scene.fog = new THREE.FogExp2(0x87CEEB, 0.002);
-            
+
+            // Goldene-Stunde Farbpalette
+            const skyTopColor  = new THREE.Color(0x2a6fb5);
+            const horizonColor = new THREE.Color(0xf6cf96);
+
+            // Atmosphärischer Nebel – verschmilzt mit dem warmen Horizont (Tiefe)
+            scene.fog = new THREE.Fog(0xe7bd82, 120, 650);
+
             // Camera - from behind and slightly above
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
             camera.position.set(0, 5.5, 10); // Höher für bessere Sicht auf Monti
             camera.lookAt(0, 3.5, 0);
+            window.__camBaseRot = camera.rotation.clone();
+            window.__camBasePos = camera.position.clone();
 
-            // Renderer
-            renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            // Renderer – Tone Mapping + weiche Schatten für hochwertigen Look
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile, alpha: true, powerPreference: 'high-performance' });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x87CEEB, 1);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+            renderer.setClearColor(0x000000, 0);
             renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.08;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-            // Besseres Lighting: Hemisphere + Directional (wie Sonne)
-            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+            // --- Beleuchtung: warme Abendsonne + natürliches Umgebungslicht ---
+            const hemiLight = new THREE.HemisphereLight(0xbfe1ff, 0x586a37, 0.7);
             scene.add(hemiLight);
 
-            const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            sunLight.position.set(50, 100, 50);
+            const ambient = new THREE.AmbientLight(0xffe7c4, 0.32);
+            scene.add(ambient);
+
+            const sunLight = new THREE.DirectionalLight(0xffd79a, 1.55);
+            sunLight.position.set(-70, 80, -50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.set(isMobile ? 1024 : 2048, isMobile ? 1024 : 2048);
+            sunLight.shadow.camera.near = 1;
+            sunLight.shadow.camera.far = 320;
+            sunLight.shadow.camera.left = -80;
+            sunLight.shadow.camera.right = 80;
+            sunLight.shadow.camera.top = 80;
+            sunLight.shadow.camera.bottom = -80;
+            sunLight.shadow.bias = -0.0006;
+            sunLight.shadow.radius = 4;
             scene.add(sunLight);
+            scene.add(sunLight.target);
+            window.__sunLight = sunLight;
+
+            // Kühles Gegenlicht für einen feinen Rim-Glanz auf Monti
+            const rimLight = new THREE.DirectionalLight(0x9cc4ff, 0.4);
+            rimLight.position.set(50, 25, 70);
+            scene.add(rimLight);
+
+            // Atmosphäre: Gradient-Himmel, Sonne, Lichtpartikel, ferne Vögel
+            createSky(skyTopColor, horizonColor);
+            createSun(sunLight.position.clone());
+            createAtmosphere();
+            createDistantBirds();
+            createWindStreaks();
 
             // Create Monti the Bird
             createMonti();
@@ -994,50 +1115,284 @@
             window.addEventListener('resize', onWindowResize);
         }
 
+        // === Atmosphäre & Himmel ============================================
+
+        // Gradient-Himmel: warmer Horizont -> tiefes Blau (riesige Innen-Sphere)
+        function createSky(topColor, bottomColor) {
+            const skyGeo = new THREE.SphereGeometry(1100, 32, 16);
+            const skyMat = new THREE.ShaderMaterial({
+                uniforms: {
+                    topColor:    { value: topColor },
+                    bottomColor: { value: bottomColor },
+                    offset:      { value: 160 },
+                    exponent:    { value: 0.65 }
+                },
+                vertexShader: `
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        vec4 wp = modelMatrix * vec4(position, 1.0);
+                        vWorldPosition = wp.xyz;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }`,
+                fragmentShader: `
+                    uniform vec3 topColor; uniform vec3 bottomColor;
+                    uniform float offset; uniform float exponent;
+                    varying vec3 vWorldPosition;
+                    void main() {
+                        float h = normalize(vWorldPosition + vec3(0.0, offset, 0.0)).y;
+                        float f = pow(max(h, 0.0), exponent);
+                        gl_FragColor = vec4(mix(bottomColor, topColor, f), 1.0);
+                    }`,
+                side: THREE.BackSide,
+                depthWrite: false,
+                fog: false
+            });
+            const sky = new THREE.Mesh(skyGeo, skyMat);
+            sky.renderOrder = -2;
+            scene.add(sky);
+        }
+
+        // Radialer Glühverlauf als Textur (für Sonne, Glow, Partikel)
+        function radialTexture(inner, outer) {
+            const c = document.createElement('canvas');
+            c.width = c.height = 128;
+            const ctx = c.getContext('2d');
+            const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            g.addColorStop(0.0, inner);
+            g.addColorStop(0.4, outer);
+            g.addColorStop(1.0, 'rgba(255,255,255,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 128, 128);
+            const tex = new THREE.CanvasTexture(c);
+            tex.encoding = THREE.sRGBEncoding;
+            return tex;
+        }
+
+        // Sonne mit weichem Halo + Lens-Glow
+        function createSun(lightPos) {
+            const dir = lightPos.clone().normalize();
+            const sunPos = dir.multiplyScalar(820);
+
+            const coreMat = new THREE.SpriteMaterial({
+                map: radialTexture('rgba(255,255,245,1)', 'rgba(255,225,160,0.85)'),
+                blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true
+            });
+            const core = new THREE.Sprite(coreMat);
+            core.scale.set(140, 140, 1);
+            core.position.copy(sunPos);
+            scene.add(core);
+
+            const haloMat = new THREE.SpriteMaterial({
+                map: radialTexture('rgba(255,210,150,0.55)', 'rgba(255,180,110,0.18)'),
+                blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true
+            });
+            const halo = new THREE.Sprite(haloMat);
+            halo.scale.set(440, 440, 1);
+            halo.position.copy(sunPos);
+            scene.add(halo);
+            window.__sun = { core, halo };
+        }
+
+        // Schwebende Licht-/Pollenpartikel ("magischer" Staub in der Luft)
+        function createAtmosphere() {
+            const count = window.__lowPerf ? 110 : 220;
+            const geo = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                positions[i*3+0] = (Math.random() - 0.5) * 70;
+                positions[i*3+1] = Math.random() * 28 - 4;
+                positions[i*3+2] = (Math.random() - 0.5) * 70 - 10;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const mat = new THREE.PointsMaterial({
+                map: radialTexture('rgba(255,255,235,0.95)', 'rgba(255,240,200,0.35)'),
+                size: 0.5, transparent: true, opacity: 0.7,
+                blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+            });
+            const points = new THREE.Points(geo, mat);
+            points.renderOrder = 2;
+            scene.add(points);
+            window.__dust = points;
+        }
+
+        // Ferne Vögel als sanft kreisende Silhouetten
+        function createDistantBirds() {
+            window.__birds = [];
+            const shape = new THREE.Shape();
+            shape.moveTo(0, 0);
+            shape.lineTo(-1, 0.35);
+            shape.lineTo(-0.92, 0.18);
+            shape.lineTo(0, 0.08);
+            shape.lineTo(0.92, 0.18);
+            shape.lineTo(1, 0.35);
+            shape.lineTo(0, 0);
+            const geo = new THREE.ShapeGeometry(shape);
+            const mat = new THREE.MeshBasicMaterial({ color: 0x44546b, transparent: true, opacity: 0.5, side: THREE.DoubleSide, fog: true });
+            const flockCount = window.__lowPerf ? 4 : 7;
+            for (let i = 0; i < flockCount; i++) {
+                const b = new THREE.Mesh(geo, mat);
+                b.scale.setScalar(2.5 + Math.random() * 2);
+                b.userData = {
+                    cx: (Math.random() - 0.5) * 160,
+                    cy: 35 + Math.random() * 40,
+                    cz: -120 - Math.random() * 160,
+                    r: 20 + Math.random() * 30,
+                    spd: 0.15 + Math.random() * 0.2,
+                    ph: Math.random() * 6.28,
+                    flap: 4 + Math.random() * 3
+                };
+                scene.add(b);
+                window.__birds.push(b);
+            }
+        }
+
+        // Wind-/Speed-Streaks bei Boost (Geschwindigkeitsgefühl)
+        function createWindStreaks() {
+            window.__streaks = [];
+            const count = window.__lowPerf ? 16 : 30;
+            const geo = new THREE.PlaneGeometry(0.05, 3.2);
+            const mat = new THREE.MeshBasicMaterial({
+                color: 0xffffff, transparent: true, opacity: 0,
+                blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide
+            });
+            for (let i = 0; i < count; i++) {
+                const s = new THREE.Mesh(geo, mat.clone());
+                s.visible = false;
+                resetStreak(s, true);
+                camera.add(s); // relativ zur Kamera -> immer um Monti herum
+                window.__streaks.push(s);
+            }
+        }
+        function resetStreak(s, far) {
+            const a = Math.random() * Math.PI * 2;
+            const rad = 2 + Math.random() * 7;
+            s.position.set(Math.cos(a) * rad, Math.sin(a) * rad * 0.7 - 1, far ? -40 - Math.random() * 30 : -38);
+            s.userData.speed = 2.2 + Math.random() * 2.5;
+        }
+
         function createMonti() {
             monti = new THREE.Group();
 
-            // Body (Yellow center - LMG Gelb) - 30% kleiner
-            const bodyGeometry = new THREE.SphereGeometry(0.28, 32, 32); // 0.28 statt 0.4 (30% kleiner)
-            const bodyMaterial = new THREE.MeshToonMaterial({ color: 0xFFB700 });
+            // Body (LMG-Gelb) - länglicher, weicher Plüsch-Körper (fliegt nach -Z)
+            const bodyGeometry = new THREE.SphereGeometry(0.32, 32, 24);
+            bodyGeometry.scale(0.95, 0.95, 1.3); // länglich entlang der Flugrichtung
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: 0xFFC21A, roughness: 0.42, metalness: 0.04,
+                emissive: 0xFFB200, emissiveIntensity: 0.12
+            });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
             body.position.y = -0.5;
+            body.castShadow = true;
             monti.add(body);
             monti.body = body; // Speichere Referenz für Animation
 
-            // Create detailed wings with LMG color gradient
+            // Helle Bauchpartie
+            const bellyMat = new THREE.MeshStandardMaterial({ color: 0xFFE8A0, roughness: 0.5 });
+            const belly = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 18), bellyMat);
+            belly.scale.set(0.78, 0.62, 1.05);
+            belly.position.set(0, -0.12, -0.04);
+            body.add(belly);
+
+            // Gemeinsame Material-Refs
+            const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 });
+            const pupilMat = new THREE.MeshStandardMaterial({ color: 0x1b2330, roughness: 0.2, metalness: 0.1 });
+            const glintMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const beakMat = new THREE.MeshStandardMaterial({ color: 0xFF8A1E, roughness: 0.4, flatShading: true });
+            const crestMat = new THREE.MeshStandardMaterial({ color: 0x0a57c2, roughness: 0.45, flatShading: true });
+
+            // --- Kopf VORNE (-Z), leicht erhöht ---
+            const head = new THREE.Group();
+            head.position.set(0, 0.2, -0.46);
+            body.add(head);
+            const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 28, 22), bodyMaterial);
+            headMesh.castShadow = true;
+            head.add(headMesh);
+
+            // Augen (weiß + Pupille + Glanzpunkt) seitlich-vorne am Kopf
+            for (const sx of [-1, 1]) {
+                const eye = new THREE.Group();
+                const white = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 16), eyeWhiteMat);
+                white.scale.set(0.85, 1, 0.7);
+                eye.add(white);
+                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.044, 14, 14), pupilMat);
+                pupil.position.set(0, 0, -0.045);
+                eye.add(pupil);
+                const glint = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 8), glintMat);
+                glint.position.set(-sx * 0.018, 0.022, -0.07);
+                eye.add(glint);
+                eye.position.set(sx * 0.15, 0.05, -0.13);
+                eye.rotation.y = sx * 0.45;
+                head.add(eye);
+            }
+
+            // Schnabel vorne am Kopf
+            const beak = new THREE.Mesh(new THREE.ConeGeometry(0.065, 0.18, 6), beakMat);
+            beak.rotation.x = -Math.PI / 2;
+            beak.position.set(0, -0.04, -0.26);
+            head.add(beak);
+
+            // Rosige Wangen
+            const cheekMat = new THREE.MeshBasicMaterial({ color: 0xFF8FA3, transparent: true, opacity: 0.5 });
+            for (const sx of [-1, 1]) {
+                const cheek = new THREE.Mesh(new THREE.CircleGeometry(0.05, 12), cheekMat);
+                cheek.position.set(sx * 0.18, -0.06, -0.12);
+                cheek.rotation.y = sx * 0.6;
+                head.add(cheek);
+            }
+
+            // Kleine Federkrone oben auf dem Kopf
+            for (let i = 0; i < 3; i++) {
+                const f = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.24 - i * 0.03, 5), crestMat);
+                f.position.set((i - 1) * 0.07, 0.2, -0.02);
+                f.rotation.x = 0.25 + (i - 1) * 0.1; // leicht nach hinten geneigt
+                f.rotation.z = (i - 1) * 0.22;
+                head.add(f);
+            }
+
+            // --- Schwanzfedern HINTEN (+Z) für klare Flugrichtung ---
+            const tailMat = new THREE.MeshStandardMaterial({ color: 0x0a5fc8, roughness: 0.45, flatShading: true });
+            for (let i = 0; i < 3; i++) {
+                const t = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.5, 5), tailMat);
+                t.position.set((i - 1) * 0.1, 0.04, 0.5);
+                t.rotation.x = Math.PI / 2 - 0.35;   // flach nach hinten
+                t.rotation.z = (i - 1) * 0.3;        // auffächern
+                t.castShadow = true;
+                body.add(t);
+            }
+
+            // Create detailed wings with LMG color gradient (flach ausgebreitet)
             const leftWing = createDetailedWing();
-            leftWing.position.set(-0.5, 0, -0.15);
-            leftWing.rotation.y = Math.PI * 0.3;
-            leftWing.rotation.z = -Math.PI * 0.3; // Ausgebreitet
-            leftWing.rotation.x = -0.1;
+            leftWing.scale.x = -1; // Mirror -> Spannweite nach links
+            leftWing.position.set(-0.24, -0.32, -0.1);
+            leftWing.rotation.y = Math.PI * 0.13;   // leicht nach hinten gepfeilt
+            leftWing.rotation.z = -Math.PI * 0.07;  // sanfte V-Stellung (Dihedral)
+            leftWing.rotation.x = 0;
             monti.add(leftWing);
             monti.leftWing = leftWing;
 
             const rightWing = createDetailedWing();
-            rightWing.scale.x = -1; // Mirror
-            rightWing.position.set(0.5, 0, -0.15);
-            rightWing.rotation.y = -Math.PI * 0.3;
-            rightWing.rotation.z = Math.PI * 0.3; // Ausgebreitet
-            rightWing.rotation.x = -0.1;
+            rightWing.position.set(0.24, -0.32, -0.1);
+            rightWing.rotation.y = -Math.PI * 0.13;
+            rightWing.rotation.z = Math.PI * 0.07;
+            rightWing.rotation.x = 0;
             monti.add(rightWing);
             monti.rightWing = rightWing;
 
-            // KEINE Schwanzfedern mehr!
-            
-            // Boost-Glow-Sphere (unsichtbar beim Start)
-            const glowGeometry = new THREE.SphereGeometry(1.2, 32, 32);
-            const glowMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0x00FF00,
+            // Boost-Glow (weicher, additiver Schimmer statt grüner Kugel)
+            const glowGeometry = new THREE.SphereGeometry(1.3, 24, 24);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0x7fe9ff,
                 transparent: true,
                 opacity: 0,
-                wireframe: false
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                fog: false
             });
             const glowSphere = new THREE.Mesh(glowGeometry, glowMaterial);
             glowSphere.position.y = -0.5;
             monti.add(glowSphere);
             monti.boostGlow = glowSphere; // Referenz speichern
-            
+
             // Kondensstreifen-Partikel
             monti.trailParticles = [];
 
@@ -1045,79 +1400,114 @@
             // Position wird über camera.add() gesetzt
         }
 
+        // Geschwungene, federartige Flügel-Silhouette (zeigt entlang +X)
+        function makeWingShape(L, W) {
+            const s = new THREE.Shape();
+            s.moveTo(0, 0.20 * W);
+            // Vorderkante wölbt sanft zur Spitze
+            s.bezierCurveTo(L * 0.45, 0.58 * W, L * 0.85, 0.30 * W, L, 0.02 * W);
+            // Abgerundete Flügelspitze
+            s.lineTo(L * 0.97, -0.12 * W);
+            // Hinterkante mit weicher Federkurve zurück zur Schulter
+            s.bezierCurveTo(L * 0.68, -0.70 * W, L * 0.32, -0.88 * W, 0, -0.42 * W);
+            s.closePath();
+            return s;
+        }
+
         function createDetailedWing() {
             const wing = new THREE.Group();
-            
-            // Wing structure: Nur äußere Federn - keine inneren gelben/hellblauen mehr
-            const featherLayers = [
-                // Outer feathers (tips) - Navy blue
-                { color: 0x000080, length: 3.0, width: 0.18, count: 5, startAngle: 0, spread: 0.6 },
-                // Mid-outer - LMG Blue
-                { color: 0x0066CC, length: 2.8, width: 0.2, count: 5, startAngle: 0.1, spread: 0.5 },
-                // Mid - Steel Blue
-                { color: 0x4682B4, length: 2.6, width: 0.22, count: 5, startAngle: 0.2, spread: 0.45 },
-                // Mid-inner - Cyan
-                { color: 0x00CED1, length: 2.4, width: 0.24, count: 5, startAngle: 0.3, spread: 0.4 }
-                // ENTFERNT: Aquamarine und Gold Layer die oben sichtbar waren
+
+            // Inneres Flügelblatt FLACH legen: Spannweite +X, Vorderkante nach -Z,
+            // Oberseite nach +Y. So liegt der Flügel waagerecht (Vogel von oben).
+            const inner = new THREE.Group();
+            inner.rotation.x = -Math.PI / 2;
+            wing.add(inner);
+
+            // Geschichtete Membranen ergeben einen weichen Blau-Verlauf
+            const layers = [
+                { color: 0x0a1f72, len: 2.95, w: 1.18, y: 0.00 }, // Navy (unten/außen)
+                { color: 0x0a5fc8, len: 2.55, w: 1.04, y: 0.03 }, // LMG-Blau
+                { color: 0x2ab0dc, len: 2.15, w: 0.88, y: 0.06 }  // Cyan (oben)
             ];
 
-            featherLayers.forEach((layer, layerIndex) => {
-                for (let i = 0; i < layer.count; i++) {
-                    const featherGeometry = new THREE.BoxGeometry(layer.width, layer.length, 0.05);
-                    const featherMaterial = new THREE.MeshToonMaterial({ color: layer.color });
-                    const feather = new THREE.Mesh(featherGeometry, featherMaterial);
-                    
-                    const angle = layer.startAngle + (i / layer.count) * layer.spread;
-                    const radius = 1.2 + layerIndex * 0.15;
-                    
-                    feather.position.x = Math.sin(angle) * radius;
-                    feather.position.y = -Math.cos(angle) * radius * 0.5;
-                    feather.position.z = layerIndex * 0.02;
-                    feather.rotation.z = angle - Math.PI / 2;
-                    
-                    wing.add(feather);
-                }
+            layers.forEach((l) => {
+                const geo = new THREE.ExtrudeGeometry(makeWingShape(l.len, l.w), {
+                    depth: 0.05, bevelEnabled: true,
+                    bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 1, steps: 1
+                });
+                geo.translate(0, 0, -0.025);
+                const mat = new THREE.MeshStandardMaterial({
+                    color: l.color, roughness: 0.4, metalness: 0.08,
+                    emissive: l.color, emissiveIntensity: 0.08,
+                    side: THREE.DoubleSide
+                });
+                const membrane = new THREE.Mesh(geo, mat);
+                membrane.position.z = l.y; // gestapelt nach oben (nach Flachlegen = +Y)
+                membrane.castShadow = true;
+                inner.add(membrane);
             });
+
+            // Einzelne Schwungfedern an der Flügelspitze (fächern nach hinten)
+            const tipMat = new THREE.MeshStandardMaterial({ color: 0x081a5e, roughness: 0.45, flatShading: true });
+            for (let i = 0; i < 4; i++) {
+                const featherGeo = new THREE.ExtrudeGeometry(makeWingShape(0.9 + i * 0.05, 0.32), {
+                    depth: 0.03, bevelEnabled: false, steps: 1
+                });
+                const feather = new THREE.Mesh(featherGeo, tipMat);
+                feather.position.set(2.2 + i * 0.1, -0.28 - i * 0.12, 0.02);
+                feather.rotation.z = -0.55 - i * 0.12; // Spitzenfedern nach hinten gefächert
+                feather.castShadow = true;
+                inner.add(feather);
+            }
+
+            // Weiche Schulterdecke blendet den Flügel in den Körper
+            const covertMat = new THREE.MeshStandardMaterial({ color: 0x123a9e, roughness: 0.5, flatShading: true });
+            const covert = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 12), covertMat);
+            covert.scale.set(1.0, 0.85, 0.5);
+            covert.position.set(0.18, -0.05, 0.04);
+            inner.add(covert);
 
             return wing;
         }
 
         function createClouds() {
-            // Clouds above (at 200m+ altitude)
-            const cloudGeometry = new THREE.SphereGeometry(1, 16, 16);
-            const cloudMaterial = new THREE.MeshToonMaterial({ 
-                color: 0xffffff, 
-                transparent: true, 
-                opacity: 0.9 
+            // Weiche, bauschige Wolken mit sonnenbeschienener Oberseite
+            const cloudGeometry = new THREE.SphereGeometry(1, 12, 10);
+            const cloudMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                roughness: 1.0, metalness: 0.0,
+                emissive: 0xffe9c8, emissiveIntensity: 0.18,
+                transparent: true, opacity: 0.95, flatShading: true
             });
 
             window.clouds = []; // Array für Wolken-Referenzen
+            const cloudCount = window.__lowPerf ? 11 : 16;
+            const puffCount = window.__lowPerf ? 6 : 9;
 
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < cloudCount; i++) {
                 const cloud = new THREE.Group();
-                
-                // Multiple spheres for cloud shape
-                for (let j = 0; j < 6; j++) {
+
+                // Mehrere überlappende Kugeln ergeben eine bauschige Form
+                for (let j = 0; j < puffCount; j++) {
                     const cloudPart = new THREE.Mesh(cloudGeometry, cloudMaterial);
-                    cloudPart.scale.set(
-                        Math.random() * 0.8 + 0.6,
-                        Math.random() * 0.4 + 0.3,
-                        Math.random() * 0.8 + 0.6
-                    );
+                    const s = Math.random() * 1.0 + 0.7;
+                    cloudPart.scale.set(s, s * (0.45 + Math.random() * 0.25), s);
                     cloudPart.position.set(
-                        Math.random() * 2.5 - 1.25,
-                        Math.random() * 0.8,
-                        Math.random() * 2.5 - 1.25
+                        Math.random() * 4.0 - 2.0,
+                        Math.random() * 0.7,
+                        Math.random() * 3.0 - 1.5
                     );
                     cloud.add(cloudPart);
                 }
 
+                const cs = 0.8 + Math.random() * 0.9;
+                cloud.scale.setScalar(cs);
                 cloud.position.set(
                     Math.random() * 60 - 30,
                     20 + Math.random() * 5,  // High up for 200m altitude
                     Math.random() * 60 - 80
                 );
-                
+
                 scene.add(cloud);
                 window.clouds.push(cloud); // Speichere Referenz
             }
@@ -1125,101 +1515,193 @@
 
         // Create scrolling landscape below
         let landscapeSegments = [];
-        
+
+        // Glatte Pseudo-Noise für sanfte Hügel
+        function smoothNoise(x, z) {
+            return Math.sin(x * 0.05) * Math.cos(z * 0.045) * 1.4
+                 + Math.sin(x * 0.11 + 1.3) * Math.cos(z * 0.10 + 0.6) * 0.7
+                 + Math.sin(x * 0.021 - 0.4) * Math.cos(z * 0.03 + 2.0) * 2.2;
+        }
+
+        const RIVER_X = 55; // Korridor des Flusses
+
+        // Höhe der Bodenoberfläche an (x,z) inkl. eingegrabenem Flussbett
+        function groundHeight(x, z) {
+            let h = smoothNoise(x, z);
+            const d = Math.abs(x - RIVER_X);
+            if (d < 24) {
+                const t = 1 - d / 24;
+                h = h * (1 - t * 0.85) - 1.6 * t; // Flussbett senkt das Gelände
+            }
+            return h;
+        }
+
         function createLandscape() {
-            // Erstelle 3 Landschafts-Segmente für nahtloses Loop - NOCH GRÖSSER
+            const low = window.__lowPerf;
+            const W = 600, L = 800;
+            const segW = low ? 42 : 64, segL = low ? 54 : 84;
+
+            const grassA  = new THREE.Color(0x72b34d);
+            const grassB  = new THREE.Color(0x4f9a37);
+            const grassDry = new THREE.Color(0xc2c95e);
+            const sandCol  = new THREE.Color(0xe6d6a0);
+
+            const treeCount   = low ? 70  : 140;
+            const rockCount   = low ? 22  : 46;
+            const flowerCount = low ? 130 : 300;
+            const lakeCount   = low ? 6   : 10;
+
+            // Gemeinsame Geometrien/Materialien -> wenige Draw Calls
+            const trunkGeo  = new THREE.CylinderGeometry(0.26, 0.34, 2.2, 5);
+            const trunkMat  = new THREE.MeshStandardMaterial({ color: 0x6b4a2b, roughness: 1.0, flatShading: true });
+            const foliageGeo = new THREE.IcosahedronGeometry(1, 0);
+            const foliageMat = new THREE.MeshStandardMaterial({ roughness: 0.9, metalness: 0.0, flatShading: true });
+            const rockGeo   = new THREE.DodecahedronGeometry(1, 0);
+            const rockMat   = new THREE.MeshStandardMaterial({ color: 0x8a8f97, roughness: 1.0, flatShading: true });
+            const flowerGeo = new THREE.IcosahedronGeometry(0.5, 0);
+            const flowerMat = new THREE.MeshStandardMaterial({ roughness: 0.7, emissiveIntensity: 0.25, flatShading: true, vertexColors: false });
+            const waterMat  = new THREE.MeshStandardMaterial({
+                color: 0x2f86d6, roughness: 0.12, metalness: 0.25,
+                emissive: 0x0a3a66, emissiveIntensity: 0.15,
+                transparent: true, opacity: 0.86
+            });
+            const greenShades = [0x2f7d32, 0x46a04a, 0x6cba5a, 0x3f9a44, 0x8bbf4d];
+            const flowerColors = [0xff5d73, 0xffd23f, 0xffffff, 0xb06bff, 0xff8e3c, 0xff9ecb];
+            const dummy = new THREE.Object3D();
+            const tmpColor = new THREE.Color();
+
             for (let seg = 0; seg < 3; seg++) {
                 const segment = new THREE.Group();
-                const zOffset = seg * 800 - 800; // Noch länger: 800 statt 500
-                
-                // Ground plane (grass) - NOCH GRÖSSER
-                const groundGeometry = new THREE.PlaneGeometry(600, 800); // 600x800 statt 400x500
-                const groundMaterial = new THREE.MeshToonMaterial({ 
-                    color: 0x7CFC00,  // Lawn green
-                    side: THREE.DoubleSide 
+                const zOffset = seg * 800 - 800;
+
+                // --- Boden mit sanften Hügeln + Vertex-Farbverlauf ---
+                const groundGeometry = new THREE.PlaneGeometry(W, L, segW, segL);
+                const pos = groundGeometry.attributes.position;
+                const colors = [];
+                for (let i = 0; i < pos.count; i++) {
+                    const vx = pos.getX(i), vz = pos.getY(i);
+                    const h = groundHeight(vx, vz);
+                    pos.setZ(i, h);
+                    const t = Math.max(0, Math.min(1, (h + 3) / 6));
+                    tmpColor.copy(grassA).lerp(grassB, t);
+                    if (h > 2.0) tmpColor.lerp(grassDry, Math.min(1, (h - 2.0) * 0.35));
+                    if (h < -1.4) tmpColor.lerp(sandCol, Math.min(1, (-h - 1.4) * 0.6));
+                    const j = (Math.sin(vx * 12.9 + vz * 4.7) * 0.5 + 0.5) * 0.08 - 0.04;
+                    tmpColor.offsetHSL(0, 0, j);
+                    colors.push(tmpColor.r, tmpColor.g, tmpColor.b);
+                }
+                groundGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                groundGeometry.computeVertexNormals();
+                const groundMaterial = new THREE.MeshStandardMaterial({
+                    vertexColors: true, roughness: 0.96, metalness: 0.0, flatShading: true,
+                    side: THREE.DoubleSide
                 });
                 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
                 ground.rotation.x = -Math.PI / 2;
                 ground.position.y = -15;
-                ground.position.z = 0; // Relativ zum Segment
+                ground.receiveShadow = true;
                 segment.add(ground);
-                
-                // Add texture variation with darker green patches - NOCH MEHR Patches
-                for (let i = 0; i < 100; i++) { // 100 statt 60
-                    const patchGeometry = new THREE.CircleGeometry(Math.random() * 4 + 2, 16);
-                    const patchMaterial = new THREE.MeshToonMaterial({ 
-                        color: 0x228B22,  // Forest green
-                        side: THREE.DoubleSide 
-                    });
-                    const patch = new THREE.Mesh(patchGeometry, patchMaterial);
-                    patch.rotation.x = -Math.PI / 2;
-                    patch.position.set(
-                        Math.random() * 580 - 290, // Breiter verteilt
-                        -14.9,
-                        Math.random() * 780 - 390  // Länger verteilt
-                    );
-                    segment.add(patch);
-                }
-                
-                // Lakes/ponds - NOCH MEHR Seen
-                for (let i = 0; i < 25; i++) { // 25 statt 15
-                    const lakeGeometry = new THREE.CircleGeometry(Math.random() * 10 + 5, 16);
-                    const lakeMaterial = new THREE.MeshToonMaterial({ 
-                        color: 0x1E90FF,  // Dodger blue
-                        side: THREE.DoubleSide,
-                        transparent: true,
-                        opacity: 0.8
-                    });
-                    const lake = new THREE.Mesh(lakeGeometry, lakeMaterial);
+
+                // --- Fluss (glänzendes Band entlang des Korridors) ---
+                const river = new THREE.Mesh(new THREE.PlaneGeometry(30, L), waterMat);
+                river.rotation.x = -Math.PI / 2;
+                river.position.set(RIVER_X, -16.0, 0);
+                segment.add(river);
+
+                // --- Seen ---
+                for (let i = 0; i < lakeCount; i++) {
+                    const lx = Math.random() * 520 - 260;
+                    const lz = Math.random() * 740 - 370;
+                    if (Math.abs(lx - RIVER_X) < 34) continue; // nicht im Fluss
+                    const lake = new THREE.Mesh(new THREE.CircleGeometry(1, 18), waterMat);
                     lake.rotation.x = -Math.PI / 2;
-                    lake.position.set(
-                        Math.random() * 560 - 280, // Breiter
-                        -14.8,
-                        Math.random() * 760 - 380  // Länger
-                    );
+                    lake.scale.setScalar(6 + Math.random() * 10);
+                    lake.position.set(lx, -15 + groundHeight(lx, lz) - 0.4, lz);
                     segment.add(lake);
                 }
-                
-                // Trees - NOCH VIEL MEHR Bäume
-                for (let i = 0; i < 150; i++) { // 150 statt 100
-                    const tree = createTree();
-                    tree.position.set(
-                        Math.random() * 580 - 290, // Breiter
-                        -15,
-                        Math.random() * 780 - 390  // Länger
-                    );
-                    segment.add(tree);
+
+                // --- Bäume (instanziert: Stamm + Laub) ---
+                const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, treeCount);
+                const foliage = new THREE.InstancedMesh(foliageGeo, foliageMat.clone(), treeCount);
+                trunks.castShadow = true; foliage.castShadow = true;
+                trunks.frustumCulled = false; foliage.frustumCulled = false;
+                let tIdx = 0;
+                for (let i = 0; i < treeCount; i++) {
+                    const x = Math.random() * 560 - 280;
+                    const z = Math.random() * 760 - 380;
+                    if (Math.abs(x - RIVER_X) < 22) continue; // keine Bäume im Fluss
+                    const gy = -15 + groundHeight(x, z);
+                    const s = 0.8 + Math.random() * 1.5;
+                    dummy.position.set(x, gy + 1.1 * s, z);
+                    dummy.scale.set(s, s, s);
+                    dummy.rotation.set(0, Math.random() * 6.28, 0);
+                    dummy.updateMatrix();
+                    trunks.setMatrixAt(tIdx, dummy.matrix);
+                    dummy.position.set(x, gy + 2.2 * s + 0.7 * s, z);
+                    dummy.scale.set(1.5 * s, 1.85 * s, 1.5 * s);
+                    dummy.rotation.set(Math.random() * 0.4, Math.random() * 6.28, Math.random() * 0.4);
+                    dummy.updateMatrix();
+                    foliage.setMatrixAt(tIdx, dummy.matrix);
+                    foliage.setColorAt(tIdx, tmpColor.set(greenShades[Math.floor(Math.random() * greenShades.length)]));
+                    tIdx++;
                 }
-                
-                // Berge links und rechts FÜR JEDES SEGMENT - NOCH MEHR und NOCH WEITER AUßEN
-                // Linke Berge
-                for (let i = 0; i < 8; i++) { // 8 statt 6
-                    const mountain = createMountain();
-                    mountain.position.set(
-                        -220 - (Math.random() * 80), // Noch weiter links
-                        -12,
-                        Math.random() * 780 - 390
-                    );
-                    segment.add(mountain);
+                trunks.count = tIdx; foliage.count = tIdx;
+                if (foliage.instanceColor) foliage.instanceColor.needsUpdate = true;
+                segment.add(trunks, foliage);
+
+                // --- Felsen (instanziert) ---
+                const rocks = new THREE.InstancedMesh(rockGeo, rockMat, rockCount);
+                rocks.castShadow = true; rocks.frustumCulled = false;
+                for (let i = 0; i < rockCount; i++) {
+                    const x = Math.random() * 560 - 280;
+                    const z = Math.random() * 760 - 380;
+                    const gy = -15 + groundHeight(x, z);
+                    const s = 0.6 + Math.random() * 2.2;
+                    dummy.position.set(x, gy + s * 0.4, z);
+                    dummy.scale.set(s, s * (0.6 + Math.random() * 0.4), s);
+                    dummy.rotation.set(Math.random(), Math.random() * 6.28, Math.random());
+                    dummy.updateMatrix();
+                    rocks.setMatrixAt(i, dummy.matrix);
                 }
-                
-                // Rechte Berge
-                for (let i = 0; i < 8; i++) { // 8 statt 6
-                    const mountain = createMountain();
-                    mountain.position.set(
-                        220 + (Math.random() * 80), // Noch weiter rechts
-                        -12,
-                        Math.random() * 780 - 390
-                    );
-                    segment.add(mountain);
+                segment.add(rocks);
+
+                // --- Blumenfelder (instanziert, leuchtend) ---
+                const flowers = new THREE.InstancedMesh(flowerGeo, flowerMat, flowerCount);
+                flowers.frustumCulled = false;
+                for (let i = 0; i < flowerCount; i++) {
+                    const x = Math.random() * 560 - 280;
+                    const z = Math.random() * 760 - 380;
+                    const gy = -15 + groundHeight(x, z);
+                    const s = 0.25 + Math.random() * 0.3;
+                    dummy.position.set(x, gy + 0.25, z);
+                    dummy.scale.set(s, s, s);
+                    dummy.rotation.set(0, Math.random() * 6.28, 0);
+                    dummy.updateMatrix();
+                    flowers.setMatrixAt(i, dummy.matrix);
+                    flowers.setColorAt(i, tmpColor.set(flowerColors[Math.floor(Math.random() * flowerColors.length)]));
                 }
-                
+                if (flowers.instanceColor) flowers.instanceColor.needsUpdate = true;
+                segment.add(flowers);
+
+                // --- Berge links/rechts mit atmosphärischer Perspektive ---
+                for (let side of [-1, 1]) {
+                    for (let i = 0; i < 8; i++) {
+                        const mountain = createMountain();
+                        mountain.position.set(
+                            side * (220 + Math.random() * 90),
+                            -12,
+                            Math.random() * 780 - 390
+                        );
+                        segment.add(mountain);
+                    }
+                }
+
                 segment.position.z = zOffset;
                 landscapeSegments.push(segment);
                 scene.add(segment);
             }
         }
-        
+
         function createMountain() {
             const mountainPart = new THREE.Group();
             
@@ -1234,10 +1716,12 @@
                 8
             );
             
-            const grayValue = Math.random() * 0.2 + 0.35; // 0.35-0.55
-            const mountainColor = new THREE.Color(grayValue, grayValue, grayValue);
-            const mainPeakMaterial = new THREE.MeshToonMaterial({ 
+            // Atmosphärische Perspektive: ferne Berge leicht bläulich/dunstig
+            const base = 0.42 + Math.random() * 0.16;
+            const mountainColor = new THREE.Color(base * 0.78, base * 0.86, base * 1.05);
+            const mainPeakMaterial = new THREE.MeshStandardMaterial({
                 color: mountainColor,
+                roughness: 1.0, metalness: 0.0,
                 flatShading: true
             });
             const mainPeak = new THREE.Mesh(mainPeakGeometry, mainPeakMaterial);
@@ -1267,43 +1751,16 @@
                 6,
                 3
             );
-            const snowCapMaterial = new THREE.MeshToonMaterial({ 
-                color: 0xFFFAFA,
-                flatShading: true
+            const snowCapMaterial = new THREE.MeshStandardMaterial({
+                color: 0xFFFAFA, roughness: 0.85, flatShading: true,
+                emissive: 0xdfeaff, emissiveIntensity: 0.08
             });
             const snowCap = new THREE.Mesh(snowCapGeometry, snowCapMaterial);
             snowCap.position.y = mountainHeight * 0.4;  // Oben auf dem Berg
             snowCap.rotation.z = mainPeak.rotation.z;
             mountainPart.add(snowCap);
-            
+
             return mountainPart;
-        }
-        
-        function createTree() {
-            const tree = new THREE.Group();
-            
-            // Variabler Stamm (Höhe und Dicke)
-            const trunkHeight = 1.5 + Math.random() * 1.0; // 1.5 - 2.5
-            const trunkRadius = 0.25 + Math.random() * 0.15; // 0.25 - 0.4
-            const trunkGeometry = new THREE.CylinderGeometry(trunkRadius, trunkRadius * 1.2, trunkHeight, 6);
-            const trunkMaterial = new THREE.MeshToonMaterial({ color: 0x5D4037 }); // Dunkleres Braun
-            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-            trunk.position.y = trunkHeight / 2;
-            tree.add(trunk);
-            
-            // Variierende Baumkrone (Kugel für Laubbäume)
-            const foliageSize = 0.7 + Math.random() * 0.4; // 0.7 - 1.1
-            const foliageGeometry = new THREE.SphereGeometry(foliageSize, 6, 6);
-            // Verschiedene Grüntöne
-            const greenShades = [0x2E7D32, 0x43A047, 0x66BB6A, 0x228B22];
-            const foliageColor = greenShades[Math.floor(Math.random() * greenShades.length)];
-            const foliageMaterial = new THREE.MeshToonMaterial({ color: foliageColor });
-            const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
-            foliage.position.y = trunkHeight + foliageSize * 0.4;
-            foliage.scale.set(1, 1.2, 1); // Leicht oval
-            tree.add(foliage);
-            
-            return tree;
         }
 
         function onWindowResize() {
@@ -1321,6 +1778,9 @@
         let isFalling = false;
         let fallDuration = 0;
         let fallTime = 0;
+        let cameraShake = 0;        // Impuls bei falscher Antwort
+        let wingBlend = 0;          // 0 = Gleiten, 1 = Flattern (weiche Übergänge)
+        let glidePhase = 0;        // kontinuierliche Gleit-Phase
         
         // Streak & Boost System
         let streakCount = 0;
@@ -1333,70 +1793,71 @@
             requestAnimationFrame(animate);
 
             if (monti) {
+                // Weicher Übergang zwischen Gleiten (0) und Flattern (1)
+                const flapTarget = (isFlapping && !isFalling) ? 1 : 0;
+                wingBlend += (flapTarget - wingBlend) * 0.12;
+                glidePhase += 0.02;
+
                 if (isFalling) {
                     // Fall-Animation bei falscher Antwort
                     fallTime += 0.016;
-                    
-                    // Flügel klappen zusammen
-                    const collapseAngle = Math.min(fallTime * 2, 1) * (Math.PI * 0.4);
-                    monti.leftWing.rotation.z = -Math.PI * 0.25 - collapseAngle;
-                    monti.rightWing.rotation.z = Math.PI * 0.25 + collapseAngle;
-                    
+
+                    // Flügel klappen weich zusammen (ease-out)
+                    const k = 1 - Math.pow(1 - Math.min(fallTime * 1.6, 1), 3);
+                    const collapseAngle = k * (Math.PI * 0.42);
+                    monti.leftWing.rotation.z = -Math.PI * 0.07 - collapseAngle;
+                    monti.rightWing.rotation.z = Math.PI * 0.07 + collapseAngle;
+                    monti.leftWing.rotation.x = -k * 0.3;
+                    monti.rightWing.rotation.x = -k * 0.3;
+
                     // Körper taumelt
                     monti.rotation.x = -0.1 + Math.sin(fallTime * 10) * 0.2;
                     monti.rotation.z = Math.sin(fallTime * 8) * 0.15;
-                    
-                    // Körper vibriert
-                    const shake = Math.sin(fallTime * 20) * 0.05;
-                    monti.body.position.y = -0.5 + shake;
-                    
+                    monti.body.position.y = -0.5 + Math.sin(fallTime * 20) * 0.05;
+
                     fallDuration -= 0.016;
                     if (fallDuration <= 0) {
                         isFalling = false;
-                        // Reset zu Gleitflug-Position
-                        monti.leftWing.rotation.z = -Math.PI * 0.25;
-                        monti.rightWing.rotation.z = Math.PI * 0.25;
+                        monti.leftWing.rotation.z = -Math.PI * 0.07;
+                        monti.rightWing.rotation.z = Math.PI * 0.07;
+                        monti.leftWing.rotation.x = 0;
+                        monti.rightWing.rotation.x = 0;
                         monti.body.position.y = -0.5;
                         monti.rotation.x = -0.1;
                         monti.rotation.z = 0;
                     }
-                } else if (isFlapping) {
-                    // Aktiver Flügelschlag bei richtigen Antworten
-                    wingFlapTime += 0.25;
-                    const flapAngle = Math.sin(wingFlapTime) * 0.4;
-                    monti.leftWing.rotation.z = -Math.PI * 0.25 + flapAngle;
-                    monti.rightWing.rotation.z = Math.PI * 0.25 - flapAngle;
-                    
-                    // Körper-Animation beim Flattern
-                    const bodyBounce = Math.abs(Math.sin(wingFlapTime)) * 0.08;
-                    monti.body.position.y = -0.5 + bodyBounce;
-                    
-                    // Leichte Rotationsbewegung des ganzen Vogels
-                    monti.rotation.x = -0.1 + Math.sin(wingFlapTime) * 0.05;
-                    
-                    flapDuration -= 0.016; // ca. 60fps
-                    if (flapDuration <= 0) {
-                        isFlapping = false;
-                        // Reset zu Gleitflug-Position
-                        monti.leftWing.rotation.z = -Math.PI * 0.25;
-                        monti.rightWing.rotation.z = Math.PI * 0.25;
-                        monti.body.position.y = -0.5;
-                        monti.rotation.x = -0.1;
-                    }
                 } else {
-                    // Sanftes Gleiten - minimal wing adjustment
-                    wingFlapTime += 0.02;
-                    const glideAngle = Math.sin(wingFlapTime) * 0.05;
-                    monti.leftWing.rotation.z = -Math.PI * 0.25 + glideAngle;
-                    monti.rightWing.rotation.z = Math.PI * 0.25 - glideAngle;
-                    
-                    // Subtile Körperbewegung auch beim Gleiten
-                    const subtleBodyMove = Math.sin(wingFlapTime * 0.5) * 0.01;
-                    monti.body.position.y = -0.5 + subtleBodyMove;
-                    
-                    // Natürliches Banking (leichtes Kippen wie ein Vogel)
+                    // Flügelschlag (Flattern) – natürliche Beschleunigung/Verzögerung
+                    if (isFlapping) {
+                        wingFlapTime += 0.25;
+                        flapDuration -= 0.016;
+                        if (flapDuration <= 0) isFlapping = false;
+                    }
+
+                    // Schnellerer Abschlag, langsameres Anheben (asymmetrische Welle)
+                    const beat = Math.sin(wingFlapTime);
+                    const flapShaped = Math.sign(beat) * Math.pow(Math.abs(beat), 0.7);
+                    // Sanftes Gleit-Flattern überlagert (immer aktiv, sehr leicht)
+                    const glide = Math.sin(glidePhase) * 0.05;
+                    const tipWobble = Math.sin(glidePhase * 1.7) * 0.04;
+
+                    const wingAngle = glide * (1 - wingBlend) + flapShaped * 0.42 * wingBlend;
+                    monti.leftWing.rotation.z = -Math.PI * 0.07 + wingAngle;
+                    monti.rightWing.rotation.z = Math.PI * 0.07 - wingAngle;
+
+                    // Leichtes Wippen der Flügel beim Gleiten
+                    const wingTilt = tipWobble * (1 - wingBlend) - 0.06 * wingBlend * Math.abs(beat);
+                    monti.leftWing.rotation.x = wingTilt;
+                    monti.rightWing.rotation.x = wingTilt;
+
+                    // Körper hebt/senkt sich mit dem Schlag
+                    const bodyBounce = Math.abs(beat) * 0.08 * wingBlend + Math.sin(glidePhase * 0.5) * 0.01;
+                    monti.body.position.y = -0.5 + bodyBounce;
+
+                    // Natürliches Banking + leichtes Nicken
                     const time = Date.now() * 0.001;
-                    monti.rotation.z = Math.sin(time * 0.5) * 0.03;
+                    monti.rotation.x = -0.1 + Math.sin(wingFlapTime) * 0.05 * wingBlend + Math.sin(time * 0.7) * 0.012;
+                    monti.rotation.z = Math.sin(time * 0.5) * 0.03 * (1 - wingBlend);
                 }
 
                 // Sehr subtiles bobbing - relativ zur Kamera-Position (nur wenn nicht fallend)
@@ -1427,25 +1888,27 @@
                     }
                 }
                 
-                // Kondensstreifen bei Boost
-                if (boostActive && Math.random() > 0.5) {
-                    // Erstelle Partikel
-                    const particleGeom = new THREE.SphereGeometry(0.15, 8, 8);
-                    const particleMat = new THREE.MeshBasicMaterial({ 
-                        color: 0xFFFFFF,
+                // Kondensstreifen bei Boost – weiche, additive Puffs
+                if (boostActive) {
+                    const particleGeom = new THREE.SphereGeometry(0.18, 8, 8);
+                    const particleMat = new THREE.MeshBasicMaterial({
+                        color: 0xcdeeff,
                         transparent: true,
-                        opacity: 0.8
+                        opacity: 0.7,
+                        blending: THREE.AdditiveBlending,
+                        depthWrite: false,
+                        fog: false
                     });
                     const particle = new THREE.Mesh(particleGeom, particleMat);
-                    
+
                     // Position hinter Monti (relativ zur Kamera)
                     const worldPos = new THREE.Vector3();
                     monti.getWorldPosition(worldPos);
                     particle.position.copy(worldPos);
                     particle.position.z += 2; // Hinter Monti
-                    particle.position.x += (Math.random() - 0.5) * 0.3;
-                    particle.position.y += (Math.random() - 0.5) * 0.3;
-                    
+                    particle.position.x += (Math.random() - 0.5) * 0.5;
+                    particle.position.y += (Math.random() - 0.5) * 0.5;
+
                     scene.add(particle);
                     monti.trailParticles.push({ mesh: particle, life: 1.0 });
                 }
@@ -1565,6 +2028,81 @@
                 });
             }
 
+            // === Atmosphäre-Updates =========================================
+            const now = Date.now() * 0.001;
+
+            // Schwebende Lichtpartikel driften sanft + funkeln
+            if (window.__dust) {
+                window.__dust.rotation.y = now * 0.01;
+                window.__dust.material.opacity = 0.5 + Math.sin(now * 1.5) * 0.2;
+            }
+
+            // Ferne Vögel kreisen langsam und "flattern"
+            if (window.__birds) {
+                window.__birds.forEach(b => {
+                    const u = b.userData;
+                    const a = now * u.spd + u.ph;
+                    b.position.set(u.cx + Math.cos(a) * u.r, u.cy + Math.sin(a * 0.6) * 3, u.cz + Math.sin(a) * u.r);
+                    b.rotation.z = Math.sin(now * u.flap) * 0.5;
+                    b.lookAt(camera.position);
+                });
+            }
+
+            // Sonne pulsiert ganz leicht (lebendiges Licht)
+            if (window.__sun) {
+                const p = 1 + Math.sin(now * 0.8) * 0.03;
+                window.__sun.halo.scale.set(440 * p, 440 * p, 1);
+            }
+
+            // Schatten-Frustum folgt dem Boden (sonst lägen Schatten außerhalb)
+            if (window.__sunLight && gameState.isPlaying) {
+                const gy = -15 - gameState.altitude;
+                window.__sunLight.target.position.set(0, gy, -40);
+                window.__sunLight.position.set(-70, gy + 95, -90);
+            }
+
+            // Wind-/Speed-Streaks bei Boost
+            if (window.__streaks) {
+                const streakOn = boostActive;
+                window.__streaks.forEach(s => {
+                    if (streakOn) {
+                        s.visible = true;
+                        s.position.z += s.userData.speed;
+                        s.material.opacity = Math.min(s.material.opacity + 0.06, 0.55);
+                        if (s.position.z > -4) resetStreak(s, false);
+                    } else if (s.visible) {
+                        s.material.opacity *= 0.88;
+                        if (s.material.opacity < 0.02) s.visible = false;
+                    }
+                });
+            }
+
+            // === Kamera-Feeling: sanftes Wiegen, Boost-Neigung, Shake ========
+            const base = window.__camBaseRot, bp = window.__camBasePos;
+            if (base && bp) {
+                let rx = base.x + Math.sin(now * 0.4) * 0.006;
+                let ry = base.y + Math.sin(now * 0.27) * 0.006;
+                let rz = base.z + Math.sin(now * 0.5) * 0.01;
+                let px = bp.x, py = bp.y, pz = bp.z;
+
+                // Leichtes "Eintauchen" bei Boost (Speed-Gefühl)
+                if (boostActive) { rx -= 0.03; py -= 0.15; }
+
+                // Camera Shake bei falscher Antwort
+                if (cameraShake > 0) {
+                    cameraShake = Math.max(0, cameraShake - 0.016);
+                    const amp = cameraShake / 0.5;
+                    rx += (Math.random() - 0.5) * 0.06 * amp;
+                    ry += (Math.random() - 0.5) * 0.06 * amp;
+                    rz += (Math.random() - 0.5) * 0.10 * amp;
+                    px += (Math.random() - 0.5) * 0.25 * amp;
+                    py += (Math.random() - 0.5) * 0.25 * amp;
+                }
+
+                camera.rotation.set(rx, ry, rz);
+                camera.position.set(px, py, pz);
+            }
+
             renderer.render(scene, camera);
         }
 
@@ -1578,6 +2116,7 @@
             isFalling = true;
             fallDuration = 1.0; // 1 Sekunde Fall-Animation
             fallTime = 0;
+            cameraShake = 0.5;  // Aufprall-Erschütterung der Kamera
         }
 
         // Game Logic
@@ -1649,9 +2188,19 @@
             handleWrongAnswer();
         }
 
+        // Kurzer "Pop" für animierte Zahlen (rein visuell)
+        function pulseValue(el) {
+            if (!el) return;
+            el.classList.remove('tick');
+            void el.offsetWidth; // Reflow -> Animation neu starten
+            el.classList.add('tick');
+        }
+
         function updateUI() {
             // Score wird direkt aktualisiert
-            document.getElementById('score-value').textContent = gameState.score;
+            const sv = document.getElementById('score-value');
+            sv.textContent = gameState.score;
+            pulseValue(sv);
             // Höhe wird animiert in animate() aktualisiert
         }
 
@@ -1865,7 +2414,9 @@
         }
         
         function updateStreakUI() {
-            document.getElementById('streak-value').textContent = streakCount;
+            const el = document.getElementById('streak-value');
+            el.textContent = streakCount;
+            pulseValue(el);
         }
         
         function activateBoost() {
