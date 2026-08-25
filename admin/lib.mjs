@@ -35,4 +35,5 @@ export async function confirm(frage) {
 }
 
 /** Synthetische Login-Mail. Schueler tippen davon nur den loginName. */
-export const emailFor = loginName => `${loginName}@lmg-vokabel.app`;
+// Kleinschreibung, damit es exakt zu lmgEmailFor() im Client passt.
+export const emailFor = loginName => `${String(loginName).trim().toLowerCase()}@lmg-vokabel.app`;

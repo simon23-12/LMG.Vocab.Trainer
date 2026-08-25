@@ -13,17 +13,19 @@ import { db, auth, emailFor, ROOT, confirm } from './lib.mjs';
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { randomInt } from 'crypto';
 
-const WOERTER = [
-  'apfel','anker','biene','blume','bruecke','delfin','eule','feder','fuchs','garten','gitarre','hafen',
-  'igel','insel','kanu','kerze','komet','krone','lampe','loewe','magnet','melone','mond','nebel',
-  'otter','palme','pinsel','planet','rakete','regen','robbe','segel','stern','tiger','tulpe','turm',
-  'vulkan','wolke','wal','zebra','zitrone','zug'
-];
-const pw = () => `${WOERTER[randomInt(WOERTER.length)]}-${WOERTER[randomInt(WOERTER.length)]}-${randomInt(10, 100)}`;
+// Passwoerter: 6 Zeichen (Firebase laesst weniger nicht zu), nur eindeutige
+// Zeichen - ohne i/l/1 und o/0, ohne Sonderzeichen, alles klein.
+const PW_ZEICHEN = 'abcdefghjkmnpqrstuvwxyz23456789';
+const PW_LAENGE = 6;
+const pw = () => Array.from({ length: PW_LAENGE }, () => PW_ZEICHEN[randomInt(PW_ZEICHEN.length)]).join('');
 
-const ohneUmlaut = s => s.toLowerCase()
+// Umlaute aufloesen, alles andere wegwerfen - der Login soll tippbar sein.
+const ohneUmlaut = s => s
   .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
-  .replace(/[^a-z]/g, '');
+  .replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue')
+  .replace(/[^A-Za-z]/g, '');
+
+const grossKlein = s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
 const datei = process.argv[2];
 const dry = process.argv.includes('--dry');
@@ -46,13 +48,43 @@ for (const z of zeilen.slice(1)) {
   schueler.push({ klasse, vorname, nachname });
 }
 
-// --- Login-Namen bilden, Dubletten aufloesen ---
+// --- Login-Namen bilden ---
+//
+// Schueler tippen nur ihren Vornamen. Ist der schon vergeben - in dieser Liste ODER
+// bei einem bereits bestehenden Account - kommt der Anfangsbuchstabe des Nachnamens
+// dazu (Lea Hoffmann -> LeaH, Lea Schneider -> LeaS). Reicht das immer noch nicht,
+// waechst der Nachnamensteil buchstabenweise, zuletzt haengt eine Ziffer an.
+//
+// Wichtig: Login-Namen muessen projektweit eindeutig sein, nicht nur pro Klasse -
+// sie werden zur Mailadresse. Deshalb pruefen wir gegen den Bestand in der Datenbank.
 const belegt = new Set();
+const bestand = (await db.ref('users').once('value')).val() || {};
+for (const u of Object.values(bestand)) {
+  if (u && u.loginName) belegt.add(String(u.loginName).toLowerCase());
+}
+if (belegt.size) console.log(`${belegt.size} bereits vergebene Logins werden beruecksichtigt.`);
+
+// Erst zaehlen: kommt ein Vorname mehrfach vor, bekommen ALLE Traeger den Zusatz -
+// sonst haette die erste Lea "Lea" und die zweite "LeaS", was unfair und verwirrend waere.
+const haeufigkeit = {};
 for (const s of schueler) {
-  const basis = `${s.klasse}.${ohneUmlaut(s.nachname)}.${ohneUmlaut(s.vorname).charAt(0)}`;
-  let name = basis, n = 2;
-  while (belegt.has(name)) name = `${basis}${n++}`;
-  belegt.add(name);
+  const v = grossKlein(ohneUmlaut(s.vorname)).toLowerCase();
+  haeufigkeit[v] = (haeufigkeit[v] || 0) + 1;
+}
+
+for (const s of schueler) {
+  const vorname = grossKlein(ohneUmlaut(s.vorname));
+  const nachname = ohneUmlaut(s.nachname);
+  const mehrfach = haeufigkeit[vorname.toLowerCase()] > 1 || belegt.has(vorname.toLowerCase());
+
+  let name = mehrfach ? vorname + grossKlein(nachname.slice(0, 1)) : vorname;   // Lea -> LeaH
+  for (let i = 2; belegt.has(name.toLowerCase()) && i <= nachname.length; i++) {
+    name = vorname + grossKlein(nachname.slice(0, i));                          // LeaH -> LeaHo
+  }
+  let n = 2;
+  while (belegt.has(name.toLowerCase())) name = vorname + (n++);                // Notnagel: Lea2
+
+  belegt.add(name.toLowerCase());
   s.loginName = name;
   s.passwort = pw();
   s.anzeige = `${s.vorname} ${s.nachname}`;
@@ -62,7 +94,12 @@ const proKlasse = {};
 for (const s of schueler) (proKlasse[s.klasse] ||= []).push(s);
 console.log(`${schueler.length} Schueler in ${Object.keys(proKlasse).length} Klassen:`);
 for (const [k, v] of Object.entries(proKlasse).sort()) console.log(`  ${k}: ${v.length}`);
-console.log(`\nBeispiel-Login: ${schueler[0].loginName} / ${schueler[0].passwort}`);
+console.log('');
+for (const [k, list] of Object.entries(proKlasse).sort()) {
+  for (const s of list) {
+    console.log(`  ${k.padEnd(4)} ${s.anzeige.padEnd(24)} Login: ${s.loginName.padEnd(16)} Passwort: ${s.passwort}`);
+  }
+}
 
 if (dry) { console.log('\n--dry: nichts geschrieben.'); process.exit(0); }
 if (!await confirm(`\n${schueler.length} Accounts jetzt wirklich anlegen?`)) { console.log('Abgebrochen.'); process.exit(0); }
