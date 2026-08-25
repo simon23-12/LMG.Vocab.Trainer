@@ -52,7 +52,7 @@
         "awards": {
           ".write": "auth.uid === $uid",
           "$awardId": {
-            ".validate": "!data.exists() && newData.hasChildren(['month'])"
+            ".validate": "!data.exists() && newData.child('unlockedAt').isString()"
           }
         },
 

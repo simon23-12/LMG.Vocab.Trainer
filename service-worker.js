@@ -3,7 +3,7 @@
 // Version 1.0 - PWA Support
 
 // ⚠️ BEI JEDEM DEPLOY HOCHZÄHLEN (v3 → v4 → …). Löst den Auto-Reload bei allen Usern aus.
-const VERSION = 'v10';
+const VERSION = 'v11';
 const CACHE_NAME = 'lmg-vocab-' + VERSION;
 const RUNTIME_CACHE = 'lmg-vocab-runtime-' + VERSION;
 

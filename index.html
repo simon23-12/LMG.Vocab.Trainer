@@ -583,15 +583,18 @@
   auth.onAuthStateChanged(async (firebaseUser) => {
     if (firebaseUser) {
       try {
+        // Nur weiterleiten, wenn WIRKLICH eine vollstaendige Sitzung vorliegt.
+        // Fehlt der localStorage-Teil (z. B. nach einem Logout), wuerde display.html
+        // sofort wieder hierher zurueckschicken - genau die Endlosschleife.
+        const savedClass = localStorage.getItem('selectedClass');
+        const savedUser = localStorage.getItem('lmg_currentUser');
+        if (!savedClass || !savedUser) return;
+
         const userSnapshot = await db.ref('users/' + firebaseUser.uid).get();
         if (userSnapshot.exists()) {
           currentUser = userSnapshot.val();
           currentUser.key = firebaseUser.uid;
-          // Direkt zu display.html mit Klasse
-          const savedClass = localStorage.getItem('selectedClass');
-          if (savedClass) {
-            window.location.href = 'display.html?class=' + savedClass;
-          }
+          window.location.href = 'display.html?class=' + savedClass;
         }
       } catch (error) {
         console.error('Session-Fehler:', error);
