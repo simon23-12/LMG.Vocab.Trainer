@@ -13,6 +13,8 @@ Alle Skripte fragen vor schreibenden Aktionen nach; `--yes` überspringt die Rü
 | `node admin/create-accounts.mjs <liste.csv> [--dry]` | Schüler-Accounts aus Klassenliste anlegen |
 | `node admin/list-accounts.mjs [klasse]` | Übersicht der angelegten Accounts |
 | `node admin/archive-users.mjs <schuljahr>` | Alten `users`-Baum nach `archive/` verschieben |
+| `node admin/delete-accounts.mjs <login> …` | Accounts vollständig löschen (Auth + Daten + Leaderboard) |
+| `node admin/cleanup-orphans.mjs [--loeschen]` | Auth-Accounts ohne Datenknoten finden/entfernen |
 
 ## Klassenliste (CSV)
 
