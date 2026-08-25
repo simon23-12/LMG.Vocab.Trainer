@@ -1,0 +1,8 @@
+# Nur lokale Werkzeuge und Doku - gehoeren nicht auf die Schuelerseite.
+admin/
+backups/
+.secrets/
+database.rules.json
+BATTLEARENA_PLAN.md
+CLAUDE.md
+dev/
