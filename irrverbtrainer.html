@@ -676,6 +676,8 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="auth-guard.js"></script>
   <script>
     // Firebase Configuration
     const firebaseConfig = {
@@ -695,6 +697,9 @@
     try {
       app = firebase.initializeApp(firebaseConfig);
       db = firebase.database();
+      // Zugriffsschutz: ohne gueltige Anmeldung zurueck zur Loginseite.
+      // Accounts vergibt ausschliesslich die Lehrkraft (siehe admin/create-accounts.mjs).
+      window.lmgSessionReady = lmgRequireAuth();
       firebaseReady = true;
       console.log('✓ Firebase initialized successfully');
     } catch (error) {

@@ -1,0 +1,119 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      ".read": "auth.token.admin === true",
+      ".indexOn": ["class", "name"],
+
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.admin === true)",
+        ".write": "auth.token.admin === true",
+
+        "name":       { ".validate": "auth.token.admin === true" },
+        "class":      { ".validate": "auth.token.admin === true" },
+        "loginName":  { ".validate": "auth.token.admin === true" },
+        "created":    { ".validate": "auth.token.admin === true" },
+        "disabled":   { ".validate": "auth.token.admin === true" },
+
+        "performance": {
+          ".write": "auth.uid === $uid",
+          "$pageKey": {
+            ".validate": "newData.hasChildren() || !newData.exists()"
+          }
+        },
+
+        "lifetimeTotalVocabs": {
+          ".write": "auth.uid === $uid",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500000 && (!data.exists() || newData.val() >= data.val())"
+        },
+
+        "montiGameHighscore": {
+          ".write": "auth.uid === $uid",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000 && (!data.exists() || newData.val() >= data.val())"
+        },
+
+        "currentStreak": {
+          ".write": "auth.uid === $uid",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3650"
+        },
+
+        "bestStreak": {
+          ".write": "auth.uid === $uid",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3650 && (!data.exists() || newData.val() >= data.val())"
+        },
+
+        "lastActivityDate": {
+          ".write": "auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+
+        "awards": {
+          ".write": "auth.uid === $uid",
+          "$awardId": {
+            ".validate": "!data.exists() && newData.hasChildren(['month'])"
+          }
+        },
+
+        "irregularVerbsSimple": {
+          ".write": "auth.uid === $uid",
+          ".validate": "newData.hasChildren() || !newData.exists()"
+        },
+
+        "irregularVerbsFull": {
+          ".write": "auth.uid === $uid",
+          ".validate": "newData.hasChildren() || !newData.exists()"
+        },
+
+        "$other": { ".validate": "auth.token.admin === true" }
+      }
+    },
+
+    "leaderboard": {
+      "$class": {
+        ".read": "auth != null",
+        ".indexOn": ["score"],
+        "$uid": {
+          ".write": "auth.uid === $uid || auth.token.admin === true",
+          ".validate": "!newData.exists() || (newData.hasChildren(['name', 'score']) && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 500000 && newData.child('name').isString() && newData.child('name').val().length <= 60)",
+          "name":       { ".validate": "newData.isString() && newData.val().length <= 60" },
+          "score":      { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500000" },
+          "vocabs":     { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500000" },
+          "accuracy":   { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100" },
+          "lifetime":   { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500000" },
+          "bestStreak": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3650" },
+          "monthKey":   { ".validate": "newData.isString() && newData.val().length <= 10" },
+          "updated":    { ".validate": "newData.isNumber()" },
+          "$other":     { ".validate": false }
+        }
+      }
+    },
+
+    "vocabulary5":  { ".read": "auth != null", ".write": "auth.token.admin === true" },
+    "vocabulary6":  { ".read": "auth != null", ".write": "auth.token.admin === true" },
+    "vocabulary7":  { ".read": "auth != null", ".write": "auth.token.admin === true" },
+    "vocabulary8":  { ".read": "auth != null", ".write": "auth.token.admin === true" },
+    "vocabulary9":  { ".read": "auth != null", ".write": "auth.token.admin === true" },
+    "vocabulary10": { ".read": "auth != null", ".write": "auth.token.admin === true" },
+
+    "usage_logs": {
+      ".read": "auth.token.admin === true",
+      "$logId": {
+        ".write": "auth != null && !data.exists()",
+        ".validate": "newData.hasChildren()"
+      }
+    },
+
+    "rooms": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$roomCode": { ".indexOn": ["createdAt"] }
+    },
+
+    "archive": {
+      ".read": "auth.token.admin === true",
+      ".write": "auth.token.admin === true"
+    }
+  }
+}

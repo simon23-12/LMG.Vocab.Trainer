@@ -34,6 +34,24 @@ Version hochgezählt werden.
 einfach miterledigen. (Reine Daten-Edits in `vocab/*.json` brauchen keinen Bump, da
 Vokabeln "network-first" geladen werden.)
 
+## Auth & Datenbank (ab Schuljahr 2026/27)
+
+**Keine Selbstregistrierung mehr.** Accounts legt ausschließlich die Lehrkraft an:
+`node admin/create-accounts.mjs <klassenliste.csv>` (siehe [admin/README.md](admin/README.md)).
+
+- Anmeldung läuft über **Firebase Authentication** (synthetische Mail `<login>@lmg-vokabel.app`).
+- Datenknoten heißt `users/<uid>` — die uid aus Firebase Auth, **nicht** mehr `name_base64(pw)`.
+- Lehrer-Recht ist ein **Custom Claim** (`admin: true`), gesetzt per `admin/set-admin.mjs`.
+  Kein Passwortvergleich im Client, kein sessionStorage-Flag.
+- [auth-guard.js](auth-guard.js) stellt `lmgRequireAuth()` / `lmgLogout()` bereit; jede Seite mit
+  Datenbankzugriff ruft den Guard nach `firebase.initializeApp(...)` auf.
+- Security Rules stehen in [database.rules.json](database.rules.json) und werden mit
+  `node admin/deploy-rules.mjs` deployt. **Rules-Änderung immer zusammen mit dem passenden
+  Client-Code deployen**, sonst bricht die App für alle.
+- Ranglisten lesen `leaderboard/<klasse>/<uid>` (jeder schreibt nur den eigenen Eintrag),
+  **nicht** mehr den kompletten `users`-Baum.
+- `.secrets/` und `backups/` sind gitignored und dürfen nie ins Repo.
+
 ## Token-Effizienz Regeln
 1. **NIE ganze Dateien lesen** - [index.html](index.html) ~800 Zeilen, [montigame.html](montigame.html) ~2000 Zeilen
 2. **Grep mit -A/-B verwenden** für Kontext statt Read

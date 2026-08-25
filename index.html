@@ -516,18 +516,13 @@
       <div class="landing-container">
         <div class="welcome-section">
           <h2>🚀 Bereit zum Lernen?</h2>
-          <p>Neu hier? Klicke auf "Registrieren".</p>
+          <p>Melde dich mit dem Login an, den du von deiner Lehrkraft bekommen hast.</p>
         </div>
-        
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('login')">Login</button>
-          <button class="tab" onclick="switchTab('register')">Registrieren</button>
-        </div>
-        
+
         <div id="loginTab" class="tab-content active">
           <div class="form-group">
             <div class="input-icon" data-icon="👤">
-              <input id="loginName" class="modern-input" placeholder="Dein Name" onkeypress="if(event.key==='Enter') login()" />
+              <input id="loginName" class="modern-input" placeholder="Dein Login (z. B. 7b.mustermann.l)" autocapitalize="none" autocorrect="off" spellcheck="false" onkeypress="if(event.key==='Enter') login()" />
             </div>
           </div>
           <div class="form-group">
@@ -536,59 +531,15 @@
             </div>
           </div>
           <button onclick="login()" class="modern-button">Login 🚀</button>
-        </div>
-        
-        <div id="registerTab" class="tab-content">
-          <div class="info-box">
-            <div class="info-box-title">💡 Wichtige Hinweise</div>
+
+          <div class="info-box" style="margin-top:22px">
+            <div class="info-box-title">💡 Login vergessen?</div>
             <ol class="info-box-list">
-              <li>Bitte melde dich nur mit deinem <strong>Vornamen</strong> als Name an, nicht den Nachnamen benutzen.</li>
-              <li>Verwende ein Passwort dass du sonst nirgends benutzt! Schreib dir dein Passwort sicher in den <strong>Schulplaner</strong> oder einen anderen Ort, wo du es jederzeit nachschauen kannst.</li>
-              <li>Bitte wähle die <strong>richtige Klasse</strong> aus, da du sonst falsch zugeordnet wirst.</li>
+              <li>Deine Zugangsdaten bekommst du von deiner Englisch- bzw. Lateinlehrkraft.</li>
+              <li>Eine eigene Anmeldung ist nicht mehr möglich – so bleibt die Klassenübersicht sauber.</li>
+              <li>Passwort verloren? Sag deiner Lehrkraft Bescheid, sie setzt es neu.</li>
             </ol>
           </div>
-          
-          <div class="form-group">
-            <div class="input-icon" data-icon="👤">
-              <input id="regName" class="modern-input" placeholder="Dein Name" />
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="input-icon" data-icon="🔒">
-              <input id="regPass" class="modern-input" placeholder="Passwort" type="password" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-secondary);">📚 Deine Klasse:</label>
-            <select id="regClass" class="modern-input">
-              <option value="">-- Klasse wählen --</option>
-              <option value="5a">5a</option>
-              <option value="5b">5b</option>
-              <option value="5c">5c</option>
-              <option value="5d">5d</option>
-              <option value="6a">6a</option>
-              <option value="6b">6b</option>
-              <option value="6c">6c</option>
-              <option value="6d">6d</option>
-              <option value="7a">7a</option>
-              <option value="7b">7b</option>
-              <option value="7c">7c</option>
-              <option value="7d">7d</option>
-              <option value="8a">8a</option>
-              <option value="8b">8b</option>
-              <option value="8c">8c</option>
-              <option value="8d">8d</option>
-              <option value="9a">9a</option>
-              <option value="9b">9b</option>
-              <option value="9c">9c</option>
-              <option value="9d">9d</option>
-              <option value="10a">10a</option>
-              <option value="10b">10b</option>
-              <option value="10c">10c</option>
-              <option value="10d">10d</option>
-            </select>
-          </div>
-          <button onclick="register()" class="modern-button">Account erstellen ✨</button>
         </div>
       </div>
       
@@ -604,17 +555,18 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="auth-guard.js"></script>
 
   <script>
   // Firebase Konfiguration
   const firebaseConfig = {
-    apiKey: "AIzaSyBJoc3KI6mElR3Xb0MKl5BNd5bJThO8m-8",
+    apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
     authDomain: "testdatabase-4daf4.firebaseapp.com",
     databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "testdatabase-4daf4",
     storageBucket: "testdatabase-4daf4.firebasestorage.app",
-    messagingSenderId: "522457998676",
-    appId: "1:522457998676:web:5b9450fa93e12fc3bdc722"
+    messagingSenderId: "743231387214",
+    appId: "1:743231387214:web:166169b25f72616280351f"
   };
 
   // Firebase initialisieren
@@ -658,176 +610,64 @@
     }, 4000);
   }
 
-  // Tab-Wechsel
-  function switchTab(tabName) {
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-content').forEach(content => {
-      content.classList.remove('active');
-    });
-    
-    if (tabName === 'login') {
-      document.querySelectorAll('.tab')[0].classList.add('active');
-      document.getElementById('loginTab').classList.add('active');
-    } else {
-      document.querySelectorAll('.tab')[1].classList.add('active');
-      document.getElementById('registerTab').classList.add('active');
-    }
-  }
-
-  // Passwort hashen (SHA-256)
-  async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  // Registrierung
-  async function register() {
-    const name = document.getElementById('regName').value.trim();
-    const pass = document.getElementById('regPass').value;
-    const cls = document.getElementById('regClass').value;
-    
-    if (!name || !pass || !cls) {
-      showStatus("Bitte alle Felder ausfüllen!", 'error');
-      return;
-    }
-
-    // Nur Buchstaben und Leerzeichen erlaubt (keine Zahlen, keine Emojis)
-    if (!/^[A-Za-zÄÖÜäöüß\s]+$/.test(name)) {
-      showStatus("Name darf nur Buchstaben und Leerzeichen enthalten – keine Zahlen oder Emojis!", 'error');
-      return;
-    }
-
-    // Extrahiere Jahrgang aus Klasse (z.B. "7b" -> "7")
-    const jahrgang = cls.charAt(0);
-    if (!['5','6','7','8','9'].includes(jahrgang) && !cls.startsWith('10')) {
-      showStatus("Ungültige Klasse!", 'error');
-      return;
-    }
-    
-    try {
-      // Erstelle eindeutigen Key aus Name + Passwort Hash
-      const userKey = name + '_' + btoa(pass).substring(0, 8);
-      
-      // Prüfe ob dieser exakte Account bereits existiert
-      const existingUser = await db.ref('users/' + userKey).get();
-      if (existingUser.exists()) {
-        showStatus("Dieser Account existiert bereits! Bitte logge dich ein.", 'error');
-        return;
-      }
-      
-      // Hash Passwort mit SHA-256
-      const passwordHash = await hashPassword(pass);
-      
-      await db.ref('users/' + userKey).set({ 
-        name: name,
-        passwordHash: passwordHash,
-        class: cls,
-        created: new Date().toISOString(),
-        performance: {},
-        currentStreak: 0,
-        bestStreak: 0,
-        lastActivityDate: null
-      });
-      
-      alert("Registrierung erfolgreich! 🎉\n\nBitte notiere dir deine Login-Daten sorgfältig:\n\nName: " + name + "\nPasswort: " + pass);
-      showStatus("Registrierung erfolgreich! Jetzt einloggen.", 'success');
-      
-      // Felder leeren und zum Login wechseln
-      document.getElementById('regName').value = '';
-      document.getElementById('regPass').value = '';
-      document.getElementById('regClass').value = '';
-      switchTab('login');
-    } catch (error) {
-      showStatus("Fehler: " + error.message, 'error');
-    }
-  }
-
   // Benutzer-Login
+  //
+  // Ab 2026/27: Accounts kommen ausschliesslich von der Lehrkraft (admin/create-accounts.mjs).
+  // Angemeldet wird ueber Firebase Authentication - der Datenknoten heisst users/<uid>,
+  // und die Security Rules erlauben Schreibzugriff nur auf den eigenen Knoten.
   async function login() {
-    const username = document.getElementById('loginName').value.trim();
+    const loginName = document.getElementById('loginName').value.trim().toLowerCase();
     const password = document.getElementById('loginPass').value;
 
-    if (!username || !password) {
+    if (!loginName || !password) {
       showStatus('⚠️ Bitte fülle alle Felder aus', 'error');
       return;
     }
 
-    // LEHRER-LOGIN CHECK
-    if (username === 'teacher' || username === 'admin@lmg-vokabel.internal' || username === 'admin') {
-      const inputHash = btoa(password);
-      const correctHash = 'TE1HYWRtaW4=';
-      
-      if (inputHash === correctHash) {
-        // Speichere Lehrer-Session
-        sessionStorage.setItem('lmg_teacher_auth', 'true');
-        sessionStorage.setItem('lmg_teacher_name', username);
-        
-        // Weiterleitung zum Teacher-Dashboard
-        window.location.href = 'teacher-dashboard.html';
-        return;
+    showStatus('Anmeldung läuft …', 'info');
+
+    let cred;
+    try {
+      cred = await auth.signInWithEmailAndPassword(lmgEmailFor(loginName), password);
+    } catch (error) {
+      const codes = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-credential', 'auth/invalid-email'];
+      if (codes.includes(error.code)) {
+        showStatus('Login oder Passwort stimmt nicht. Schau nochmal auf deinen Zettel :)', 'error');
+      } else if (error.code === 'auth/too-many-requests') {
+        showStatus('Zu viele Versuche. Bitte warte einen Moment.', 'error');
+      } else if (error.code === 'auth/user-disabled') {
+        showStatus('Dieser Zugang wurde deaktiviert. Bitte wende dich an deine Lehrkraft.', 'error');
       } else {
-        showStatus('❌ Falsches Passwort', 'error');
-        return;
+        showStatus('Fehler bei der Anmeldung: ' + error.message, 'error');
       }
+      console.error(error);
+      return;
+    }
+
+    const uid = cred.user.uid;
+
+    // Lehrkraft? Das Admin-Recht steckt als Custom Claim im Token, nicht im Client-Code.
+    const token = await cred.user.getIdTokenResult(true);
+    if (token.claims.admin === true) {
+      window.location.href = 'teacher-dashboard.html';
+      return;
     }
 
     try {
-      // Erstelle den gleichen Key wie bei der Registrierung
-      const userKey = username + '_' + btoa(password).substring(0, 8);
-      
-      const snap = await db.ref('users/' + userKey).get();
-      
+      const snap = await db.ref('users/' + uid).get();
       if (!snap.exists()) {
-        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
+        showStatus('Zu diesem Login gibt es noch keine Daten. Bitte melde dich bei deiner Lehrkraft.', 'error');
+        await auth.signOut();
         return;
       }
-      
       const data = snap.val();
-      
-      // Hash Passwort für Vergleich
-      const inputHash = await hashPassword(password);
-      
-      // Support für alte Accounts (Klartext oder Base64)
-      const isValidHash = data.passwordHash && data.passwordHash === inputHash;
-      const isValidLegacy = data.password && data.password === password;
-      
-      if (!isValidHash && !isValidLegacy) {
-        showStatus("Hoppla, deine Login-Daten stimmen nicht. Bitte überprüfe das noch einmal :)", 'error');
-        return;
-      }
 
-      // Firebase Authentication für Session
-      const email = userKey + '@lmg-vokabel.app';
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-      } catch (authError) {
-        if (authError.code === 'auth/user-not-found') {
-          await auth.createUserWithEmailAndPassword(email, password);
-          await auth.signInWithEmailAndPassword(email, password);
-        }
-      }
+      // Jahrgang aus der Klasse ableiten ("7b" -> "7", "10c" -> "10")
+      const jahrgang = String(data.class).startsWith('10') ? '10' : String(data.class).charAt(0);
 
-      // Erfolgreicher Login
-      currentUser = data;
-      currentUser.key = userKey;
-      
-      // Extrahiere Jahrgang aus Klasse
-      let jahrgang;
-      if (data.class.startsWith('10')) {
-        jahrgang = '10';
-      } else {
-        jahrgang = data.class.charAt(0);
-      }
-      
-      // Erstelle vollständiges User-Objekt für display.html
       const userObject = {
         name: data.name,
-        userKey: userKey,
+        userKey: uid,
         class: data.class,
         jahrgang: jahrgang,
         currentStreak: data.currentStreak || 0,
@@ -835,20 +675,17 @@
         lastActivityDate: data.lastActivityDate || null,
         lifetimeTotalVocabs: data.lifetimeTotalVocabs || 0
       };
-      
-      // Speichere Session-Daten für display.html
+
       localStorage.setItem('lmg_currentUser', JSON.stringify(userObject));
       localStorage.setItem('lmg_userPerformance', JSON.stringify(data.performance || {}));
       localStorage.setItem('lmg_sessionPerformance', JSON.stringify({}));
       localStorage.setItem('selectedClass', data.class);
-      localStorage.setItem('currentUserKey', userKey);
-      
-      console.log('✓ Session-Daten gespeichert für display.html');
-      
+      localStorage.setItem('currentUserKey', uid);
+
       showStatus('✓ Erfolgreich angemeldet!', 'success');
       setTimeout(() => {
         window.location.href = 'display.html?class=' + data.class;
-      }, 500);
+      }, 400);
 
     } catch (error) {
       showStatus('Fehler: ' + error.message, 'error');

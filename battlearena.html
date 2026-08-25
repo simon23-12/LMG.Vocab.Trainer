@@ -138,6 +138,8 @@
   <!-- Firebase SDK (compat, wie im restlichen Projekt) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="auth-guard.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
   <script>
@@ -162,6 +164,9 @@
       appCheck.activate('6LcyqzEsAAAAADdyoXYe8Nz0RNXg0JF--msTJuSY', true);
     } catch (e) { console.warn('App Check nicht aktiv (lokal?):', e.message); }
     db = firebase.database();
+    // Zugriffsschutz: ohne gueltige Anmeldung zurueck zur Loginseite.
+    // Accounts vergibt ausschliesslich die Lehrkraft (siehe admin/create-accounts.mjs).
+    window.lmgSessionReady = lmgRequireAuth();
     db.ref('.info/serverTimeOffset').on('value', s => { serverOffset = s.val() || 0; });
   } catch (e) {
     console.error('Firebase Init Fehler:', e);

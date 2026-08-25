@@ -849,6 +849,8 @@
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="auth-guard.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -891,6 +893,9 @@
                 
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.database();
+                // Zugriffsschutz: ohne gueltige Anmeldung zurueck zur Loginseite.
+                // Accounts vergibt ausschliesslich die Lehrkraft (siehe admin/create-accounts.mjs).
+                window.lmgSessionReady = lmgRequireAuth();
                 console.log('✓ Firebase initialisiert für Highscore');
             } catch (error) {
                 console.error('Firebase Init Fehler:', error);

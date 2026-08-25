@@ -1,0 +1,10 @@
+{
+  "name": "lmg-vokabeltrainer-admin",
+  "private": true,
+  "type": "module",
+  "description": "Admin-Werkzeuge: Accounts anlegen, Rules deployen, Backups, Archiv. Laeuft nur lokal mit .secrets/firebase-admin.json.",
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "google-auth-library": "^9.0.0"
+  }
+}

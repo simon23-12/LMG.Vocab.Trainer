@@ -450,17 +450,19 @@
   <!-- Firebase Configuration -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="auth-guard.js"></script>
 
   <script>
   // Firebase Konfiguration
   const firebaseConfig = {
-    apiKey: "AIzaSyBJoc3KI6mElR3Xb0MKl5BNd5bJThO8m-8",
+    apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
     authDomain: "testdatabase-4daf4.firebaseapp.com",
     databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "testdatabase-4daf4",
     storageBucket: "testdatabase-4daf4.firebasestorage.app",
-    messagingSenderId: "522457998676",
-    appId: "1:522457998676:web:5b9450fa93e12fc3bdc722"
+    messagingSenderId: "743231387214",
+    appId: "1:743231387214:web:166169b25f72616280351f"
   };
 
   // Firebase initialisieren
@@ -468,16 +470,14 @@
   const db = firebase.database();
 
   // Auth-Check beim Laden
-  window.addEventListener('DOMContentLoaded', () => {
-    // Prüfe ob Lehrer authentifiziert ist
-    const isAuth = sessionStorage.getItem('lmg_teacher_auth');
-    if (isAuth !== 'true') {
-      // Nicht authentifiziert -> zurück zum Login
-      window.location.href = 'index.html';
-      return;
-    }
-    
-    // Authentifiziert -> lade Daten
+  //
+  // Das Lehrer-Recht steckt als Custom Claim (admin: true) im Firebase-Token und wird
+  // serverseitig von den Security Rules geprueft - es laesst sich nicht mehr durch
+  // Setzen eines sessionStorage-Flags vortaeuschen. Vergeben wird es mit
+  // "node admin/set-admin.mjs <loginName>".
+  window.addEventListener('DOMContentLoaded', async () => {
+    const session = await lmgRequireAuth({ admin: true });
+    console.log('Lehrer-Zugang bestätigt:', session.loginName);
     loadAdminStats();
     initDarkMode();
   });
@@ -829,9 +829,7 @@
   }
 
   function logout() {
-    sessionStorage.removeItem('lmg_teacher_auth');
-    sessionStorage.removeItem('lmg_teacher_name');
-    window.location.href = 'index.html';
+    lmgLogout();
   }
 
   function initDarkMode() {

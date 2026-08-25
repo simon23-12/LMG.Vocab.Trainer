@@ -1548,6 +1548,8 @@
   
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="auth-guard.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
   
   <script>
@@ -1722,6 +1724,9 @@
       try {
         app = firebase.initializeApp(firebaseConfig);
         db = firebase.database();
+        // Zugriffsschutz: ohne gueltige Anmeldung zurueck zur Loginseite.
+        // Accounts vergibt ausschliesslich die Lehrkraft (siehe admin/create-accounts.mjs).
+        window.lmgSessionReady = lmgRequireAuth();
         
         // Firebase App Check aktivieren (reCAPTCHA v3 - unsichtbar!)
         const appCheck = firebase.appCheck();
@@ -2725,6 +2730,9 @@
       
       // CHECK FOR NEW AWARDS (IMMER ausführen)
       await checkForNewAwards();
+
+      // Eigenen Leaderboard-Eintrag veroeffentlichen (siehe publishLeaderboardEntry)
+      await publishLeaderboardEntry();
       
       const existingPerf = userPerformance[window.currentPerformanceKey];
       if (existingPerf && existingPerf.percent > percent) {
@@ -3259,47 +3267,23 @@
       if (winSnap.exists() && winSnap.val().month === monthKey) return;
       if (podSnap.exists() && podSnap.val().month === monthKey) return;
 
-      // Lade alle User und berechne Leaderboard für Vormonat
-      const usersSnap = await db.ref('users').get();
-      if (!usersSnap.exists()) return;
+      // Rangliste des Vormonats aus dem veroeffentlichten Monats-Snapshot.
+      // (Der komplette users-Baum ist fuer Schueler nicht mehr lesbar.)
+      const klasse = (currentUser.class || '').toLowerCase().trim();
+      const lbSnap = await db.ref('leaderboard/' + klasse).get();
+      if (!lbSnap.exists()) return;
 
-      const allUsers = usersSnap.val();
+      const eintraege = lbSnap.val();
       const classUsers = [];
-      const currentClass = (currentUser.class || '').toLowerCase().trim();
       const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
 
-      for (let userKey in allUsers) {
-        const user = allUsers[userKey];
-        const userClass = (user.class || '').toLowerCase().trim();
-        if (userClass !== currentClass) continue;
-        if (!user.name || testAccounts.includes(user.name.toLowerCase())) continue;
-
-        let monthVocabs = 0;
-        let overallTotalPercent = 0;
-        let overallPerfCount = 0;
-
-        if (user.performance) {
-          for (let perfKey in user.performance) {
-            const perf = user.performance[perfKey];
-            if (perf.percent !== undefined && !isNaN(perf.percent)) {
-              overallTotalPercent += perf.percent;
-              overallPerfCount++;
-            }
-            if (perf.timestamp) {
-              const perfDate = new Date(perf.timestamp);
-              if (perfDate.getMonth() + 1 === prevMonth && perfDate.getFullYear() === prevYear) {
-                monthVocabs += (perf.total || 0);
-              }
-            }
-          }
-        }
-
-        const overallAccuracy = overallPerfCount > 0 ? (overallTotalPercent / overallPerfCount) : 0;
-        const score = Math.round(monthVocabs * (overallAccuracy / 100));
-
-        if (score > 0) {
-          classUsers.push({ userKey, name: user.name, score });
-        }
+      for (let uid in eintraege) {
+        const e = eintraege[uid];
+        if (!e || !e.name) continue;
+        if (testAccounts.includes(String(e.name).toLowerCase())) continue;
+        if (e.monthKey !== monthKey) continue;
+        const score = Number(e.score) || 0;
+        if (score > 0) classUsers.push({ userKey: uid, name: e.name, score });
       }
 
       if (classUsers.length === 0) return;
@@ -3482,82 +3466,37 @@
       document.getElementById('leaderboardTitle').innerHTML = `🏆 Top 10 Leaderboard ${userClass} <span class="leaderboard-month">${monthNames[currentMonth - 1]}</span>`;
       
       // Lade alle User der gleichen Klasse
-      const usersSnap = await db.ref('users').get();
-      if (!usersSnap.exists()) {
+      // Leaderboard liest NICHT mehr den kompletten users-Baum (das war world-readable
+      // und ist es seit den neuen Security Rules auch nicht mehr). Jede Schuelerin und
+      // jeder Schueler veroeffentlicht stattdessen den eigenen Monatsscore unter
+      // leaderboard/<klasse>/<uid> - siehe publishLeaderboardEntry().
+      const klasse = (currentUser.class || '').toLowerCase().trim();
+      const lbSnap = await db.ref('leaderboard/' + klasse).get();
+      if (!lbSnap.exists()) {
         list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Noch keine Daten verfügbar</li>';
         return;
       }
-      
-      const allUsers = usersSnap.val();
+
+      const eintraege = lbSnap.val();
       const classUsers = [];
-      
-      // Filtere User nach Klasse und berechne Score für diesen Monat
-      for (let userKey in allUsers) {
-        const user = allUsers[userKey];
-        
-        // Nur User der gleichen Klasse (case-insensitive!)
-        const userClass = (user.class || '').toLowerCase().trim();
-        const currentClass = (currentUser.class || '').toLowerCase().trim();
-        
-        if (userClass !== currentClass) continue;
-        
-        // Überspringe User ohne Namen (fehlerhafte Einträge)
-        if (!user.name) {
-          console.log('Überspringe User ohne Namen:', userKey);
-          continue;
-        }
-        
-        // Exkludiere Test-Accounts
-        const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
-        if (testAccounts.includes(user.name.toLowerCase())) {
-          console.log('Überspringe Test-Account:', user.name);
-          continue;
-        }
-        
-        // Berechne Score: Monatliche Vokabeln * Overall Accuracy
-        let monthVocabs = 0;
-        let overallTotalPercent = 0;
-        let overallPerfCount = 0;
-        
-        if (user.performance) {
-          for (let perfKey in user.performance) {
-            const perf = user.performance[perfKey];
-            
-            // Zähle ALLE Performance-Einträge für Overall Accuracy
-            if (perf.percent !== undefined && !isNaN(perf.percent)) {
-              overallTotalPercent += perf.percent;
-              overallPerfCount++;
-            }
-            
-            // Zähle nur Vokabeln von Tests in diesem Monat
-            if (perf.timestamp) {
-              const perfDate = new Date(perf.timestamp);
-              const perfMonth = perfDate.getMonth() + 1;
-              const perfYear = perfDate.getFullYear();
-              
-              if (perfMonth === currentMonth && perfYear === currentYear) {
-                monthVocabs += (perf.total || 0);
-              }
-            }
-          }
-        }
-        
-        // Berechne Overall Accuracy (aus ALLEN Tests, nicht nur diesem Monat)
-        const overallAccuracy = overallPerfCount > 0 ? (overallTotalPercent / overallPerfCount) : 0;
-        
-        // Score = Monatliche Vokabeln * (Overall Accuracy / 100)
-        const score = Math.round(monthVocabs * (overallAccuracy / 100));
-        
-        // Nur User mit Aktivität in diesem Monat hinzufügen (Score > 0)
-        if (score > 0) {
-          classUsers.push({
-            userKey: userKey,
-            name: user.name,
-            vocabs: monthVocabs,
-            accuracy: Math.round(overallAccuracy),
-            score: score
-          });
-        }
+      // monthKey ist in dieser Funktion bereits weiter oben definiert (Zeile ~3457)
+      const testAccounts = ['test5', 'test6', 'test7', 'test8', 'test9', 'test10'];
+
+      for (let uid in eintraege) {
+        const e = eintraege[uid];
+        if (!e || !e.name) continue;
+        if (testAccounts.includes(String(e.name).toLowerCase())) continue;
+        if (e.monthKey !== monthKey) continue;        // Eintrag stammt aus einem alten Monat
+        const score = Number(e.score) || 0;
+        if (score <= 0) continue;
+
+        classUsers.push({
+          userKey: uid,
+          name: e.name,
+          vocabs: Number(e.vocabs) || 0,
+          accuracy: Number(e.accuracy) || 0,
+          score: score
+        });
       }
       
       // Sortiere nach Score (absteigend)
@@ -3604,6 +3543,55 @@
     }
   }
   
+  /**
+   * Veroeffentlicht den eigenen Monatsscore unter leaderboard/<klasse>/<uid>.
+   *
+   * Hintergrund: Frueher hat jeder Client den kompletten users-Baum gelesen, um die
+   * Rangliste zu bauen - dafuer musste users world-readable sein (inkl. Passwort-Hashes).
+   * Jetzt liest niemand mehr fremde Nutzerdaten; jeder schreibt nur seinen eigenen
+   * Eintrag, und die Security Rules lassen genau das zu (auth.uid === $uid).
+   */
+  async function publishLeaderboardEntry() {
+    try {
+      if (!currentUser || !currentUser.userKey || !currentUser.class) return;
+
+      const jetzt = new Date();
+      const monthKey = `${jetzt.getFullYear()}-${String(jetzt.getMonth() + 1).padStart(2, '0')}`;
+
+      let monthVocabs = 0, summePercent = 0, anzahlPerf = 0;
+      for (const key in userPerformance) {
+        const perf = userPerformance[key];
+        if (!perf) continue;
+        if (perf.percent !== undefined && !isNaN(perf.percent)) {
+          summePercent += perf.percent;
+          anzahlPerf++;
+        }
+        if (perf.timestamp) {
+          const d = new Date(perf.timestamp);
+          const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          if (k === monthKey) monthVocabs += (perf.total || 0);
+        }
+      }
+
+      const accuracy = anzahlPerf > 0 ? (summePercent / anzahlPerf) : 0;
+      const score = Math.round(monthVocabs * (accuracy / 100));
+      const klasse = String(currentUser.class).toLowerCase().trim();
+
+      await db.ref('leaderboard/' + klasse + '/' + currentUser.userKey).set({
+        name: currentUser.name,
+        score: score,
+        vocabs: monthVocabs,
+        accuracy: Math.round(accuracy),
+        lifetime: currentUser.lifetimeTotalVocabs || 0,
+        bestStreak: currentUser.bestStreak || 0,
+        monthKey: monthKey,
+        updated: Date.now()
+      });
+    } catch (e) {
+      console.error('Leaderboard-Eintrag konnte nicht veroeffentlicht werden:', e);
+    }
+  }
+
   // Cache für Leaderboard
   let leaderboardCache = null;
   let leaderboardCacheTime = null;

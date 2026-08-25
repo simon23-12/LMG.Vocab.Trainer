@@ -1,0 +1,11 @@
+.DS_Store
+.vscode/
+
+# Firebase Admin Credentials – NIEMALS committen/hochladen!
+.secrets/
+*firebase-adminsdk*.json
+serviceAccountKey.json
+firebase-debug.log
+*.log
+node_modules/
+backups/
