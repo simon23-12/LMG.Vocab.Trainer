@@ -6,8 +6,18 @@ import { randomInt } from 'crypto';
 
 // Ohne <passwort> wird eines erzeugt und in backups/ abgelegt (gitignored),
 // damit es nicht in der Shell-History steht.
-const ZEICHEN = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!?+-*';
-const erzeuge = () => Array.from({ length: 20 }, () => ZEICHEN[randomInt(ZEICHEN.length)]).join('');
+//
+// Sprechbar statt Zeichensalat: Der Lehrer-Zugang wird im Kollegium weitergegeben,
+// muss also diktierbar sein. Zwei Woerter plus Zahl sind kurz genug dafuer und
+// trotzdem deutlich schwerer zu raten als ein einzelnes Wort.
+const WOERTER = [
+  'anker', 'biene', 'blume', 'bruecke', 'delfin', 'eule', 'feder', 'fuchs', 'garten',
+  'hafen', 'insel', 'kanu', 'kerze', 'komet', 'krone', 'lampe', 'loewe', 'magnet',
+  'melone', 'mond', 'nebel', 'otter', 'palme', 'pinsel', 'planet', 'rakete', 'regen',
+  'robbe', 'segel', 'stern', 'tiger', 'tulpe', 'turm', 'vulkan', 'wolke', 'zebra'
+];
+const erzeuge = () =>
+  `${WOERTER[randomInt(WOERTER.length)]}-${WOERTER[randomInt(WOERTER.length)]}-${randomInt(10, 100)}`;
 
 const [loginName, passwortArg, anzeigename] = process.argv.slice(2);
 if (!loginName) {
