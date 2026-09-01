@@ -15,6 +15,14 @@ Alle Skripte fragen vor schreibenden Aktionen nach; `--yes` überspringt die Rü
 | `node admin/archive-users.mjs <schuljahr>` | Alten `users`-Baum nach `archive/` verschieben |
 | `node admin/delete-accounts.mjs <login> …` | Accounts vollständig löschen (Auth + Daten + Leaderboard) |
 | `node admin/cleanup-orphans.mjs [--loeschen]` | Auth-Accounts ohne Datenknoten finden/entfernen |
+| `node admin/anonymize-names.mjs [--dry]` | Anzeigenamen ueberall auf den Login-Namen ziehen |
+
+## Anzeigenamen
+
+In Firebase steht als `name` **nur der Login** (`PaulB`) — in der Begruessung, der
+Lehreruebersicht, der Rangliste und der Battle Arena taucht nichts anderes auf.
+Der Klarname bleibt ausschliesslich in den Zugangsdaten-Listen unter `backups/`.
+`create-accounts.mjs` macht das automatisch; `anonymize-names.mjs` zieht Altbestaende nach.
 
 ## Klassenliste (CSV)
 

@@ -669,7 +669,8 @@
       const jahrgang = String(data.class).startsWith('10') ? '10' : String(data.class).charAt(0);
 
       const userObject = {
-        name: data.name,
+        // Angezeigt wird ausschliesslich der Login-Name - nie der Klarname.
+        name: data.loginName || data.name,
         userKey: uid,
         class: data.class,
         jahrgang: jahrgang,

@@ -611,7 +611,7 @@
           const vocabCount = Object.keys(perf).filter(k => k.startsWith('page_') || k.startsWith('interval_')).length;
           studentsInClass.push({
             userKey: userKey,
-            displayName: user.name || userKey,
+            displayName: user.loginName || user.name || userKey,   // nur der Login, nie der Klarname
             vocabCount: vocabCount,
             dataLoaded: false
           });

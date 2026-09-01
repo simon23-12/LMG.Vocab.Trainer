@@ -6,6 +6,10 @@
 // Pro Schueler entsteht:
 //   - ein Firebase-Auth-Account  <loginName>@lmg-vokabel.app  mit generiertem Passwort
 //   - ein Datenknoten users/<uid> mit name, class, loginName, created
+//
+// Datenschutz: In Firebase landet NUR der Login-Name (PaulB). Der Klarname steht
+// ausschliesslich in der lokalen Zugangsdaten-Liste - weder Mitschueler noch die
+// Lehreruebersicht bekommen ihn je zu sehen.
 // Ausgabe: backups/zugangsdaten-<stamp>.csv  und  eine druckbare HTML-Liste pro Klasse.
 //
 // Passwoerter sind bewusst sprechbar (Wort-Wort-Zahl), damit Fuenftklaessler sie abtippen koennen.
@@ -110,11 +114,11 @@ for (const s of schueler) {
   const email = emailFor(s.loginName);
   try {
     let user = await auth.getUserByEmail(email).catch(() => null);
-    if (user) { await auth.updateUser(user.uid, { password: s.passwort, displayName: s.anzeige }); aktualisiert++; }
-    else { user = await auth.createUser({ email, password: s.passwort, displayName: s.anzeige }); neu++; }
+    if (user) { await auth.updateUser(user.uid, { password: s.passwort, displayName: s.loginName }); aktualisiert++; }
+    else { user = await auth.createUser({ email, password: s.passwort, displayName: s.loginName }); neu++; }
     s.uid = user.uid;
     await db.ref('users/' + user.uid).update({
-      name: s.anzeige,
+      name: s.loginName,
       class: s.klasse,
       loginName: s.loginName,
       created: new Date().toISOString()
