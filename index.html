@@ -487,6 +487,119 @@
         z-index: 1;
       }
     }
+
+    /* =========================================================
+       MOBILE LOGIN – nur Handy (<=600px).
+       Vintage-Vorlage images/mobilelogin.jpg ist die Oberflaeche:
+       Logo, Titel, "Bereit zum Lernen?" und Fusszeile stecken schon
+       im Bild. Wir blenden die HTML-Pendants aus und setzen nur die
+       interaktiven Elemente (Felder, Button, Infobox) in die Luecke.
+       iPad/PC (>=601px) bleiben unveraendert.
+       ========================================================= */
+    @media (max-width: 600px) {
+      /* Ton = untere Bildkante der Vorlage, damit der Uebergang
+         Bild -> Body nahtlos ist */
+      body, body.dark-mode { padding: 0; background: #d7c6ac; }
+
+      .dark-mode-toggle,
+      .vocab-background { display: none; }
+
+      /* Container-Chrome weg */
+      .container {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+
+      /* steckt schon in der Vorlage */
+      .container > h1,
+      #loginScreen .welcome-section,
+      .container > .footer { display: none; }
+
+      /* Vorlage als massstabsgetreue Buehne. Das Bild (941x1518) traegt
+         Logo, Titel und "Bereit zum Lernen?" schon in sich; darunter ist
+         freie Flaeche fuer die Felder. Waechst der Inhalt ueber die
+         Bildhoehe hinaus, laeuft er nahtlos auf den gleichen Pergamenton
+         des Body weiter. */
+      #loginScreen.screen.active {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 941 / 1518;
+        background: url("images/mobilelogin.jpg") top center / 100% auto no-repeat border-box;
+        padding: 119% 9% 26px;   /* oben: ~74% der Bildhoehe -> unter die Vorlage-Texte */
+      }
+
+      #loginScreen .landing-container {
+        position: relative;
+        margin: 0;
+        max-width: none;
+      }
+
+      #loginScreen #loginTab.tab-content.active { animation: none; }
+      #loginScreen .form-group { margin: 0 0 9px; }
+
+      /* Eingabefelder – Pergament, duenner Rahmen */
+      #loginScreen .modern-input {
+        background: rgba(255,252,244,0.74);
+        border: 1px solid #b3a17f;
+        border-radius: 7px;
+        padding: 11px 16px 11px 42px;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 16px;
+        color: #2b2b2b;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+      }
+      #loginScreen .modern-input:focus {
+        border-color: #1c3350;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35), 0 0 0 3px rgba(28,51,80,0.15);
+        transform: none;
+      }
+      #loginScreen .input-icon::before {
+        left: 14px;
+        filter: grayscale(1);
+        opacity: .6;
+      }
+
+      /* Button – dunkles Navy wie in der Vorlage */
+      #loginScreen .modern-button {
+        margin-top: 3px;
+        padding: 13px;
+        background: #1c3350;
+        border: 1px solid #0f2237;
+        border-radius: 7px;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 18px;
+        letter-spacing: .5px;
+        box-shadow: inset 0 0 0 3px rgba(255,255,255,0.22), 0 3px 8px rgba(0,0,0,0.25);
+      }
+      #loginScreen .modern-button:hover { transform: none; box-shadow: inset 0 0 0 3px rgba(255,255,255,0.22), 0 3px 8px rgba(0,0,0,0.25); }
+
+      /* Infobox – heller Pergamentrahmen statt Blau, kompakt */
+      #loginScreen .info-box {
+        margin: 12px 0 0 !important;
+        background: rgba(255,251,242,0.5);
+        border: 1px solid #b3a17f;
+        box-shadow: inset 0 0 0 3px rgba(255,255,255,0.28);
+        padding: 9px 12px;
+        animation: none;
+      }
+      #loginScreen .info-box-title {
+        color: #1c3350;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+      #loginScreen .info-box-list { color: #3a3222; font-size: 11.5px; padding-left: 16px; }
+      #loginScreen .info-box-list li { margin: 2px 0; line-height: 1.3; }
+
+      #loginScreen #loginStatus { margin: 8px 0 0; padding: 8px; font-size: 13px; }
+    }
   </style>
 </head>
 <body>
@@ -532,6 +645,8 @@
           </div>
           <button onclick="login()" class="modern-button">Login 🚀</button>
 
+          <div id="loginStatus" class="status"></div>
+
           <div class="info-box" style="margin-top:22px">
             <div class="info-box-title">💡 Login vergessen?</div>
             <ol class="info-box-list">
@@ -542,8 +657,6 @@
           </div>
         </div>
       </div>
-      
-      <div id="loginStatus" class="status"></div>
     </div>
 
     <div class="footer">

@@ -26,6 +26,18 @@
             window.location.reload();
           });
 
+          // Bei jedem Start aktiv nach einer neuen Version fragen. Ohne das
+          // prueft ein installiertes PWA (v. a. auf dem iPhone) teils erst
+          // beim uebernaechsten Oeffnen – dann sieht der Schueler die alte Seite.
+          registration.update().catch(() => {});
+
+          // Falls schon ein neuer SW wartet (Update kam beim letzten Besuch,
+          // wurde aber nie aktiv): jetzt durchdruecken.
+          if (registration.waiting && navigator.serviceWorker.controller) {
+            updateArmed = true;
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+
           // Check for updates
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
@@ -37,6 +49,10 @@
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 console.log('[PWA] Update installiert – aktiviere Auto-Reload');
                 updateArmed = true;
+                // Sicherheitsnetz, falls der SW skipWaiting() nicht selbst schafft.
+                if (registration.waiting) {
+                  registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
               }
             });
           });

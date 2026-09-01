@@ -3,7 +3,7 @@
 // Version 1.0 - PWA Support
 
 // ⚠️ BEI JEDEM DEPLOY HOCHZÄHLEN (v3 → v4 → …). Löst den Auto-Reload bei allen Usern aus.
-const VERSION = 'v13';
+const VERSION = 'v14';
 const CACHE_NAME = 'lmg-vocab-' + VERSION;
 const RUNTIME_CACHE = 'lmg-vocab-runtime-' + VERSION;
 
@@ -15,11 +15,11 @@ const PRECACHE_URLS = [
   '/montigame.html',
   '/irrverbtrainer.html',
   '/teacher-dashboard.html',
-  '/overview.html',
   '/battlearena.html',
   '/pwa-install.js',
   '/auth-guard.js',
   '/images/montiwhite.png',
+  '/images/mobilelogin.jpg',
   '/images/montigame.jpg',
   '/images/montilanded.jpg',
   '/images/icons/icon-192.png',
@@ -37,14 +37,28 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('[Service Worker] Pre-caching app shell');
-        return cache.addAll(PRECACHE_URLS);
+        // {cache: 'reload'} umgeht den HTTP-Cache des Browsers: beim Update
+        // wird IMMER die frische index.html vom Netz geholt, nie eine alte
+        // aus dem Browser-Cache. Sonst koennte ein Handy die neue Version
+        // trotz Versionssprung noch Minuten lang nicht sehen.
+        // allSettled statt addAll: eine einzelne fehlende Datei (404) darf
+        // NICHT den ganzen Install kippen - sonst wird skipWaiting() nie
+        // erreicht und das Update bleibt haengen.
+        return Promise.allSettled(
+          PRECACHE_URLS.map(u => cache.add(new Request(u, { cache: 'reload' })))
+        );
       })
-      .then(() => {
+      .then(results => {
+        const fehlgeschlagen = results.filter(r => r.status === 'rejected').length;
+        if (fehlgeschlagen) {
+          console.warn('[Service Worker] ' + fehlgeschlagen + ' Precache-Datei(en) nicht ladbar - werden uebersprungen');
+        }
         console.log('[Service Worker] Installation complete');
         return self.skipWaiting();
       })
       .catch(err => {
         console.error('[Service Worker] Pre-caching failed:', err);
+        return self.skipWaiting();
       })
   );
 });
