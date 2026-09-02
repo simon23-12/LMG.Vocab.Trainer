@@ -680,15 +680,19 @@
     <script src="/auth-guard.js"></script>
 
     <script>
-        // Firebase Config
+        // Firebase Config - MUSS mit index.html/display.html uebereinstimmen!
+        // Firebase legt die Anmeldung unter dem Schluessel
+        // "firebase:authUser:<apiKey>:[DEFAULT]" ab. Mit einem anderen Web-App-
+        // Schluessel (auch im selben Projekt) sieht diese Seite die Sitzung nicht
+        // und wirft den User raus.
         const firebaseConfig = {
-            apiKey: "AIzaSyDV58JIlKupwVv_0kWDZ0RQxPMBPiRdaAU",
+            apiKey: "AIzaSyBRPlWh1slILKg8DWQDOEWXSFsnUK3j1vw",
             authDomain: "testdatabase-4daf4.firebaseapp.com",
             databaseURL: "https://testdatabase-4daf4-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "testdatabase-4daf4",
             storageBucket: "testdatabase-4daf4.firebasestorage.app",
-            messagingSenderId: "495756765056",
-            appId: "1:495756765056:web:c20dc0f3cc3ba1deb5e5cd"
+            messagingSenderId: "743231387214",
+            appId: "1:743231387214:web:166169b25f72616280351f"
         };
 
         firebase.initializeApp(firebaseConfig);
