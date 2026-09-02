@@ -676,6 +676,7 @@
         // Firebase Config
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDV58JIlKupwVv_0kWDZ0RQxPMBPiRdaAU",
@@ -689,6 +690,14 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        /** Wartet auf den ersten Auth-Status (null = nicht angemeldet). */
+        function ersterAuthStatus() {
+            return new Promise(resolve => {
+                const stop = onAuthStateChanged(auth, user => { stop(); resolve(user); });
+            });
+        }
 
         // Award Definitionen - Alle Awards
         const AWARDS = [
@@ -822,13 +831,10 @@
             }
         ];
 
-        // Hole User aus localStorage
-        const currentUser = JSON.parse(localStorage.getItem('lmg_currentUser') || 'null');
-        
-        if (!currentUser) {
-            alert('Bitte logge dich zuerst ein!');
-            window.location.href = '../display.html';
-        }
+        // Name/Klasse kommen aus dem localStorage, der Datenbankschluessel aber aus
+        // der Firebase-Auth-Session (siehe Init unten) - ohne angemeldeten User
+        // verweigern die Security Rules jeden Zugriff auf users/<uid>.
+        const currentUser = JSON.parse(localStorage.getItem('lmg_currentUser') || 'null') || {};
 
         // Berechne richtige Antworten aus Performance
         async function calculateCorrectAnswers() {
@@ -904,101 +910,74 @@
             }
         }
 
-        // Prüfe ob User am Wochenende (Sa/So) geübt hat
+        /**
+         * Sammelt alle Aktivitaets-Zeitpunkte, die ein Schueler selbst lesen darf.
+         * usage_logs gehoeren laut Security Rules der Lehrkraft, deshalb kommt hier
+         * nur der eigene Nutzerknoten zum Einsatz.
+         */
+        function sammleAktivitaetsDaten(userData) {
+            const daten = [];
+            if (!userData) return daten;
+
+            const performance = userData.performance || {};
+            Object.values(performance).forEach(perf => {
+                if (perf && perf.timestamp) daten.push(new Date(perf.timestamp));
+            });
+
+            ['irregularVerbsSimple', 'irregularVerbsFull'].forEach(key => {
+                if (userData[key] && userData[key].timestamp) {
+                    daten.push(new Date(userData[key].timestamp));
+                }
+            });
+
+            // lastActivityDate ist "YYYY-MM-DD" - Mittag setzen, damit die
+            // Zeitzone den Wochentag nicht verschiebt.
+            if (userData.lastActivityDate) {
+                daten.push(new Date(userData.lastActivityDate + 'T12:00:00'));
+            }
+
+            return daten.filter(d => !isNaN(d.getTime()));
+        }
+
+        // Prueft ob User am Wochenende (Sa/So) geuebt hat
         async function hasWeekendPractice() {
             try {
                 console.log('🔍 Checking Weekend Practice for:', currentUser.name);
-                
-                // METHODE 1: Check performance timestamps (Vokabel-Tests)
-                const userRef = ref(db, 'users/' + currentUser.userKey);
-                const userSnapshot = await get(userRef);
-                
-                if (userSnapshot.exists()) {
-                    const userData = userSnapshot.val();
-                    const performance = userData?.performance || {};
-                    
-                    // Prüfe alle Performance-Einträge (Seiten + Intervalle)
-                    for (let key in performance) {
-                        const entry = performance[key];
-                        if (entry.timestamp) {
-                            const entryDate = new Date(entry.timestamp);
-                            const dayOfWeek = entryDate.getDay(); // 0 = Sonntag, 6 = Samstag
-                            
-                            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                                console.log('✅ Weekend practice found in performance:', key, entry.timestamp);
-                                return true;
-                            }
-                        }
-                    }
-                    
-                    // METHODE 2: Check Irregular Verbs timestamps
-                    if (userData.irregularVerbsSimple?.timestamp) {
-                        const date = new Date(userData.irregularVerbsSimple.timestamp);
-                        if (date.getDay() === 0 || date.getDay() === 6) {
-                            console.log('✅ Weekend practice found in irregularVerbsSimple');
-                            return true;
-                        }
-                    }
-                    
-                    if (userData.irregularVerbsFull?.timestamp) {
-                        const date = new Date(userData.irregularVerbsFull.timestamp);
-                        if (date.getDay() === 0 || date.getDay() === 6) {
-                            console.log('✅ Weekend practice found in irregularVerbsFull');
-                            return true;
-                        }
-                    }
+
+                const snapshot = await get(ref(db, 'users/' + currentUser.userKey));
+                const treffer = sammleAktivitaetsDaten(snapshot.val())
+                    .find(d => d.getDay() === 0 || d.getDay() === 6);
+
+                if (treffer) {
+                    console.log('✅ Weekend practice found:', treffer.toISOString());
+                    return true;
                 }
-                
-                // METHODE 3: Check usage_logs (falls vorhanden)
-                const logsRef = ref(db, 'usage_logs');
-                const logsSnapshot = await get(logsRef);
-                
-                if (logsSnapshot.exists()) {
-                    const logs = logsSnapshot.val();
-                    
-                    for (let logId in logs) {
-                        const log = logs[logId];
-                        
-                        if (log.userName === currentUser.name && log.userClass === currentUser.class) {
-                            const logDate = new Date(log.timestamp);
-                            const dayOfWeek = logDate.getDay();
-                            
-                            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                                console.log('✅ Weekend practice found in usage_logs:', log.timestamp);
-                                return true;
-                            }
-                        }
-                    }
-                }
-                
-                // METHODE 4: Check Leaderboard entries
-                const leaderboardRef = ref(db, 'leaderboard');
-                const leaderboardSnapshot = await get(leaderboardRef);
-                
-                if (leaderboardSnapshot.exists()) {
-                    const leaderboard = leaderboardSnapshot.val();
-                    
-                    for (let entryId in leaderboard) {
-                        const entry = leaderboard[entryId];
-                        
-                        if (entry.userName === currentUser.name && entry.userClass === currentUser.class) {
-                            const entryDate = new Date(entry.timestamp);
-                            const dayOfWeek = entryDate.getDay();
-                            
-                            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                                console.log('✅ Weekend practice found in leaderboard:', entry.timestamp);
-                                return true;
-                            }
-                        }
-                    }
-                }
-                
-                console.log('❌ No weekend practice found');
-                return false;
             } catch (error) {
                 console.error('Fehler beim Weekend-Check:', error);
-                return false;
             }
+
+            // Fallback: eigener Ranglisteneintrag leaderboard/<klasse>/<uid>.
+            // 'updated' sagt, wann zuletzt ein Ergebnis veroeffentlicht wurde.
+            try {
+                const klasse = String(currentUser.class || '').toLowerCase().trim();
+                if (klasse && currentUser.userKey) {
+                    const lbSnap = await get(ref(db, 'leaderboard/' + klasse + '/' + currentUser.userKey));
+                    const updated = lbSnap.exists() ? lbSnap.val().updated : null;
+
+                    if (updated) {
+                        const d = new Date(updated);
+                        if (d.getDay() === 0 || d.getDay() === 6) {
+                            console.log('✅ Weekend practice found in leaderboard entry');
+                            return true;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Fehler beim Weekend-Check (Leaderboard):', error);
+            }
+
+            console.log('❌ No weekend practice found');
+            return false;
         }
 
         // Zähle perfekte Seiten (100%)
@@ -1026,38 +1005,30 @@
             }
         }
 
-        // Berechne wie viele Wochen insgesamt geübt wurde
+        /** ISO-8601-Wochenschluessel (z. B. "2026-W36") fuer ein Datum. */
+        function isoWochenSchluessel(datum) {
+            const d = new Date(Date.UTC(datum.getFullYear(), datum.getMonth(), datum.getDate()));
+            // Der Donnerstag derselben Woche bestimmt Jahr und Wochennummer.
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const jahresStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const woche = Math.ceil(((d - jahresStart) / 86400000 + 1) / 7);
+            return `${d.getUTCFullYear()}-W${String(woche).padStart(2, '0')}`;
+        }
+
+        // Berechne wie viele Wochen insgesamt geuebt wurde.
+        // Grundlage sind die eigenen Aktivitaets-Zeitpunkte; performance-Eintraege
+        // werden pro Seite ueberschrieben, laenger zurueckliegende Wochen koennen
+        // also fehlen. usage_logs waeren vollstaendiger, sind fuer Schueler aber
+        // per Security Rules gesperrt.
         async function calculateTotalWeeks() {
             try {
-                const logsRef = ref(db, 'usage_logs');
-                const snapshot = await get(logsRef);
-                
-                if (!snapshot.exists()) return 0;
-                
-                const logs = snapshot.val();
+                const snapshot = await get(ref(db, 'users/' + currentUser.userKey));
                 const weeks = new Set();
-                
-                // Durchsuche alle Logs nach diesem User
-                for (let logId in logs) {
-                    const log = logs[logId];
-                    
-                    // Check ob dieser Log vom aktuellen User ist
-                    if (log.userName === currentUser.name && log.userClass === currentUser.class) {
-                        // Berechne die Wochennummer (ISO 8601)
-                        const date = new Date(log.timestamp);
-                        const year = date.getFullYear();
-                        
-                        // ISO Woche berechnen
-                        const oneJan = new Date(year, 0, 1);
-                        const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
-                        const weekNumber = Math.ceil((numberOfDays + oneJan.getDay() + 1) / 7);
-                        
-                        // Speichere Jahr + Woche als eindeutigen String
-                        const weekKey = `${year}-W${weekNumber}`;
-                        weeks.add(weekKey);
-                    }
-                }
-                
+
+                sammleAktivitaetsDaten(snapshot.val()).forEach(d => {
+                    weeks.add(isoWochenSchluessel(d));
+                });
+
                 console.log('Total Weeks:', weeks.size);
                 return weeks.size;
             } catch (error) {
@@ -1268,8 +1239,16 @@
                 Math.round((unlockedCount / AWARDS.length) * 100) + '%';
         }
 
-        // Initialize
-        renderAwards();
+        // Initialize - erst Anmeldung abwarten, dann Awards laden
+        (async () => {
+            const user = await ersterAuthStatus();
+            if (!user) {
+                window.location.href = '../index.html';
+                return;
+            }
+            currentUser.userKey = user.uid;   // Rules erlauben nur users/<eigene uid>
+            renderAwards();
+        })();
 
         // Animation Functions
         function showAnimation(award) {
