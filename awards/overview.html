@@ -672,12 +672,15 @@
         </div>
     </div>
 
-    <script type="module">
-        // Firebase Config
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    <!-- Gleiche SDK-Kombination wie display.html - so teilen sich alle Seiten
+         dieselbe Firebase-Auth-Session. -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="/auth-guard.js"></script>
 
+    <script>
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDV58JIlKupwVv_0kWDZ0RQxPMBPiRdaAU",
             authDomain: "testdatabase-4daf4.firebaseapp.com",
@@ -688,16 +691,8 @@
             appId: "1:495756765056:web:c20dc0f3cc3ba1deb5e5cd"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const auth = getAuth(app);
-
-        /** Wartet auf den ersten Auth-Status (null = nicht angemeldet). */
-        function ersterAuthStatus() {
-            return new Promise(resolve => {
-                const stop = onAuthStateChanged(auth, user => { stop(); resolve(user); });
-            });
-        }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         // Award Definitionen - Alle Awards
         const AWARDS = [
@@ -839,8 +834,8 @@
         // Berechne richtige Antworten aus Performance
         async function calculateCorrectAnswers() {
             try {
-                const userRef = ref(db, 'users/' + currentUser.userKey);
-                const snapshot = await get(userRef);
+                const userRef = db.ref('users/' + currentUser.userKey);
+                const snapshot = await userRef.get();
                 const userData = snapshot.val();
 
                 if (!userData) return 0;
@@ -864,8 +859,8 @@
         // Berechne insgesamt geübte Vokabeln (egal ob richtig oder falsch)
         async function calculateTotalPracticed() {
             try {
-                const userRef = ref(db, 'users/' + currentUser.userKey);
-                const snapshot = await get(userRef);
+                const userRef = db.ref('users/' + currentUser.userKey);
+                const snapshot = await userRef.get();
                 const userData = snapshot.val();
 
                 if (!userData) return 0;
@@ -884,8 +879,8 @@
         // Berechne aktuellen Streak
         async function calculateStreak() {
             try {
-                const userRef = ref(db, 'users/' + currentUser.userKey);
-                const snapshot = await get(userRef);
+                const userRef = db.ref('users/' + currentUser.userKey);
+                const snapshot = await userRef.get();
                 const userData = snapshot.val();
                 
                 return userData?.currentStreak || 0;
@@ -898,8 +893,8 @@
         // Prüfe ob User eine perfekte Seite hat
         async function hasPerfectPage() {
             try {
-                const userRef = ref(db, 'users/' + currentUser.userKey);
-                const snapshot = await get(userRef);
+                const userRef = db.ref('users/' + currentUser.userKey);
+                const snapshot = await userRef.get();
                 const userData = snapshot.val();
                 
                 const performance = userData?.performance || {};
@@ -944,7 +939,7 @@
             try {
                 console.log('🔍 Checking Weekend Practice for:', currentUser.name);
 
-                const snapshot = await get(ref(db, 'users/' + currentUser.userKey));
+                const snapshot = await db.ref('users/' + currentUser.userKey).get();
                 const treffer = sammleAktivitaetsDaten(snapshot.val())
                     .find(d => d.getDay() === 0 || d.getDay() === 6);
 
@@ -961,7 +956,7 @@
             try {
                 const klasse = String(currentUser.class || '').toLowerCase().trim();
                 if (klasse && currentUser.userKey) {
-                    const lbSnap = await get(ref(db, 'leaderboard/' + klasse + '/' + currentUser.userKey));
+                    const lbSnap = await db.ref('leaderboard/' + klasse + '/' + currentUser.userKey).get();
                     const updated = lbSnap.exists() ? lbSnap.val().updated : null;
 
                     if (updated) {
@@ -983,8 +978,8 @@
         // Zähle perfekte Seiten (100%)
         async function countPerfectPages() {
             try {
-                const userRef = ref(db, 'users/' + currentUser.userKey);
-                const snapshot = await get(userRef);
+                const userRef = db.ref('users/' + currentUser.userKey);
+                const snapshot = await userRef.get();
                 const userData = snapshot.val();
                 
                 const performance = userData?.performance || {};
@@ -1022,7 +1017,7 @@
         // per Security Rules gesperrt.
         async function calculateTotalWeeks() {
             try {
-                const snapshot = await get(ref(db, 'users/' + currentUser.userKey));
+                const snapshot = await db.ref('users/' + currentUser.userKey).get();
                 const weeks = new Set();
 
                 sammleAktivitaetsDaten(snapshot.val()).forEach(d => {
@@ -1079,15 +1074,15 @@
 
             try {
                 // Check ob Award bereits freigeschaltet ist
-                const awardRef = ref(db, 'users/' + currentUser.userKey + '/awards/' + award.id);
-                const snapshot = await get(awardRef);
+                const awardRef = db.ref('users/' + currentUser.userKey + '/awards/' + award.id);
+                const snapshot = await awardRef.get();
                 
                 if (snapshot.exists()) {
                     return false; // Bereits freigeschaltet
                 }
 
                 // NEU FREIGESCHALTET! Speichere Award
-                await set(awardRef, {
+                await awardRef.set({
                     unlockedAt: new Date().toISOString(),
                     requirement: award.requirement
                 });
@@ -1109,8 +1104,8 @@
         // Check ob Award bereits freigeschaltet ist
         async function isAwardUnlocked(awardId) {
             try {
-                const awardRef = ref(db, 'users/' + currentUser.userKey + '/awards/' + awardId);
-                const snapshot = await get(awardRef);
+                const awardRef = db.ref('users/' + currentUser.userKey + '/awards/' + awardId);
+                const snapshot = await awardRef.get();
                 return snapshot.exists();
             } catch (error) {
                 console.error('Fehler:', error);
@@ -1239,14 +1234,11 @@
                 Math.round((unlockedCount / AWARDS.length) * 100) + '%';
         }
 
-        // Initialize - erst Anmeldung abwarten, dann Awards laden
+        // Initialize - erst Anmeldung abwarten, dann Awards laden.
+        // Ohne Session leitet lmgRequireAuth() selbst zur Loginseite weiter.
         (async () => {
-            const user = await ersterAuthStatus();
-            if (!user) {
-                window.location.href = '../index.html';
-                return;
-            }
-            currentUser.userKey = user.uid;   // Rules erlauben nur users/<eigene uid>
+            const session = await lmgRequireAuth();
+            currentUser.userKey = session.uid;   // Rules erlauben nur users/<eigene uid>
             renderAwards();
         })();
 

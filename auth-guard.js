@@ -15,7 +15,8 @@
 (function () {
   'use strict';
 
-  const LOGIN_SEITE = 'index.html';
+  // Wurzel-absolut, damit auch Unterordner (z. B. awards/) korrekt zurueckfinden.
+  const LOGIN_SEITE = '/index.html';
   const MAIL_DOMAIN = '@lmg-vokabel.app';
 
   /** Login-Name -> synthetische Mailadresse (Schueler tippen nur den Namen). */
