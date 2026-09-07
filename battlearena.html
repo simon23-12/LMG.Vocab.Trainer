@@ -140,6 +140,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="auth-guard.js"></script>
+  <script src="daily-stats.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
   <script>
@@ -929,6 +930,9 @@
       answeredRound = cr.nr;
       clearInterval(timerInt);
       await roomRef.child('players/' + myId + '/answers/' + cr.nr).set({ given: given, answeredAt: serverNow() });
+      // Anonyme Tagesstatistik: eine Antwort = eine geuebte Vokabel.
+      // session:false, sonst zaehlt jede Runde als eigene Session.
+      if (window.lmgTrackDaily) lmgTrackDaily(1, { session: false });
       STU._waiting(cr);
     };
 
@@ -973,6 +977,8 @@
       if (renderedPhaseKey === 'final') return;
       renderedPhaseKey = 'final';
       clearInterval(timerInt);
+      // Eine gespielte Battle = eine Session (die Vokabeln wurden pro Antwort gezaehlt).
+      if (window.lmgTrackDaily) lmgTrackDaily(0, { session: true });
       const results = (room.currentRound && room.currentRound.results) ||
         Object.keys(room.players || {}).map(id => ({ id, name: room.players[id].name, totalScore: room.players[id].score || 0 }));
       results.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));

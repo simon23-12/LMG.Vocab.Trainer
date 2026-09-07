@@ -851,6 +851,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="auth-guard.js"></script>
+  <script src="daily-stats.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -859,7 +860,8 @@
             altitude: 100,
             score: 0,
             isPlaying: false,
-            isPaused: false
+            isPaused: false,
+            vocabsAnswered: 0   // fuer die anonyme Tagesstatistik
         };
 
         // Firebase Config (gleich wie in display.html)
@@ -2137,6 +2139,7 @@
             targetAltitude = 100;
             displayedAltitude = 100;
             gameState.score = 0;
+            gameState.vocabsAnswered = 0;
             
             // Reset Streak & Boost
             streakCount = 0;
@@ -2211,6 +2214,7 @@
 
         function checkAnswer(answer) {
             const userAnswer = answer.trim();
+            gameState.vocabsAnswered++;
             
             // Normalisierung (wie in display.html)
             const normalize = (text) => {
@@ -2500,6 +2504,9 @@
             
             document.getElementById('final-score-value').textContent = gameState.score;
             document.getElementById('game-over-screen').style.display = 'flex';
+
+            // Anonyme Tagesstatistik fuer die Heatmap im Lehrer-Dashboard (nur eine Zahl)
+            if (window.lmgTrackDaily) lmgTrackDaily(gameState.vocabsAnswered);
         }
 
         // Event Listeners

@@ -97,6 +97,23 @@
     "vocabulary9":  { ".read": "auth != null", ".write": "auth.token.admin === true" },
     "vocabulary10": { ".read": "auth != null", ".write": "auth.token.admin === true" },
 
+    "stats": {
+      ".read": "auth.token.admin === true",
+
+      "daily": {
+        "$day": {
+          ".write": "auth != null",
+          "vocabs":   { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5000000 && (!data.exists() || newData.val() >= data.val())" },
+          "sessions": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000 && (!data.exists() || newData.val() >= data.val())" },
+          "$other":   { ".validate": false }
+        }
+      },
+
+      "meta": {
+        ".write": "auth.token.admin === true"
+      }
+    },
+
     "usage_logs": {
       ".read": "auth.token.admin === true",
       "$logId": {

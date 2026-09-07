@@ -678,6 +678,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="auth-guard.js"></script>
+  <script src="daily-stats.js"></script>
   <script>
     // Firebase Configuration
     const firebaseConfig = {
@@ -1175,6 +1176,9 @@
         
         await db.ref(path).set(resultData);
         console.log('✓ Results saved to Firebase successfully');
+
+        // Anonyme Tagesstatistik fuer die Heatmap im Lehrer-Dashboard (nur eine Zahl)
+        if (window.lmgTrackDaily) lmgTrackDaily(totalQuestions);
 
         // Update dashboard stats
         await updateDashboardStats();

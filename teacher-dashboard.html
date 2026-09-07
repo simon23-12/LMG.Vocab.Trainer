@@ -32,9 +32,21 @@
       --button-hover: #5568d3;
       --card-bg: white;
       --shadow-color: rgba(0,0,0,0.1);
+      --heat-0: #ebedf0;
+      --heat-1: #9be9a8;
+      --heat-2: #40c463;
+      --heat-3: #30a14e;
+      --heat-4: #216e39;
+      --heat-grid-border: rgba(27,31,35,0.06);
     }
 
     body.dark-mode {
+      --heat-0: #1c2333;
+      --heat-1: #0e4429;
+      --heat-2: #006d32;
+      --heat-3: #26a641;
+      --heat-4: #39d353;
+      --heat-grid-border: rgba(255,255,255,0.05);
       --bg-gradient-start: #1a1a2e;
       --bg-gradient-end: #16213e;
       --container-bg: #0f3460;
@@ -209,6 +221,99 @@
       background: #c0392b;
     }
     
+    /* ---- Aktivitaets-Heatmap (Schuljahr) ---- */
+    .heatmap-box {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      background: var(--card-bg);
+      overflow-x: auto;
+    }
+
+    .heatmap-facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 26px;
+      margin-bottom: 16px;
+    }
+
+    .heatmap-facts div span {
+      display: block;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .heatmap-facts div b {
+      font-size: 22px;
+      color: var(--text-primary);
+    }
+
+    .heatmap-scroll { display: flex; gap: 6px; min-width: max-content; }
+
+    .heatmap-daylabels {
+      display: grid;
+      grid-template-rows: repeat(7, 13px);
+      gap: 3px;
+      margin-top: 18px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    .heatmap-daylabels span { line-height: 13px; }
+
+    .heatmap-months {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 13px;
+      gap: 3px;
+      height: 18px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .heatmap-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 13px;
+      grid-template-rows: repeat(7, 13px);
+      gap: 3px;
+    }
+
+    /* Monatsnamen sind breiter als eine Spalte - sie duerfen ueberstehen. */
+    .heatmap-months span { white-space: nowrap; overflow: visible; }
+
+    .heat-day {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      background: var(--heat-0);
+      outline: 1px solid var(--heat-grid-border);
+      outline-offset: -1px;
+    }
+
+    .heat-day.l1 { background: var(--heat-1); }
+    .heat-day.l2 { background: var(--heat-2); }
+    .heat-day.l3 { background: var(--heat-3); }
+    .heat-day.l4 { background: var(--heat-4); }
+    .heat-day.outside { background: transparent; outline: none; }
+    .heat-day.future { opacity: 0.45; }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .heatmap-note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      line-height: 1.5;
+    }
+
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -398,6 +503,38 @@
       </div>
     </div>
     
+    <!-- Aktivitaets-Heatmap (anonym, keine Filterung nach Name/Klasse) -->
+    <div style="margin-bottom: 40px;">
+      <h3>🔥 Übungsaktivität <span id="heatmapYearLabel">Schuljahr</span></h3>
+      <div class="heatmap-box">
+        <div class="heatmap-facts">
+          <div><span>Vokabeln im Schuljahr</span><b id="heatTotal">-</b></div>
+          <div><span>Bester Tag</span><b id="heatBest">-</b></div>
+          <div><span>Tage mit Übung</span><b id="heatActiveDays">-</b></div>
+          <div><span>Ø pro Übungstag</span><b id="heatAvg">-</b></div>
+        </div>
+        <div class="heatmap-scroll">
+          <div class="heatmap-daylabels">
+            <span>Mo</span><span></span><span>Mi</span><span></span><span>Fr</span><span></span><span></span>
+          </div>
+          <div>
+            <div class="heatmap-months" id="heatMonths"></div>
+            <div class="heatmap-grid" id="heatGrid"></div>
+          </div>
+        </div>
+        <div class="heatmap-legend">
+          <span>weniger</span>
+          <div class="heat-day"></div>
+          <div class="heat-day l1"></div>
+          <div class="heat-day l2"></div>
+          <div class="heat-day l3"></div>
+          <div class="heat-day l4"></div>
+          <span>mehr</span>
+        </div>
+        <div class="heatmap-note" id="heatNote"></div>
+      </div>
+    </div>
+
     <!-- Klassen-Auswahl -->
     <div class="form-group">
       <label>Klasse auswählen:</label>
@@ -479,6 +616,7 @@
     const session = await lmgRequireAuth({ admin: true });
     console.log('Lehrer-Zugang bestätigt:', session.loginName);
     loadAdminStats();
+    loadActivityHeatmap();
     initDarkMode();
   });
 
@@ -490,6 +628,159 @@
     setTimeout(() => {
       statusEl.className = 'status';
     }, 4000);
+  }
+
+  // ===================== Aktivitaets-Heatmap =====================
+  // Liest NUR stats/daily (reine Tagessummen, keine Personendaten).
+  // Fenster = Schuljahr; liegen aeltere Tage vor (z. B. die hochgerechneten
+  // Sommerwochen), wird der Anfang automatisch dorthin verlaengert.
+  const SCHULJAHR = { start: '2026-09-01', ende: '2027-07-31', label: '2026/27' };
+
+  const MONATE_KURZ = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+
+  function heatParse(s) {           // 'YYYY-MM-DD' -> Date (UTC, sommerzeitfest)
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(Date.UTC(y, m - 1, d));
+  }
+
+  function heatKey(d) {
+    const p = n => String(n).padStart(2, '0');
+    return d.getUTCFullYear() + '-' + p(d.getUTCMonth() + 1) + '-' + p(d.getUTCDate());
+  }
+
+  function heatAddDays(d, n) {
+    const c = new Date(d.getTime());
+    c.setUTCDate(c.getUTCDate() + n);
+    return c;
+  }
+
+  function heatLangesDatum(d) {
+    return d.toLocaleDateString('de-DE', {
+      weekday: 'short', day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC'
+    });
+  }
+
+  // Schwellen aus den Quartilen der Tage mit Aktivitaet - feste Grenzen waeren
+  // je nach Klassengroesse entweder immer blass oder immer dunkelgruen.
+  function heatSchwellen(werte) {
+    const sortiert = werte.slice().sort((a, b) => a - b);
+    const q = f => sortiert[Math.min(sortiert.length - 1, Math.floor(sortiert.length * f))];
+    let t = [q(0.25), q(0.5), q(0.75)];
+    for (let i = 1; i < t.length; i++) if (t[i] <= t[i - 1]) t[i] = t[i - 1] + 1;
+    return t;
+  }
+
+  async function loadActivityHeatmap() {
+    const grid = document.getElementById('heatGrid');
+    const monate = document.getElementById('heatMonths');
+    const note = document.getElementById('heatNote');
+    if (!grid) return;
+
+    let daily = {}, meta = {};
+    try {
+      const snap = await db.ref('stats').get();
+      const val = snap.val() || {};
+      daily = val.daily || {};
+      meta = val.meta || {};
+    } catch (error) {
+      console.error('Fehler beim Laden der Heatmap-Daten:', error);
+      note.textContent = 'Aktivitätsdaten konnten nicht geladen werden.';
+      return;
+    }
+
+    // Fenster bestimmen
+    const vorhandene = Object.keys(daily).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+    const fruehester = vorhandene.length ? vorhandene[0] : null;
+    const heuteKey = heatKey(new Date(Date.now() - new Date().getTimezoneOffset() * 60000));
+    const vonKey = (fruehester && fruehester < SCHULJAHR.start) ? fruehester : SCHULJAHR.start;
+    const bisKey = heuteKey > SCHULJAHR.ende ? heuteKey : SCHULJAHR.ende;
+
+    document.getElementById('heatmapYearLabel').textContent =
+      vonKey < SCHULJAHR.start
+        ? 'seit ' + heatParse(vonKey).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
+        : 'Schuljahr ' + SCHULJAHR.label;
+
+    // Raster immer bei Montag beginnen und bei Sonntag enden
+    const von = heatParse(vonKey), bis = heatParse(bisKey);
+    const gridVon = heatAddDays(von, -((von.getUTCDay() + 6) % 7));
+    const gridBis = heatAddDays(bis, 6 - ((bis.getUTCDay() + 6) % 7));
+
+    // Werte einsammeln
+    const werte = [];
+    for (let d = new Date(von.getTime()); d <= bis; d = heatAddDays(d, 1)) {
+      const e = daily[heatKey(d)];
+      const v = (e && Number(e.vocabs)) || 0;
+      if (v > 0) werte.push(v);
+    }
+    const schwellen = werte.length ? heatSchwellen(werte) : [1, 2, 3];
+    const gesamt = werte.reduce((a, b) => a + b, 0);
+    const bester = werte.length ? Math.max.apply(null, werte) : 0;
+
+    document.getElementById('heatTotal').textContent = gesamt.toLocaleString('de-DE');
+    document.getElementById('heatBest').textContent = bester.toLocaleString('de-DE');
+    document.getElementById('heatActiveDays').textContent = werte.length;
+    document.getElementById('heatAvg').textContent =
+      werte.length ? Math.round(gesamt / werte.length).toLocaleString('de-DE') : '-';
+
+    // Raster zeichnen
+    const geschaetztBis = meta.estimatedUntil || null;
+    const zellen = [];
+    const monatsSpalten = [];
+    let letzterMonat = -1;
+
+    for (let d = new Date(gridVon.getTime()); d <= gridBis; d = heatAddDays(d, 1)) {
+      const key = heatKey(d);
+      const wochentag = (d.getUTCDay() + 6) % 7;
+
+      // Monatsbeschriftung: einmal pro Monat ueber der ersten Spalte des Monats
+      if (wochentag === 0) {
+        const m = d.getUTCMonth();
+        const zeigen = m !== letzterMonat && key >= vonKey;
+        monatsSpalten.push('<span>' + (zeigen ? MONATE_KURZ[m] : '') + '</span>');
+        if (zeigen) letzterMonat = m;
+      }
+
+      if (key < vonKey || key > bisKey) {
+        zellen.push('<div class="heat-day outside"></div>');
+        continue;
+      }
+
+      const eintrag = daily[key] || {};
+      const vokabeln = Number(eintrag.vocabs) || 0;
+      const runden = Number(eintrag.sessions) || 0;
+      const geschaetzt = geschaetztBis && key <= geschaetztBis && vokabeln > 0;
+      const zukunft = key > heuteKey;
+
+      let stufe = 0;
+      if (vokabeln > 0) {
+        stufe = vokabeln <= schwellen[0] ? 1 : vokabeln <= schwellen[1] ? 2 : vokabeln <= schwellen[2] ? 3 : 4;
+      }
+
+      // Tage, die noch kommen, bekommen bewusst keinen Tooltip - "keine Übung"
+      // waere dort irrefuehrend.
+      const tooltip = zukunft ? '' : heatLangesDatum(d) + ': ' +
+        (vokabeln ? vokabeln.toLocaleString('de-DE') + ' Vokabeln' : 'keine Übung') +
+        (runden ? ' · ' + runden + (runden === 1 ? ' Runde' : ' Runden') : '') +
+        (geschaetzt ? ' (hochgerechnet)' : '');
+
+      zellen.push('<div class="heat-day' + (stufe ? ' l' + stufe : '') +
+        (zukunft ? ' future' : '') +
+        (tooltip ? '" title="' + tooltip : '') + '"></div>');
+    }
+
+    monate.innerHTML = monatsSpalten.join('');
+    grid.innerHTML = zellen.join('');
+
+    // Hinweistext (die Herkunft der Septemberzahlen erklaert die Lehrkraft muendlich)
+    note.textContent = 'Anonyme Gesamtzahlen über alle Trainer (Vokabeltrainer, Monti-Game, Irregular Verbs, Battlearena) – keine Zuordnung zu Schülern oder Klassen.';
+
+    // Direkt zur aktuellen Woche scrollen statt ans Schuljahresende
+    const box = grid.closest('.heatmap-box');
+    if (box) {
+      const spaltenBreite = 16; // 13px Feld + 3px Abstand
+      const wochenBisHeute = Math.floor((heatParse(heuteKey) - gridVon) / 604800000);
+      box.scrollLeft = Math.max(0, (wochenBisHeute + 2) * spaltenBreite - box.clientWidth);
+    }
   }
 
   // Lade Admin-Statistiken (aus users/ aggregiert - keine usage_logs mehr)

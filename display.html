@@ -1550,6 +1550,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="auth-guard.js"></script>
+  <script src="daily-stats.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
   
   <script>
@@ -2722,6 +2723,9 @@
       await db.ref('users/' + userPath + '/lifetimeTotalVocabs').set(newLifetimeTotal);
       
       console.log(`✓ lifetimeTotalVocabs aktualisiert: ${currentLifetimeTotal} + ${vocabsJustPracticed} = ${newLifetimeTotal}`);
+
+      // Anonyme Tagesstatistik fuer die Heatmap im Lehrer-Dashboard (nur eine Zahl)
+      if (window.lmgTrackDaily) lmgTrackDaily(vocabsJustPracticed);
       
       // UPDATE STREAK nach erfolgreichem Üben (IMMER, auch bei schlechterem Score!)
       await updateStreak();

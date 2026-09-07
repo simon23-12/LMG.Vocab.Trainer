@@ -3,7 +3,7 @@
 // Version 1.0 - PWA Support
 
 // ⚠️ BEI JEDEM DEPLOY HOCHZÄHLEN (v3 → v4 → …). Löst den Auto-Reload bei allen Usern aus.
-const VERSION = 'v18';
+const VERSION = 'v20';
 const CACHE_NAME = 'lmg-vocab-' + VERSION;
 const RUNTIME_CACHE = 'lmg-vocab-runtime-' + VERSION;
 
@@ -18,6 +18,7 @@ const PRECACHE_URLS = [
   '/battlearena.html',
   '/pwa-install.js',
   '/auth-guard.js',
+  '/daily-stats.js',
   '/images/montiwhite.png',
   '/images/mobilelogin.jpg',
   '/images/montigame.jpg',
