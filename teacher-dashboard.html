@@ -588,11 +588,19 @@
     <!-- Accuracy-Diagramm der Klasse -->
     <div id="accuracyChartWrap" style="display:none; margin: 20px 0;">
       <h3 id="accuracyChartTitle">📊 Overall Accuracy</h3>
-      <div id="chartFilterRow" style="display:none; margin: 10px 0;">
-        <label style="font-size: 14px; color: var(--text-secondary);">Auswertung: </label>
-        <select id="chartFilterSelect" onchange="renderAccuracyChart()" style="font-size: 14px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
+      <div id="chartFilterRow" style="display:none; margin: 10px 0; flex-wrap: wrap; align-items: center; gap: 8px;">
+        <label style="font-size: 14px; color: var(--text-secondary);">Auswertung:</label>
+        <select id="chartModusSelect" onchange="chartModusGewechselt()" style="font-size: 14px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
           <option value="overall">Overall (alle Tests)</option>
+          <option value="seiten">Intervall (Seiten wählen)</option>
         </select>
+        <span id="chartRangeInputs" style="display:none; align-items: center; gap: 6px; font-size: 14px; color: var(--text-secondary);">
+          <span>S.</span>
+          <input type="number" id="chartVon" min="1" step="1" oninput="renderAccuracyChart()" style="width: 78px; font-size: 14px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary);">
+          <span>bis</span>
+          <input type="number" id="chartBis" min="1" step="1" oninput="renderAccuracyChart()" style="width: 78px; font-size: 14px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary);">
+          <span id="chartRangeHint" style="font-size: 12px; color: var(--text-tertiary);"></span>
+        </span>
       </div>
       <div class="chart-box">
         <div id="accuracyChart"></div>
@@ -1007,42 +1015,79 @@
     return null;
   }
 
-  // Accuracy fuer die aktuell gewaehlte Auswertung (overall oder ein Intervall)
-  function accuracyFuer(student, filter) {
-    if (filter === 'overall') return student.accuracy;
-    return accuracyAusEintraegen([student.tests[filter]]);
+  function seitenNummer(key) {
+    return parseInt(key.replace('page_', ''), 10);
   }
 
   function intervallGrenzen(key) {
     const teile = key.replace('interval_', '').split('_');
-    return [parseInt(teile[0], 10) || 0, parseInt(teile[1], 10) || 0];
+    return [parseInt(teile[0], 10), parseInt(teile[1], 10)];
   }
 
-  function intervallLabel(key) {
-    const [von, bis] = intervallGrenzen(key);
-    return 'Intervall S. ' + von + '–' + bis;
+  // Alle Tests eines Schuelers, die im gewaehlten Seitenbereich liegen:
+  // Seitentests S. von-bis und Intervall-Tests, die komplett darin liegen
+  function testsImBereich(student, von, bis) {
+    const treffer = [];
+    const tests = student.tests || {};
+
+    for (let key in tests) {
+      if (key.startsWith('page_')) {
+        const nr = seitenNummer(key);
+        if (!isNaN(nr) && nr >= von && nr <= bis) treffer.push(tests[key]);
+      } else if (key.startsWith('interval_')) {
+        const [a, b] = intervallGrenzen(key);
+        if (!isNaN(a) && !isNaN(b) && a >= von && b <= bis) treffer.push(tests[key]);
+      }
+    }
+    return treffer;
   }
 
-  // Dropdown mit allen Intervall-Tests fuellen, die in der Klasse vorkommen
-  function befuelleChartFilter() {
-    const sel = document.getElementById('chartFilterSelect');
-    const reihe = document.getElementById('chartFilterRow');
-    if (!sel || !reihe) return;
-
-    const keys = new Set();
+  // Welche Seiten kommen in dieser Klasse ueberhaupt vor?
+  function seitenBereichDerKlasse() {
+    let min = null, max = null;
     currentStudents.forEach(st => {
-      Object.keys(st.tests || {}).forEach(k => { if (k.startsWith('interval_')) keys.add(k); });
+      Object.keys(st.tests || {}).forEach(key => {
+        const nummern = key.startsWith('page_') ? [seitenNummer(key)] : intervallGrenzen(key);
+        nummern.forEach(nr => {
+          if (isNaN(nr)) return;
+          if (min === null || nr < min) min = nr;
+          if (max === null || nr > max) max = nr;
+        });
+      });
     });
+    return [min, max];
+  }
 
-    const sortiert = [...keys].sort((a, b) => {
-      const [av, ab] = intervallGrenzen(a), [bv, bb] = intervallGrenzen(b);
-      return av - bv || ab - bb;
-    });
+  // Seitenfelder vorbelegen und Hinweis auf den vorhandenen Bereich setzen
+  function befuelleChartFilter() {
+    const reihe = document.getElementById('chartFilterRow');
+    const modus = document.getElementById('chartModusSelect');
+    if (!reihe || !modus) return;
 
-    sel.innerHTML = '<option value="overall">Overall (alle Tests)</option>'
-      + sortiert.map(k => '<option value="' + k + '">' + intervallLabel(k) + '</option>').join('');
-    sel.value = 'overall';
-    reihe.style.display = sortiert.length > 0 ? 'block' : 'none';
+    modus.value = 'overall';
+    document.getElementById('chartRangeInputs').style.display = 'none';
+    reihe.style.display = 'flex';
+
+    const [min, max] = seitenBereichDerKlasse();
+    const von = document.getElementById('chartVon');
+    const bis = document.getElementById('chartBis');
+    const hinweis = document.getElementById('chartRangeHint');
+
+    if (min !== null) {
+      von.value = min;
+      bis.value = max;
+      hinweis.textContent = '(Daten liegen vor für S. ' + min + '–' + max + ')';
+    } else {
+      von.value = '';
+      bis.value = '';
+      hinweis.textContent = '(in dieser Klasse noch keine Seitentests)';
+    }
+  }
+
+  function chartModusGewechselt() {
+    const seiten = document.getElementById('chartModusSelect').value === 'seiten';
+    document.getElementById('chartRangeInputs').style.display = seiten ? 'inline-flex' : 'none';
+    renderAccuracyChart();
   }
 
   function accuracyFarbe(wert) {
@@ -1063,8 +1108,11 @@
     if (!wrap || !ziel) return;
 
     const klasse = document.getElementById('adminClassSelect').value;
-    const filterSel = document.getElementById('chartFilterSelect');
-    const filter = filterSel ? filterSel.value : 'overall';
+    const modus = document.getElementById('chartModusSelect').value;
+    const von = parseInt(document.getElementById('chartVon').value, 10);
+    const bis = parseInt(document.getElementById('chartBis').value, 10);
+    const bereichOk = !isNaN(von) && !isNaN(bis) && von <= bis;
+    const seitenModus = modus === 'seiten';
 
     // bewusst ALLE Schueler der Klasse, auch ohne Daten oder mit 0 %
     const schueler = [...currentStudents].sort((a, b) => a.displayName.localeCompare(b.displayName, 'de'));
@@ -1073,13 +1121,22 @@
       return;
     }
 
-    const werte = schueler.map(st => accuracyFuer(st, filter));
-    const mitDaten = werte.filter(w => typeof w === 'number');
+    const daten = schueler.map(st => {
+      if (!seitenModus) return { wert: st.accuracy, anzahl: st.vocabCount };
+      if (!bereichOk) return { wert: null, anzahl: 0 };
+      const treffer = testsImBereich(st, von, bis);
+      return { wert: accuracyAusEintraegen(treffer), anzahl: treffer.length };
+    });
+
+    const mitDaten = daten.filter(d => typeof d.wert === 'number');
     const schnitt = mitDaten.length
-      ? Math.round(mitDaten.reduce((a, b) => a + b, 0) / mitDaten.length)
+      ? Math.round(mitDaten.reduce((sum, d) => sum + d.wert, 0) / mitDaten.length)
       : null;
 
-    const titel = filter === 'overall' ? '📊 Overall Accuracy' : '📊 Accuracy · ' + intervallLabel(filter);
+    const bereichText = 'S. ' + von + '–' + bis;
+    const titel = !seitenModus
+      ? '📊 Overall Accuracy'
+      : (bereichOk ? '📊 Accuracy · ' + bereichText : '📊 Accuracy · Seitenbereich');
     document.getElementById('accuracyChartTitle').textContent = titel + ' – Klasse ' + klasse;
 
     const slot = 38;                 // Platz pro Schueler
@@ -1112,19 +1169,22 @@
     schueler.forEach((st, i) => {
       const x = padLeft + i * slot + (slot - balken) / 2;
       const mitte = x + balken / 2;
-      const wert = werte[i];
+      const wert = daten[i].wert;
+      const anzahl = daten[i].anzahl;
       const hat = typeof wert === 'number';
-      const tooltipTest = filter === 'overall' ? st.vocabCount + ' Einheiten' : intervallLabel(filter);
+      const testText = anzahl + (anzahl === 1 ? ' Test' : ' Tests') + (seitenModus ? ' in ' + bereichText : '');
 
       if (hat) {
         const h = Math.max(3, (wert / 100) * plotH);
         const y = basis - h;
         svg += '<rect class="chart-bar" x="' + x + '" y="' + y + '" width="' + balken + '" height="' + h + '" rx="4" fill="' + accuracyFarbe(wert) + '">'
-             + '<title>' + xmlEscape(st.displayName) + ': ' + wert + '% (' + tooltipTest + ')</title></rect>';
+             + '<title>' + xmlEscape(st.displayName) + ': ' + wert + '% (' + testText + ')</title></rect>';
         svg += '<text x="' + mitte + '" y="' + (y - 5) + '" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--text-primary)">' + wert + '</text>';
       } else {
-        // noch keine Daten: gestrichelter Platzhalter, damit der Schueler trotzdem sichtbar bleibt
-        const hinweis = filter === 'overall' ? 'noch nichts geübt' : intervallLabel(filter) + ' noch nicht geschrieben';
+        // kein Ergebnis: gestrichelter Platzhalter, damit der Schueler trotzdem sichtbar bleibt
+        const hinweis = seitenModus
+          ? (bereichOk ? 'keine Ergebnisse in ' + bereichText : 'kein gültiger Seitenbereich')
+          : 'noch nichts geübt';
         svg += '<rect x="' + x + '" y="' + (basis - plotH) + '" width="' + balken + '" height="' + plotH + '" rx="4" fill="none" '
              + 'stroke="var(--border-color)" stroke-width="1" stroke-dasharray="3 3">'
              + '<title>' + xmlEscape(st.displayName) + ': ' + hinweis + '</title></rect>';
@@ -1142,12 +1202,16 @@
 
     ziel.innerHTML = svg;
 
-    const basisText = filter === 'overall'
-      ? 'Richtige Antworten aller Tests geteilt durch alle Fragen. '
-      : 'Ergebnis im ' + intervallLabel(filter) + '. ';
-    notiz.textContent = basisText
-      + mitDaten.length + ' von ' + schueler.length + ' Schüler:innen mit Daten · '
-      + 'grün ab 80 %, gelb ab 50 %, rot darunter · gestrichelte Säule mit „–" = noch kein Ergebnis.';
+    if (seitenModus && !bereichOk) {
+      notiz.textContent = 'Bitte einen gültigen Seitenbereich eingeben (von ≤ bis).';
+    } else {
+      const basisText = seitenModus
+        ? 'Ø über die Seiten ' + bereichText + ' – Seitentests plus Intervall-Tests, die ganz in diesem Bereich liegen. '
+        : 'Richtige Antworten aller Tests geteilt durch alle Fragen. ';
+      notiz.textContent = basisText
+        + mitDaten.length + ' von ' + schueler.length + ' Schüler:innen mit Ergebnis · '
+        + 'grün ab 80 %, gelb ab 50 %, rot darunter · gestrichelte Säule mit „–" = kein Ergebnis.';
+    }
     wrap.style.display = 'block';
   }
 
