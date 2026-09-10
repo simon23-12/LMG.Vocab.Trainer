@@ -230,6 +230,24 @@
       overflow-x: auto;
     }
 
+    .chart-box {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px 10px 10px;
+      background: var(--card-bg);
+      overflow-x: auto;
+    }
+
+    .chart-box .chart-note {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+      padding: 0 8px;
+    }
+
+    .chart-bar { transition: opacity 0.2s; }
+    .chart-bar:hover { opacity: 0.75; }
+
     .heatmap-facts {
       display: flex;
       flex-wrap: wrap;
@@ -567,6 +585,21 @@
       </select>
     </div>
     
+    <!-- Accuracy-Diagramm der Klasse -->
+    <div id="accuracyChartWrap" style="display:none; margin: 20px 0;">
+      <h3 id="accuracyChartTitle">📊 Overall Accuracy</h3>
+      <div id="chartFilterRow" style="display:none; margin: 10px 0;">
+        <label style="font-size: 14px; color: var(--text-secondary);">Auswertung: </label>
+        <select id="chartFilterSelect" onchange="renderAccuracyChart()" style="font-size: 14px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
+          <option value="overall">Overall (alle Tests)</option>
+        </select>
+      </div>
+      <div class="chart-box">
+        <div id="accuracyChart"></div>
+        <div class="chart-note" id="accuracyChartNote"></div>
+      </div>
+    </div>
+
     <!-- Sortierung -->
     <div id="sortControls" style="display:none; margin: 15px 0 5px;">
       <label style="font-size: 14px; color: var(--text-secondary);">Sortieren nach: </label>
@@ -880,6 +913,7 @@
     if (!selectedClass) {
       document.getElementById('studentList').innerHTML = '';
       document.getElementById('sortControls').style.display = 'none';
+      document.getElementById('accuracyChartWrap').style.display = 'none';
       return;
     }
     
@@ -899,11 +933,18 @@
         const user = allUsers[userKey];
         if (user.class === selectedClass) {
           const perf = user.performance || {};
-          const vocabCount = Object.keys(perf).filter(k => k.startsWith('page_') || k.startsWith('interval_')).length;
+          const tests = {};
+          for (let key in perf) {
+            if (!key.startsWith('page_') && !key.startsWith('interval_')) continue;
+            const d = perf[key] || {};
+            tests[key] = { score: d.score, total: d.total, percent: d.percent };
+          }
           studentsInClass.push({
             userKey: userKey,
             displayName: user.loginName || user.name || userKey,   // nur der Login, nie der Klarname
-            vocabCount: vocabCount,
+            vocabCount: Object.keys(tests).length,
+            tests: tests,
+            accuracy: berechneGesamtAccuracy(user, tests),
             dataLoaded: false
           });
         }
@@ -912,12 +953,15 @@
       if (studentsInClass.length === 0) {
         document.getElementById('studentList').innerHTML = '<p style="color: var(--text-secondary);">Keine Schüler in dieser Klasse gefunden.</p>';
         document.getElementById('sortControls').style.display = 'none';
+        document.getElementById('accuracyChartWrap').style.display = 'none';
         return;
       }
 
       currentStudents = studentsInClass;
       document.getElementById('sortControls').style.display = 'block';
       document.getElementById('studentSortSelect').value = 'name';
+      befuelleChartFilter();
+      renderAccuracyChart();
       renderStudentList();
       showStatus("✓ " + studentsInClass.length + " Schüler gefunden", 'success');
       
@@ -925,6 +969,186 @@
       showStatus("Fehler: " + error.message, 'error');
       console.error(error);
     }
+  }
+
+  // Accuracy aus einer Liste von Test-Eintraegen: richtige Antworten / alle Fragen
+  function accuracyAusEintraegen(eintraege) {
+    let score = 0, total = 0;
+    const nurProzente = [];
+
+    eintraege.forEach(d => {
+      if (!d) return;
+      if (typeof d.total === 'number' && d.total > 0 && typeof d.score === 'number') {
+        score += d.score;
+        total += d.total;
+      } else if (typeof d.percent === 'number') {
+        nurProzente.push(d.percent);
+      }
+    });
+
+    if (total > 0) return Math.round((score / total) * 100);
+    if (nurProzente.length > 0) {
+      return Math.round(nurProzente.reduce((a, b) => a + b, 0) / nurProzente.length);
+    }
+    return null;
+  }
+
+  // Gesamt-Accuracy eines Schuelers ueber alle Vokabeltests
+  function berechneGesamtAccuracy(user, tests) {
+    const wert = accuracyAusEintraegen(Object.values(tests));
+    if (wert !== null) return wert;
+
+    // Fallback: nur unregelmaessige Verben geuebt
+    const irr = [];
+    if (user.irregularVerbsSimple && typeof user.irregularVerbsSimple.percent === 'number') irr.push(user.irregularVerbsSimple.percent);
+    if (user.irregularVerbsFull && typeof user.irregularVerbsFull.percent === 'number') irr.push(user.irregularVerbsFull.percent);
+    if (irr.length > 0) return Math.round(irr.reduce((a, b) => a + b, 0) / irr.length);
+
+    return null;
+  }
+
+  // Accuracy fuer die aktuell gewaehlte Auswertung (overall oder ein Intervall)
+  function accuracyFuer(student, filter) {
+    if (filter === 'overall') return student.accuracy;
+    return accuracyAusEintraegen([student.tests[filter]]);
+  }
+
+  function intervallGrenzen(key) {
+    const teile = key.replace('interval_', '').split('_');
+    return [parseInt(teile[0], 10) || 0, parseInt(teile[1], 10) || 0];
+  }
+
+  function intervallLabel(key) {
+    const [von, bis] = intervallGrenzen(key);
+    return 'Intervall S. ' + von + '–' + bis;
+  }
+
+  // Dropdown mit allen Intervall-Tests fuellen, die in der Klasse vorkommen
+  function befuelleChartFilter() {
+    const sel = document.getElementById('chartFilterSelect');
+    const reihe = document.getElementById('chartFilterRow');
+    if (!sel || !reihe) return;
+
+    const keys = new Set();
+    currentStudents.forEach(st => {
+      Object.keys(st.tests || {}).forEach(k => { if (k.startsWith('interval_')) keys.add(k); });
+    });
+
+    const sortiert = [...keys].sort((a, b) => {
+      const [av, ab] = intervallGrenzen(a), [bv, bb] = intervallGrenzen(b);
+      return av - bv || ab - bb;
+    });
+
+    sel.innerHTML = '<option value="overall">Overall (alle Tests)</option>'
+      + sortiert.map(k => '<option value="' + k + '">' + intervallLabel(k) + '</option>').join('');
+    sel.value = 'overall';
+    reihe.style.display = sortiert.length > 0 ? 'block' : 'none';
+  }
+
+  function accuracyFarbe(wert) {
+    if (wert >= 80) return '#27ae60';
+    if (wert >= 50) return '#f0a500';
+    return '#e74c3c';
+  }
+
+  function xmlEscape(text) {
+    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Balkendiagramm: X = ALLE Schueler der Klasse (A-Z, schraeg), Y = Accuracy
+  function renderAccuracyChart() {
+    const wrap = document.getElementById('accuracyChartWrap');
+    const ziel = document.getElementById('accuracyChart');
+    const notiz = document.getElementById('accuracyChartNote');
+    if (!wrap || !ziel) return;
+
+    const klasse = document.getElementById('adminClassSelect').value;
+    const filterSel = document.getElementById('chartFilterSelect');
+    const filter = filterSel ? filterSel.value : 'overall';
+
+    // bewusst ALLE Schueler der Klasse, auch ohne Daten oder mit 0 %
+    const schueler = [...currentStudents].sort((a, b) => a.displayName.localeCompare(b.displayName, 'de'));
+    if (schueler.length === 0) {
+      wrap.style.display = 'none';
+      return;
+    }
+
+    const werte = schueler.map(st => accuracyFuer(st, filter));
+    const mitDaten = werte.filter(w => typeof w === 'number');
+    const schnitt = mitDaten.length
+      ? Math.round(mitDaten.reduce((a, b) => a + b, 0) / mitDaten.length)
+      : null;
+
+    const titel = filter === 'overall' ? '📊 Overall Accuracy' : '📊 Accuracy · ' + intervallLabel(filter);
+    document.getElementById('accuracyChartTitle').textContent = titel + ' – Klasse ' + klasse;
+
+    const slot = 38;                 // Platz pro Schueler
+    const balken = 24;
+    const padLeft = 46, padRight = 18, padTop = 22;
+    const plotH = 230;
+    const maxName = Math.max(...schueler.map(st => st.displayName.length));
+    const labelH = Math.min(120, Math.max(58, Math.round(maxName * 6.4)));
+    const breite = Math.max(320, padLeft + schueler.length * slot + padRight);
+    const hoehe = padTop + plotH + labelH;
+    const basis = padTop + plotH;
+
+    let svg = '<svg width="' + breite + '" height="' + hoehe + '" viewBox="0 0 ' + breite + ' ' + hoehe + '" style="display:block; font-family: inherit;">';
+
+    // Gitternetz + Y-Achsenbeschriftung
+    [0, 25, 50, 75, 100].forEach(wert => {
+      const y = basis - (wert / 100) * plotH;
+      svg += '<line x1="' + padLeft + '" y1="' + y + '" x2="' + (breite - padRight) + '" y2="' + y + '" stroke="var(--border-color)" stroke-width="1" />';
+      svg += '<text x="' + (padLeft - 8) + '" y="' + (y + 4) + '" text-anchor="end" font-size="11" fill="var(--text-tertiary)">' + wert + '%</text>';
+    });
+
+    // Klassendurchschnitt
+    if (schnitt !== null) {
+      const y = basis - (schnitt / 100) * plotH;
+      svg += '<line x1="' + padLeft + '" y1="' + y + '" x2="' + (breite - padRight) + '" y2="' + y + '" stroke="#667eea" stroke-width="2" stroke-dasharray="6 4" />';
+      svg += '<text x="' + (breite - padRight) + '" y="' + (y - 6) + '" text-anchor="end" font-size="11" font-weight="bold" fill="#667eea">Ø ' + schnitt + '%</text>';
+    }
+
+    // Balken + Namen
+    schueler.forEach((st, i) => {
+      const x = padLeft + i * slot + (slot - balken) / 2;
+      const mitte = x + balken / 2;
+      const wert = werte[i];
+      const hat = typeof wert === 'number';
+      const tooltipTest = filter === 'overall' ? st.vocabCount + ' Einheiten' : intervallLabel(filter);
+
+      if (hat) {
+        const h = Math.max(3, (wert / 100) * plotH);
+        const y = basis - h;
+        svg += '<rect class="chart-bar" x="' + x + '" y="' + y + '" width="' + balken + '" height="' + h + '" rx="4" fill="' + accuracyFarbe(wert) + '">'
+             + '<title>' + xmlEscape(st.displayName) + ': ' + wert + '% (' + tooltipTest + ')</title></rect>';
+        svg += '<text x="' + mitte + '" y="' + (y - 5) + '" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--text-primary)">' + wert + '</text>';
+      } else {
+        // noch keine Daten: gestrichelter Platzhalter, damit der Schueler trotzdem sichtbar bleibt
+        const hinweis = filter === 'overall' ? 'noch nichts geübt' : intervallLabel(filter) + ' noch nicht geschrieben';
+        svg += '<rect x="' + x + '" y="' + (basis - plotH) + '" width="' + balken + '" height="' + plotH + '" rx="4" fill="none" '
+             + 'stroke="var(--border-color)" stroke-width="1" stroke-dasharray="3 3">'
+             + '<title>' + xmlEscape(st.displayName) + ': ' + hinweis + '</title></rect>';
+        svg += '<text x="' + mitte + '" y="' + (basis - 8) + '" text-anchor="middle" font-size="12" fill="var(--text-tertiary)">–</text>';
+      }
+
+      // Name schraeg unter der Achse
+      svg += '<text x="' + mitte + '" y="' + (basis + 14) + '" text-anchor="end" font-size="11" fill="var(--text-secondary)" '
+           + 'transform="rotate(-45 ' + mitte + ' ' + (basis + 14) + ')">' + xmlEscape(st.displayName) + '</text>';
+    });
+
+    // X-Achse
+    svg += '<line x1="' + padLeft + '" y1="' + basis + '" x2="' + (breite - padRight) + '" y2="' + basis + '" stroke="var(--text-tertiary)" stroke-width="1.5" />';
+    svg += '</svg>';
+
+    ziel.innerHTML = svg;
+
+    const basisText = filter === 'overall'
+      ? 'Richtige Antworten aller Tests geteilt durch alle Fragen. '
+      : 'Ergebnis im ' + intervallLabel(filter) + '. ';
+    notiz.textContent = basisText
+      + mitDaten.length + ' von ' + schueler.length + ' Schüler:innen mit Daten · '
+      + 'grün ab 80 %, gelb ab 50 %, rot darunter · gestrichelte Säule mit „–" = noch kein Ergebnis.';
+    wrap.style.display = 'block';
   }
 
   function renderStudentList() {
