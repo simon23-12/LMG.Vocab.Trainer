@@ -1024,22 +1024,34 @@
     return [parseInt(teile[0], 10), parseInt(teile[1], 10)];
   }
 
-  // Alle Tests eines Schuelers, die im gewaehlten Seitenbereich liegen:
-  // Seitentests S. von-bis und Intervall-Tests, die komplett darin liegen
-  function testsImBereich(student, von, bis) {
-    const treffer = [];
+  // Auswertung eines Seitenbereichs: JEDE Seite zaehlt gleich viel,
+  // nicht geuebte Seiten gehen als 0 % ein (Hausaufgabe nicht gemacht = 0)
+  function seitenAuswertung(student, von, bis) {
     const tests = student.tests || {};
+    const seiten = bis - von + 1;
 
+    // Intervall-Tests des Schuelers decken jede Seite ihres Bereichs ab
+    const intervalle = [];
     for (let key in tests) {
-      if (key.startsWith('page_')) {
-        const nr = seitenNummer(key);
-        if (!isNaN(nr) && nr >= von && nr <= bis) treffer.push(tests[key]);
-      } else if (key.startsWith('interval_')) {
-        const [a, b] = intervallGrenzen(key);
-        if (!isNaN(a) && !isNaN(b) && a >= von && b <= bis) treffer.push(tests[key]);
+      if (!key.startsWith('interval_')) continue;
+      const [a, b] = intervallGrenzen(key);
+      if (!isNaN(a) && !isNaN(b)) intervalle.push({ von: a, bis: b, daten: tests[key] });
+    }
+
+    let summe = 0, geuebt = 0;
+    for (let nr = von; nr <= bis; nr++) {
+      const eintraege = [];
+      if (tests['page_' + nr]) eintraege.push(tests['page_' + nr]);
+      intervalle.forEach(iv => { if (nr >= iv.von && nr <= iv.bis) eintraege.push(iv.daten); });
+
+      const wert = accuracyAusEintraegen(eintraege);
+      if (wert !== null) {
+        summe += wert;
+        geuebt++;
       }
     }
-    return treffer;
+
+    return { wert: Math.round(summe / seiten), geuebt: geuebt, seiten: seiten };
   }
 
   // Welche Seiten kommen in dieser Klasse ueberhaupt vor?
@@ -1111,7 +1123,8 @@
     const modus = document.getElementById('chartModusSelect').value;
     const von = parseInt(document.getElementById('chartVon').value, 10);
     const bis = parseInt(document.getElementById('chartBis').value, 10);
-    const bereichOk = !isNaN(von) && !isNaN(bis) && von <= bis;
+    const MAX_SEITEN = 400;
+    const bereichOk = !isNaN(von) && !isNaN(bis) && von <= bis && (bis - von) < MAX_SEITEN;
     const seitenModus = modus === 'seiten';
 
     // bewusst ALLE Schueler der Klasse, auch ohne Daten oder mit 0 %
@@ -1122,10 +1135,10 @@
     }
 
     const daten = schueler.map(st => {
-      if (!seitenModus) return { wert: st.accuracy, anzahl: st.vocabCount };
-      if (!bereichOk) return { wert: null, anzahl: 0 };
-      const treffer = testsImBereich(st, von, bis);
-      return { wert: accuracyAusEintraegen(treffer), anzahl: treffer.length };
+      if (!seitenModus) return { wert: st.accuracy, anzahl: st.vocabCount, seiten: 0 };
+      if (!bereichOk) return { wert: null, anzahl: 0, seiten: 0 };
+      const aus = seitenAuswertung(st, von, bis);
+      return { wert: aus.wert, anzahl: aus.geuebt, seiten: aus.seiten };
     });
 
     const mitDaten = daten.filter(d => typeof d.wert === 'number');
@@ -1172,7 +1185,9 @@
       const wert = daten[i].wert;
       const anzahl = daten[i].anzahl;
       const hat = typeof wert === 'number';
-      const testText = anzahl + (anzahl === 1 ? ' Test' : ' Tests') + (seitenModus ? ' in ' + bereichText : '');
+      const testText = seitenModus
+        ? anzahl + ' von ' + daten[i].seiten + ' Seiten geübt'
+        : anzahl + (anzahl === 1 ? ' Test' : ' Tests');
 
       if (hat) {
         const h = Math.max(3, (wert / 100) * plotH);
@@ -1182,9 +1197,7 @@
         svg += '<text x="' + mitte + '" y="' + (y - 5) + '" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--text-primary)">' + wert + '</text>';
       } else {
         // kein Ergebnis: gestrichelter Platzhalter, damit der Schueler trotzdem sichtbar bleibt
-        const hinweis = seitenModus
-          ? (bereichOk ? 'keine Ergebnisse in ' + bereichText : 'kein gültiger Seitenbereich')
-          : 'noch nichts geübt';
+        const hinweis = seitenModus ? 'kein gültiger Seitenbereich' : 'noch nichts geübt';
         svg += '<rect x="' + x + '" y="' + (basis - plotH) + '" width="' + balken + '" height="' + plotH + '" rx="4" fill="none" '
              + 'stroke="var(--border-color)" stroke-width="1" stroke-dasharray="3 3">'
              + '<title>' + xmlEscape(st.displayName) + ': ' + hinweis + '</title></rect>';
@@ -1203,14 +1216,18 @@
     ziel.innerHTML = svg;
 
     if (seitenModus && !bereichOk) {
-      notiz.textContent = 'Bitte einen gültigen Seitenbereich eingeben (von ≤ bis).';
+      notiz.textContent = 'Bitte einen gültigen Seitenbereich eingeben (von ≤ bis, höchstens ' + MAX_SEITEN + ' Seiten).';
     } else {
-      const basisText = seitenModus
-        ? 'Ø über die Seiten ' + bereichText + ' – Seitentests plus Intervall-Tests, die ganz in diesem Bereich liegen. '
-        : 'Richtige Antworten aller Tests geteilt durch alle Fragen. ';
-      notiz.textContent = basisText
-        + mitDaten.length + ' von ' + schueler.length + ' Schüler:innen mit Ergebnis · '
-        + 'grün ab 80 %, gelb ab 50 %, rot darunter · gestrichelte Säule mit „–" = kein Ergebnis.';
+      if (seitenModus) {
+        const aktive = daten.filter(d => d.anzahl > 0).length;
+        notiz.textContent = 'Ø über ' + bereichText + ' – jede Seite zählt gleich viel, nicht geübte Seiten gehen als 0 % ein. '
+          + aktive + ' von ' + schueler.length + ' Schüler:innen haben mindestens eine Seite geübt · '
+          + 'grün ab 80 %, gelb ab 50 %, rot darunter.';
+      } else {
+        notiz.textContent = 'Richtige Antworten aller Tests geteilt durch alle Fragen. '
+          + mitDaten.length + ' von ' + schueler.length + ' Schüler:innen mit Ergebnis · '
+          + 'grün ab 80 %, gelb ab 50 %, rot darunter · gestrichelte Säule mit „–" = noch nichts geübt.';
+      }
     }
     wrap.style.display = 'block';
   }
